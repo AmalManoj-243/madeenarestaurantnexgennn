@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "@*": ["src/*"],
+      "@assets/*":["assets/*"],
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
       "underscore": ["lodash"]

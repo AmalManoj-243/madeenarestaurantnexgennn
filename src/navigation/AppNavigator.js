@@ -1,7 +1,8 @@
 // navigation/TabNavigator.js
 import React from 'react';
+import { Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Feather, MaterialCommunityIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, MaterialIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import TabBarIcon from '@components/TabBarIcon';
 import { HomeScreen, CartScreen, CategoriesScreen, MyOrdersScreen, ProfileScreen } from '@screens';
 const Tab = createBottomTabNavigator();
@@ -13,12 +14,14 @@ const TabNavigator = () => {
     headerShown: false,
     tabBarStyle: {
       position: "absolute",
-      bottom: 10,
-      right: 15,
-      left: 15,
-      borderRadius: 10,
+      bottom: 5,
+      right: 10,
+      left: 10,
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
+      // borderRadius: 10,
       elevation: 0,
-      height: 70,
+      height: 60,
       backgroundColor: '#2e294e', // Focused state background color
     }
   };
@@ -29,21 +32,36 @@ const TabNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} iconComponent={<Feather name="home" size={18} color={focused ? "#151718" : "#fff"} />} label="Home" />
+          tabBarIcon: ({ focused }) =>
+            <TabBarIcon
+              focused={focused}
+              iconComponent={require('@assets/icons/bottom_tabs/home.png')}
+              label="Home"
+            />
         }}
       />
       <Tab.Screen
         name="Categories"
         component={CategoriesScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} iconComponent={<MaterialCommunityIcons name="view-dashboard-outline" size={18} color={focused ? "#151718" : "#fff"} />} label="Categories" />
+          tabBarIcon: ({ focused }) =>
+            <TabBarIcon
+              focused={focused}
+              iconComponent={require('@assets/icons/bottom_tabs/category.png')}
+              label="Categories"
+            />
         }}
       />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} iconComponent={<MaterialCommunityIcons name="cart-outline" size={18} color={focused ? "#151718" : "#fff"} />} label="Cart" />,
+          tabBarIcon: ({ focused }) =>
+            <TabBarIcon
+              focused={focused}
+              iconComponent={require('@assets/icons/bottom_tabs/cart.png')}
+              label="Cart"
+            />
           // tabBarStyle: { display: 'none' }
         }}
       />
@@ -51,14 +69,24 @@ const TabNavigator = () => {
         name="MyOrders"
         component={MyOrdersScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} iconComponent={<SimpleLineIcons name="handbag" size={18} color={focused ? "#151718" : "#fff"} />} label="Orders" />
+          tabBarIcon: ({ focused }) =>
+            <TabBarIcon
+              focused={focused}
+              iconComponent={require('@assets/icons/bottom_tabs/order.png')}
+              label="Orders"
+            />
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} iconComponent={<FontAwesome name="user-o" size={18} color={focused ? "#151718" : "#fff"} />} label="Profile" />
+          tabBarIcon: ({ focused }) =>
+            <TabBarIcon
+              focused={focused}
+              iconComponent={require('@assets/icons/bottom_tabs/profile.png')}
+              label="Profile"
+            />
         }}
       />
     </Tab.Navigator>
