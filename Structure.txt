@@ -69,3 +69,5 @@
     - fonts
     - ...
   - App.js
+
+  https://chat.openai.com/share/72814fe1-a70a-4b7a-a550-7f9a4799aa65

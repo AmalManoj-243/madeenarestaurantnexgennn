@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^6.9.18",
     "@shopify/flash-list": "1.6.3",
     "expo": "~50.0.7",
+    "expo-font": "~11.10.3",
     "expo-status-bar": "~1.11.1",
     "immer": "^10.0.3",
     "nativewind": "^2.0.11",
