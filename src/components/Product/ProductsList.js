@@ -1,8 +1,7 @@
 import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-// import COLORS from '../../constants/color';
 import Text from '@components/Text';
-// import { errorImage } from '@constants/links';
+import { COLORS } from '@constants/theme';
 
 const ProductsList = ({ item, onPress }) => {
 
@@ -30,13 +29,12 @@ const ProductsList = ({ item, onPress }) => {
                 onError={() => setImageLoading(false)}
             />
             <View style={{ paddingTop: 50 }}></View>
-
             <View style={styles.textContainer}>
                 <Text style={styles.name}>{truncatedName}</Text>
             </View>
-            {/* <View style={[styles.bottomBar, { backgroundColor: '#F37021' }]}> */}
-            {/* <Text style={styles.price}>Price: ${item?.portal_price}</Text> */}
-            {/* </View> */}
+            <View style={[styles.bottomBar, { backgroundColor:COLORS.orange }]}>
+            <Text style={styles.price}>Price:{item?.portal_price}{' '}AED</Text>
+            </View>
         </TouchableOpacity>
     );
 };
@@ -48,12 +46,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         margin: 6,
-        borderWidth: 1,
-        borderRadius: 8,
+        borderWidth: 0.5,
+        borderRadius: 10,
         marginTop: 5,
-        // marginVertical:10,
-        // marginBottom:5,
-        borderColor: 'black',
+        // borderColor: '#F37021',
         backgroundColor: "white",
     },
     image: {
@@ -61,15 +57,14 @@ const styles = StyleSheet.create({
         height: 80,
         resizeMode: 'cover',
         borderRadius: 8,
-        marginTop: 10, // you can remove also the marginTop 
-        // marginBottom: 10,
+        marginTop: 10,
     },
     textContainer: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        bottom: -80,
+        bottom: -50,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -83,7 +78,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 12,
         color: '#fff',
-        fontFamily: 'Urbanist-Regular',
+        fontFamily: 'Urbanist-Bold',
     },
     bottomBar: {
         position: 'absolute',
@@ -91,8 +86,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         paddingVertical: 5,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
     },

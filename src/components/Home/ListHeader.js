@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    fontFamily: FONT_FAMILY.urbanistBold,
+    fontFamily: FONT_FAMILY.urbanistExtraBold,
     color: 'black',
   },
 });

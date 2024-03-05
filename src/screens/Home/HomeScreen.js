@@ -1,14 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Image, Dimensions, TouchableOpacity, StyleSheet, Platform, FlatList, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, FONT_FAMILY } from '@constants/theme';
-import Text from '@components/Text';
-import { CarouselPagination, ImageContainer, ListHeader } from '@components/Home';
+import { View, Dimensions, StyleSheet, ActivityIndicator } from 'react-native';
+import { CarouselPagination, ImageContainer, ListHeader, Header, NavigationHeader } from '@components/Home';
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { fetchProducts } from '@api/services/generalApi';
-import ProductsList from './ProductLIst';
+import { CommonContainer } from '@components/common';
+import { ProductsList } from '@components/Product';
 
-const { width, height } = Dimensions.get('window');
+
+const { height } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
 
@@ -69,7 +68,6 @@ const HomeScreen = ({ navigation }) => {
 
   const renderItem = ({ item }) => {
     if (item.empty) {
-      console.log("hey i am trure")
       return <View style={[styles.itemStyle, styles.itemInvisible]} />
     }
     return (
@@ -88,57 +86,43 @@ const HomeScreen = ({ navigation }) => {
 
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.primaryThemeColor }}>
-      <View style={{ flex: 1, backgroundColor: 'white', borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
+    <CommonContainer>
+      {/* Header */}
+      <Header />
+      {/* Navigation Header */}
+      <NavigationHeader
+        onSearchPress={() => navigation.navigate('')}
+        onOptionsPress={() => navigation.navigate('')}
+        onScannerPress={() => navigation.navigate('')}
+      />
+      {/* Carousel */}
+      <CarouselPagination />
 
-        {/* Header */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 }}>
-          <Image source={require('@assets/images/Home/Header/header_transparent_bg.png')} style={{ width: width * 0.5, aspectRatio: 3 }} />
-          <Image source={require('@assets/images/Home/Header/notification.gif')} style={{ width: width * 0.25, aspectRatio: 2 / 1, resizeMode: 'contain' }} />
-        </View>
-
-        {/* Navigation Header */}
-        <View style={{ backgroundColor: '#2e294e', padding: 10, marginHorizontal: 20, borderRadius: 10, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('SearchProducts')}>
-            <Image source={require('@assets/images/Home/Header/search.png')} style={{ width: 20, height: 20 }} tintColor="white" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Options')}>
-            <Text style={{ color: 'white', fontFamily: FONT_FAMILY.urbanistLight }}>What are you looking for ?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Scanner')}>
-            <Image source={require('@assets/images/Home/Header/barcode_scanner.png')} style={{ width: 20, height: 20 }} tintColor="white" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Carousel */}
-        <CarouselPagination />
-
-        {/* Section */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 8 }}>
-          <ImageContainer source={require('@assets/images/Home/section/pickup.png')} onPress={() => navigateToScreen('Pickup')} backgroundColor="#f37021" title="Pickup" />
-          <ImageContainer source={require('@assets/images/Home/section/services.png')} onPress={() => navigateToScreen('Services')} backgroundColor="#f37021" title="Services" />
-          <ImageContainer source={require('@assets/images/Home/section/customer.png')} onPress={() => navigateToScreen('Customer')} backgroundColor="#f37021" title="Customer" />
-        </View>
-
-        {/* Bottom sheet */}
-        <BottomSheet snapPoints={snapPoints}>
-          {/* Product list header */}
-          <ListHeader title="Products" />
-          {/* flatlist */}
-          <BottomSheetFlatList
-            data={formatData(products, 3)}
-            numColumns={3}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ paddingBottom: '25%' }}
-            onEndReached={fetchMoreProducts}
-            showsVerticalScrollIndicator={false}
-            onEndReachedThreshold={0.1} 
-            ListFooterComponent={loading && <ActivityIndicator size="large" color="#0000ff" />}
-          />
-        </BottomSheet>
+      {/* Section */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 8 }}>
+        <ImageContainer source={require('@assets/images/Home/section/pickup.png')} onPress={() => navigateToScreen('Pickup')} backgroundColor="#f37021" title="Pickup" />
+        <ImageContainer source={require('@assets/images/Home/section/services.png')} onPress={() => navigateToScreen('Services')} backgroundColor="#f37021" title="Services" />
+        <ImageContainer source={require('@assets/images/Home/section/customer.png')} onPress={() => navigateToScreen('Customer')} backgroundColor="#f37021" title="Customer" />
       </View>
-    </SafeAreaView>
+
+      {/* Bottom sheet */}
+      <BottomSheet snapPoints={snapPoints}>
+        {/* Product list header */}
+        <ListHeader title="Products" />
+        {/* flatlist */}
+        <BottomSheetFlatList
+          data={formatData(products, 3)}
+          numColumns={3}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ paddingBottom: '25%' }}
+          onEndReached={fetchMoreProducts}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={loading && <ActivityIndicator size="large" color="#0000ff" />}
+        />
+      </BottomSheet>
+    </CommonContainer>
   );
 }
 
