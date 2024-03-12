@@ -17,7 +17,7 @@ const ProductsList = ({ item, onPress }) => {
 
     const [imageLoading, setImageLoading] = useState(true);
     const truncatedName =
-        item?.product_name?.length > 15 ? item?.product_name?.substring(0, 15) + '...' : item?.product_name;
+        item?.product_name?.length > 15 ? item?.product_name?.substring(0, 14) + '...' : item?.product_name;
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.container}>
@@ -32,8 +32,8 @@ const ProductsList = ({ item, onPress }) => {
             <View style={styles.textContainer}>
                 <Text style={styles.name}>{truncatedName}</Text>
             </View>
-            <View style={[styles.bottomBar, { backgroundColor: COLORS.white }]}>
-                <Text style={styles.price}>PRICE{' '}:{' '}{item?.portal_price}{' '}AED</Text>
+            <View style={[styles.bottomBar, { backgroundColor: 'transparent' }]}>
+                <Text style={styles.price}>Price{' '}:{' '}{item?.portal_price}{' '}AED</Text>
             </View>
         </TouchableOpacity>
     );
@@ -73,16 +73,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textTransform: 'capitalize',
         color: '#2E2B2B',
-        fontFamily: 'Urbanist-Bold'
+        fontFamily: FONT_FAMILY.urbanistBold
     },
     price: {
         fontSize: 12,
         color: 'grey',
-        fontFamily: FONT_FAMILY.urbanistRegular,
+        fontFamily: FONT_FAMILY.urbanistBold,
     },
     bottomBar: {
         position: 'absolute',
-        bottom: 10,
+        bottom: 8,
         left: 0,
         right: 0,
         paddingVertical: 5,
