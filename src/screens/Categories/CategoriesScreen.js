@@ -85,8 +85,8 @@ const CategoriesScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-      <NavigationHeader title="Products" onBackPress={() => navigation.goBack()} />
-      <SearchContainer placeholder="Search Products" onChangeText={handleSearchTextChange} />
+      <NavigationHeader title="Categories" onBackPress={() => navigation.goBack()} />
+      <SearchContainer placeholder="Search Categories" onChangeText={handleSearchTextChange} />
       <RoundedContainer>
         <FlashList
           data={formatData(products, 3)}
@@ -97,7 +97,7 @@ const CategoriesScreen = ({ navigation }) => {
           onEndReached={fetchMoreProducts}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.2}
-          ListFooterComponent={loading && <Loader visible={loading} animationSource={require('@assets/animations/loading.json')} />}
+          ListFooterComponent={loading && <Loader visible={loading} animationSource={require('@assets/animations/loading_up_down.json')} />}
         />
       </RoundedContainer>
     </SafeAreaView>
