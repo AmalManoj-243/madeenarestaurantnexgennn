@@ -85,7 +85,7 @@ export const fetchBills = {
   },
 
   customerReceiptsDetails: async (sequenceNo) => {
-    return fetchDetails(DETAIL_API_ENDPOINTS.CAPITAL_RECEIPTS_DETAILS, sequenceNo);
+    return fetchDetails(DETAIL_API_ENDPOINTS.CUSTOMER_RECEIPTS_DETAILS, sequenceNo);
   },
 
   customerPaymentDetails: async (sequenceNo) => {
