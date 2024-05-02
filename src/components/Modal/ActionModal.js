@@ -39,14 +39,6 @@ const ActionModal = ({ title, setImageUrl }) => {
         handleImagePicked(result);
     };
 
-    // const handleImagePicked = async (pickerResult) => {
-    //     if (!pickerResult.cancelled) {
-    //         const imagePath = pickerResult.assets[0].uri
-    //        const url = await uploadApi(imagePath)
-    //        setImageUrl(url);
-    //     }
-    // };
-
     const handleImagePicked = async (pickerResult) => {
         if (!pickerResult.cancelled) {
             const imagePath = pickerResult.assets[0].uri;
@@ -125,7 +117,7 @@ const ActionModal = ({ title, setImageUrl }) => {
             </Modal>
             <Text style={styles.label}>{title}</Text>
             <TouchableOpacity style={{ width: 80, height: 80 }} onPress={toggleModal}>
-                <Image source={require('@assets/icons/modal/image_upload.png')} style={{ width: 80, height: 80, tintColor: COLORS.primaryThemeColor }} />
+                <Image source={require('@assets/icons/modal/image_upload.png')} style={{ width: 80, height: 80, tintColor: COLORS.orange }} />
             </TouchableOpacity>
         </>
     );

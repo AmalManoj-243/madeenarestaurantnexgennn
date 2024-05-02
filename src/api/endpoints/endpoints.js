@@ -5,7 +5,8 @@ export const API_ENDPOINTS = {
     VIEW_CATEGORIES: '/viewCategories',
     VIEW_WAREHOUSE: `/viewWarehouses`,
     VIEW_CUSTOMER: '/viewCustomers',
-    VIEW_QUOTATION: '/viewQuotation'
+    VIEW_QUOTATION: '/viewQuotation',
+    VIEW_AUDITING: '/viewAuditing'
 };
 
 export const DETAIL_API_ENDPOINTS = {

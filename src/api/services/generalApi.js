@@ -35,3 +35,17 @@ export const fetchCategories = async ({ offset, limit, searchText }) => {
     throw error;
   }
 };
+
+export const fetchAuditing = async ({ offset, limit }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+    };
+    const response = await get(API_ENDPOINTS.VIEW_AUDITING, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};

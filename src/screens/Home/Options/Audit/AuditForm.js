@@ -13,6 +13,8 @@ import useAuthStore from '@stores/auth/authStore'
 import { ActionModal } from '@components/Modal'
 import { formatData } from '@utils/formatters'
 import { AntDesign } from '@expo/vector-icons';
+import { post } from '@api/services/utils'
+import Toast from 'react-native-toast-message'
 
 const AuditForm = ({ navigation }) => {
 
@@ -23,141 +25,142 @@ const AuditForm = ({ navigation }) => {
   const [collectionType, setCollectionType] = useState(null);
   const [errors, setErrors] = useState({});
   const [ledger, setLedger] = useState({})
+  console.log("🚀 ~ AuditForm ~ ledger:", ledger)
   const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
+  const [remarks, setRemarks] = useState('')
+  const [splittedBillName, setSplittedBillName] = useState('')
+  console.log("🚀 ~ AuditForm ~ splittedBillName:", splittedBillName)
   const loginUser = useAuthStore(state => state.user)
-
-  let scannedBillName;
-  let scannedBillSequence;
 
   // Function to handle scanned data
   const handleScan = async (data) => {
 
     const billParts = data.split('-')
-    console.log("🚀 ~ handleScan ~ billParts:", billParts)
-    scannedBillName = billParts[0]
-    scannedBillSequence = billParts.slice(1).join('-')
+    const billName = billParts[0]
+    const billSequence = billParts.slice(1).join('-')
+    setSplittedBillName(billName)
 
     try {
       let response, billDetails;
       // console.log("Response of customer data", billDetails)
-      switch (scannedBillName) {
+      switch (billName) {
         case "Invoice":
-          response = await fetchBills.invoiceDetails(scannedBillSequence);
+          response = await fetchBills.invoiceDetails(billSequence);
           billDetails = response[0];
           console.log("Invoice Bill data", billDetails);
           break;
 
         case "Vendor Bill":
-          response = await fetchBills.vendorDetails(scannedBillSequence);
+          response = await fetchBills.vendorDetails(billSequence);
           billDetails = response[0];
           console.log("Vendor bill Bill data", billDetails);
           break;
 
         case "Sales Return":
-          response = await fetchBills.salesReturnDetails(scannedBillSequence);
+          response = await fetchBills.salesReturnDetails(billSequence);
           billDetails = response[0];
           console.log("Sales return Bill data", billDetails);
           break;
 
         case "PURCHRET":
-          response = await fetchBills.purchaseReturnDetails(scannedBillSequence);
+          response = await fetchBills.purchaseReturnDetails(billSequence);
           billDetails = response[0];
           console.log("Sales return Bill data", billDetails);
           break;
 
         case "CAPREC":
-          response = await fetchBills.capitalRecieptsDetails(scannedBillSequence);
+          response = await fetchBills.capitalRecieptsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "Cash rec":
-          response = await fetchBills.cashReceiptsDetails(scannedBillSequence);
+          response = await fetchBills.cashReceiptsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "Cash pay":
-          response = await fetchBills.cashPaymentsDetails(scannedBillSequence);
+          response = await fetchBills.cashPaymentsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "Bankpay":
-          response = await fetchBills.expenseDetails(scannedBillSequence);
+          response = await fetchBills.expenseDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "Bank rec":
-          response = await fetchBills.capitalRecieptsDetails(scannedBillSequence);
+          response = await fetchBills.capitalRecieptsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "CUSTREC":
-          response = await fetchBills.customerReceiptsDetails(scannedBillSequence);
+          response = await fetchBills.customerReceiptsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "CUSTPAY":
-          response = await fetchBills.customerPaymentDetails(scannedBillSequence);
+          response = await fetchBills.customerPaymentDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "SUPREC":
-          response = await fetchBills.supplierRecieptsDetails(scannedBillSequence);
+          response = await fetchBills.supplierRecieptsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "SUPPAY":
-          response = await fetchBills.supplierPaymentsDetails(scannedBillSequence);
+          response = await fetchBills.supplierPaymentsDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "CAPPAY":
-          response = await fetchBills.capitalPaymentDetails(scannedBillSequence);
+          response = await fetchBills.capitalPaymentDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "JobInvoice":
-          response = await fetchBills.jobInvoiceDetails(scannedBillSequence);
+          response = await fetchBills.jobInvoiceDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "PETTYALLOT":
-          response = await fetchBills.pettyCashAllotmentDetails(scannedBillSequence);
+          response = await fetchBills.pettyCashAllotmentDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "PETEXP":
-          response = await fetchBills.pettyCashExpenseDetails(scannedBillSequence);
+          response = await fetchBills.pettyCashExpenseDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "CASRET":
-          response = await fetchBills.pettyCashReturnDetails(scannedBillSequence);
+          response = await fetchBills.pettyCashReturnDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "PETTYTRANS":
-          response = await fetchBills.pettyCashTransferDetails(scannedBillSequence);
+          response = await fetchBills.pettyCashTransferDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
 
         case "Spare Issue":
-          response = await fetchBills.sparePartsIssueDetails(scannedBillSequence);
+          response = await fetchBills.sparePartsIssueDetails(billSequence);
           billDetails = response[0];
           console.log("Bill data", billDetails);
           break;
@@ -220,10 +223,10 @@ const AuditForm = ({ navigation }) => {
     Keyboard.dismiss();
     let isValid = true;
     const errorMessages = {
-      customerName: "Scanned Customer name is required",
-      invoiceNumber: "Scanned Invoice no is required",
+      displayName: "Scanned Customer name is required",
+      documentNumber: "Scanned Invoice no is required",
       totalAmount: "Scanned Total amount is required",
-      collectionType: "Scanned Collection type is required",
+      // collectionType: "Scanned Collection type is required",
     };
 
     for (const field in errorMessages) {
@@ -243,7 +246,7 @@ const AuditForm = ({ navigation }) => {
         date: format(new Date(), 'yyyy-MM-dd'),
         amount: displayBillDetails?.totalAmount ?? 0,
         un_taxed_amount: scannedBillDetails?.untaxed_total_amount ?? 0,
-        customer_vendor_signature: uploadUrl ?? null,
+        customer_vendor_signature: url ?? null,
         attachments: imageUrls ?? null,
         cashier_signature: "",
         remarks: remarks || "",
@@ -257,14 +260,15 @@ const AuditForm = ({ navigation }) => {
         supplier_name: scannedBillDetails?.supplier?.supplier_name ?? null,
         collection_type_id: collectionType?._id ?? null,
         collection_type_name: collectionType?.collection_type_name ?? null,
+        bussiness_type_id: collectionType?.bussiness_type_id ?? null,
         customer_id: null,
         customer_name: '',
         invoice_id: scannedBillDetails?._id,
         inv_sequence_no: displayBillDetails?.documentNumber ?? null,
-        register_payment_id: scannedBillDetails?.register_payments[0]._id ?? null,
-        chq_no: scannedBillDetails?.register_payments[0]?.chq_no ?? null,
-        chq_date: scannedBillDetails?.register_payments[0]?.chq_date ?? null,
-        chq_type: scannedBillDetails?.register_payments[0]?.chq_type ?? null,
+        register_payment_id: scannedBillDetails?.register_payments?.[0]._id ?? null,
+        chq_no: scannedBillDetails?.register_payments?.[0]?.chq_no ?? null,
+        chq_date: scannedBillDetails?.register_payments?.[0]?.chq_date ?? null,
+        chq_type: scannedBillDetails?.register_payments?.[0]?.chq_type ?? null,
         cheque_transaction_type: "",
         chart_of_accounts_id: loginUser?.company.company_id ?? null,
         chart_of_accounts_name: "",
@@ -279,11 +283,12 @@ const AuditForm = ({ navigation }) => {
         service_product_amount: null,
         is_estimation: scannedBillDetails?.is_estimation ?? null
       };
-      switch (scannedBillName) {
+      console.log('Entering the switch statements')
+      switch (splittedBillName) {
         case "Invoice":
           // Handling for Invoice bill
           auditingData.customer_id = loginUser?.company?.company_id ?? null;
-          auditingData.customer_name = displayBillDetails?.customerName ?? null;
+          auditingData.customer_name = displayBillDetails?.displayName ?? null;
           auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
           auditingData.supplier_name = scannedBillDetails?.supplier?.supplier_name ?? null;
           break;
@@ -300,8 +305,7 @@ const AuditForm = ({ navigation }) => {
           auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
           auditingData.chq_no = scannedBillDetails.chq_no ?? null;
           auditingData.customer_id = scannedBillDetails?.customer?.customer_id;
-          auditingData.customer_name = displayBillDetails.displayName;
-          auditingData.register_payment_sequence_no = scannedBillDetails?.register_payments[0]?.sequence_no ?? null;
+          auditingData.customer_name = displayBillDetails?.displayName;
           break;
         case "Cash rec":
           auditingData.chq_no = scannedBillDetails?.chq_type ?? null,
@@ -315,8 +319,6 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_name = ledger?.ledger_name
           break;
         case "Cash pay":
-          auditingData.collection_type_id = collectionType?._id ?? null;
-          auditingData.collection_type_name = collectionType?.collection_type_name ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
@@ -331,13 +333,11 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           break;
         case "Bankpay":
-          auditingData.collection_type_id = collectionType?._id ?? null;
-          auditingData.collection_type_name = collectionType?.collection_type_name ?? null;
-          auditingData.bussiness_type_id = collectionType?.bussiness_type_id ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
+          auditingData.chart_of_accounts_name = scannedBillDetails?.paid_through_chart_of_account_name ?? null;
           break;
         case "SUPREC":
           auditingData.customer_id = loginUser?.company?.company_id ?? null;
@@ -374,27 +374,24 @@ const AuditForm = ({ navigation }) => {
           break;
         case "CAPREC":
           // Handling for Sales Return 
-          auditingData.chq_no = scannedBillDetails?.chq_type ?? null,
-            auditingData.chq_date = scannedBillDetails?.chq_type ?? null,
-            auditingData.chq_type = scannedBillDetails?.chq_type ?? null,
-            auditingData.customer_id = null;
-          auditingData.register_payment_sequence_no = scannedBillDetails?.register_payments[0]?.sequence_no ?? null;
+          auditingData.customer_id = null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
-          break;
-        case "CAPPAY":
-          auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
-          auditingData.supplier_name = scannedBillDetails?.supplier?.supplier_name ?? null;
-          auditingData.register_payment_id = scannedBillDetails?.register_payments[0]._id ?? null;
-          auditingData.chq_no = scannedBillDetails?.register_payments[0]?.chq_no ?? null;
-          auditingData.chq_date = scannedBillDetails?.register_payments[0]?.chq_date ?? null;
-          auditingData.chq_type = scannedBillDetails?.register_payments[0]?.chq_type ?? null;
           auditingData.chart_of_accounts_id = scannedBillDetails?.capital_chart_of_account_id ?? null;
           auditingData.chart_of_accounts_name = scannedBillDetails?.capital_chart_of_account_name ?? null;
-          auditingData.employee_ledger_id = scannedBillDetails?.employee_ledger ?? null;
-          auditingData.employee_ledger_name = scannedBillDetails?.employee_ledger ?? null;
+          break;
+        case "CAPPAY":
+          auditingData.chq_no = scannedBillDetails?.chq_no ?? null;
+          auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
+          auditingData.chq_type = scannedBillDetails?.chq_type ?? null;
+          auditingData.chart_of_accounts_id = scannedBillDetails?.capital_chart_of_account_id ?? null;
+          auditingData.chart_of_accounts_name = scannedBillDetails?.capital_chart_of_account_name ?? null;
+          auditingData.ledger_id = ledger?.ledger_id ?? null;
+          auditingData.ledger_type = ledger?.ledger_type ?? null;
+          auditingData.ledger_name = ledger?.ledger_name ?? null;
+          auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           break;
         case "PETEXP":
           auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
@@ -454,7 +451,26 @@ const AuditForm = ({ navigation }) => {
         default:
           break;
       }
-      return auditingData;
+      console.log("Auditing Data:", auditingData)
+      // return auditingData;
+      const response = await post('/createAuditing', auditingData);
+      if (response.success === 'true') {
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Audit created successfully',
+          position: 'bottom',
+        });
+        // navigation.navigate('CashCollection');
+      } else {
+        console.error('Auditing creation failed:', response.message);
+        Toast.show({
+          type: 'error',
+          text1: 'ERROR',
+          text2: response.message || 'Audit creation failed',
+          position: 'bottom',
+        });
+      }
     } catch (err) {
       console.log("🚀 ~ handleSubmitAudit ~ err:", err)
     }
@@ -491,7 +507,6 @@ const AuditForm = ({ navigation }) => {
 
 
   const renderItem = ({ index, item }) => {
-    console.log("🚀 ~ renderItem ~ index:", index)
     if (item.empty) {
       return <View style={[styles.itemStyle, styles.itemInvisible]} />
     }
@@ -517,22 +532,22 @@ const AuditForm = ({ navigation }) => {
         <View style={styles.dottedQrBorderContainer}>
           <FormInput
             label={'Customer'}
-            placeholder={'Customer Name'}
+            placeholder={'Customer name'}
             editable={false}
             value={displayBillDetails?.displayName?.toUpperCase() || ''}
-            validate={errors.customerName}
+            validate={errors.displayName}
           />
           <FormInput
             label={'Invoice Number'}
             placeholder={'Invoice no'}
             editable={false}
             value={displayBillDetails?.documentNumber || ''}
-            validate={errors.invoiceNumber}
+            validate={errors.documentNumber}
           />
           <FormInput
             label={'Total Amount'}
             editable={false}
-            placeholder={'Total Amount'}
+            placeholder={'Total amount'}
             value={displayBillDetails?.totalAmount?.toString()}
             validate={errors.totalAmount}
           />
@@ -559,7 +574,7 @@ const AuditForm = ({ navigation }) => {
           </View>
         )}
         <SignaturePad setScrollEnabled={setScrollEnabled} setUrl={setUrl} title={'Customer/Vendor Signature'} />
-        <FormInput label={'Remarks'} multiline={true} numberOfLines={5} />
+        <FormInput label={'Remarks'} multiline={true} numberOfLines={5} onChangeText={(text) => setRemarks(text)} />
         <Button backgroundColor={COLORS.primaryThemeColor} title={'SUBMIT'} onPress={validate} />
       </RoundedScrollContainer>
     </SafeAreaView>
@@ -575,7 +590,7 @@ const styles = StyleSheet.create({
   },
   dottedQrBorderContainer: {
     padding: 15,
-    borderWidth: 1.3,
+    borderWidth: 1.8,
     borderColor: COLORS.primaryThemeColor,
     borderRadius: 18,
     borderStyle: 'dotted',
