@@ -85,7 +85,7 @@ const CategoriesScreen = ({ navigation }) => {
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty_data.png')} message={'No Items Found'} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_data.png')} message={''} /> //no items found 
   );
 
   const renderContent = () => (

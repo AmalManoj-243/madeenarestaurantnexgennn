@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     image: {
-        width: '45%',
-        height: '45%',
+        width: '100%',
+        height: '100%',
     },
     versionText: {
         position: 'absolute',

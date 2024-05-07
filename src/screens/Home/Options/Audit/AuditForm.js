@@ -25,12 +25,12 @@ const AuditForm = ({ navigation }) => {
   const [collectionType, setCollectionType] = useState(null);
   const [errors, setErrors] = useState({});
   const [ledger, setLedger] = useState({})
-  console.log("🚀 ~ AuditForm ~ ledger:", ledger)
+  // console.log("🚀 ~ AuditForm ~ ledger:", ledger)
   const [imageLoading, setImageLoading] = useState(true);
   const [scannedBillDetails, setScannedBillDetails] = useState({});
   const [remarks, setRemarks] = useState('')
   const [splittedBillName, setSplittedBillName] = useState('')
-  console.log("🚀 ~ AuditForm ~ splittedBillName:", splittedBillName)
+  // console.log("🚀 ~ AuditForm ~ splittedBillName:", splittedBillName)
   const loginUser = useAuthStore(state => state.user)
 
   // Function to handle scanned data
@@ -64,7 +64,7 @@ const AuditForm = ({ navigation }) => {
           console.log("Sales return Bill data", billDetails);
           break;
 
-        case "PURCHRET":
+        case "Purchase Return":
           response = await fetchBills.purchaseReturnDetails(billSequence);
           billDetails = response[0];
           console.log("Sales return Bill data", billDetails);
@@ -327,13 +327,14 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           break;
         case "Bank rec":
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0,
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           auditingData.chart_of_accounts_name = scannedBillDetails?.paid_through_chart_of_account_name ?? null;
           break;
-        case "Bankpay":
+        case "Bankpay": //BNKREC
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
@@ -363,15 +364,16 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           break;
         case "CUSTPAY":
-          auditingData.bussiness_type_id = scannedBillDetails?.bussiness_type_id ?? null;
           auditingData.customer_id = scannedBillDetails?.chart_of_account_id ?? null;
           auditingData.customer_name = scannedBillDetails?.chart_of_account_name ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           break;
         case "CAPREC":
           // Handling for Sales Return 
@@ -382,6 +384,7 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           auditingData.chart_of_accounts_id = scannedBillDetails?.capital_chart_of_account_id ?? null;
           auditingData.chart_of_accounts_name = scannedBillDetails?.capital_chart_of_account_name ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           break;
         case "CAPPAY":
           auditingData.chq_no = scannedBillDetails?.chq_no ?? null;
@@ -393,6 +396,7 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
+          auditingData.un_taxed_amount = displayBillDetails?.totalAmount ?? 0;
           break;
         case "PETEXP":
           auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
@@ -403,22 +407,16 @@ const AuditForm = ({ navigation }) => {
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
           break;
         case "PETTYALLOT":
-          auditingData.customer_id = loginUser?.company?.company_id ?? null;
-          auditingData.customer_name = customer?.customerName ?? null;
-          auditingData.chart_of_accounts_id = scannedBillDetails?.capital_chart_of_account_id ?? null;
-          auditingData.chart_of_accounts_name = scannedBillDetails?.capital_chart_of_account_name ?? null;
-          auditingData.employee_ledger_id = scannedBillDetails?.employee_ledger ?? null;
-          auditingData.employee_ledger_name = scannedBillDetails?.employee_ledger ?? null;
           auditingData.ledger_id = ledger?.ledger_id ?? null;
           auditingData.ledger_type = ledger?.ledger_type ?? null;
           auditingData.ledger_name = ledger?.ledger_name ?? null;
           auditingData.ledger_display_name = ledger?.ledger_display_name ?? null;
+          auditingData.employee_ledger_id = scannedBillDetails?.employee_ledger ?? null;
+          auditingData.employee_ledger_name = scannedBillDetails?.employee_ledger ?? null;
           break;
-        case "PURCHRET":
+        case "Purchase Return":
           auditingData.customer_id = loginUser?.company?.company_id ?? null;
           auditingData.customer_name = displayBillDetails?.displayName ?? null;
-          auditingData.supplier_id = scannedBillDetails?.supplier?.supplier_id ?? null;
-          auditingData.supplier_name = scannedBillDetails?.supplier?.supplier_name ?? null;
           auditingData.un_taxed_amount = scannedBillDetails?.total_untaxed_amount ?? 0;
           auditingData.chq_no = scannedBillDetails?.chq_no ?? null;
           auditingData.chq_date = scannedBillDetails?.chq_date ?? null;
@@ -462,7 +460,7 @@ const AuditForm = ({ navigation }) => {
           text2: 'Audit created successfully',
           position: 'bottom',
         });
-        // navigation.navigate('CashCollection');
+        // navigation.navigate('AuditScreen');
       } else {
         console.error('Auditing creation failed:', response.message);
         Toast.show({

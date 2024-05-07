@@ -9,7 +9,7 @@ const Loader = ({ visible, animationSource }) => {
       source={animationSource}
       overlayColor="transparent"
       animationStyle={styles.lottie}
-      speed={1.5}
+      speed={1.3}
     />
   );
 };

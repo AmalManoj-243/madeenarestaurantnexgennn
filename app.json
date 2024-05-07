@@ -4,13 +4,27 @@
     "slug": "369ai",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/android/icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android/icon_foreground.png",
+        "backgroundImage": "./assets/android/icon_background.png",
+        "monochromeImage": "./assets/android/icon_monochrome.png",
+        "backgroundColor": "#ffffff"
+      },
+      "icon": "./assets/android/icon.png"  
     },
     "plugins": [
       "expo-font",

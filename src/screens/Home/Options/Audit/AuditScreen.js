@@ -90,7 +90,7 @@ const AuditScreen = ({ navigation }) => {
     };
 
     const renderEmptyState = () => (
-        <EmptyState message={'No Transactions found!!'}/>
+        <EmptyState imageSource={require('@assets/images/EmptyData/transaction_empty.png')} message={''} />
     );
 
     const renderContent = () => (

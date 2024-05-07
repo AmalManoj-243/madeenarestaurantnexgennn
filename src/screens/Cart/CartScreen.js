@@ -1,11 +1,13 @@
-import { View, Text } from 'react-native'
 import React from 'react'
+import { RoundedScrollContainer, SafeAreaView } from '@components/containers'
 
 const CartScreen = () => {
   return (
-    <View>
-      <Text>CartScreen</Text>
-    </View>
+   <SafeAreaView>
+    <RoundedScrollContainer>
+      
+    </RoundedScrollContainer>
+   </SafeAreaView>
   )
 }
 

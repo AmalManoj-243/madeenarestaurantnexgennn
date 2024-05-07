@@ -1,10 +1,10 @@
-import { FONT_FAMILY } from '@constants/theme';
+import { COLORS, FONT_FAMILY } from '@constants/theme';
 import React from 'react';
 import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 
 const EmptyState = ({ imageSource, message }) => (
   <View style={styles.container}>
-    {/* <Image source={imageSource} style={styles.image} /> */}
+    <Image source={imageSource} style={styles.image} />
     <Text style={styles.message}>{message}</Text>
   </View>
 );
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontSize: 18, // Increase font size for better readability
     textAlign: 'center',
     marginTop: 20, // Add margin to separate image and message
-    color: '#888', // Set message color to a subtle gray
+    color: COLORS.primaryThemeColor, // Set message color to a subtle gray
     fontFamily: FONT_FAMILY.urbanistMedium
   },
 });
