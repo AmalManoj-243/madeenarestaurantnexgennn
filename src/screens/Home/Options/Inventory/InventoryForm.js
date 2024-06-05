@@ -13,7 +13,6 @@ import {
   fetchStockTransferDropdown,
   fetchVendorBillDropdown
 } from '@api/dropdowns/dropdownApi';
-import { reasons } from '@constants/dropdownConst';
 import InventoryRequestItem from './InventoryRequestItem';
 import Text from '@components/Text';
 import { styles } from './styles';
@@ -27,8 +26,8 @@ import Loader from '@components/Loader/Loader';
 
 const InventoryForm = ({ navigation, route }) => {
 
-  const { items = [], boxId, boxName = '' } = route?.params || []
-  const [itemsList, setItemsList] = useState(items.map(item => ({ ...item, quantity: item.quantity === 0 ? 0 : 1 })));
+  const { items = [], boxId, boxName = '', reason = {} } = route?.params || []
+  const [itemsList, setItemsList] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [chosenItem, setChosenItem] = useState(null);
@@ -36,7 +35,7 @@ const InventoryForm = ({ navigation, route }) => {
   const currentUser = useAuthStore(state => state.user)
 
   const [formData, setFormData] = useState({
-    reason: '',
+    reason: reason,
     sales: '',
     service: '',
     purchase: '',
@@ -47,6 +46,7 @@ const InventoryForm = ({ navigation, route }) => {
     remarks: '',
   });
 
+  console.log("🚀 ~ InventoryForm ~ formData:", formData)
   const [dropdown, setDropdown] = useState({
     invoice: [],
     service: [],
@@ -109,6 +109,15 @@ const InventoryForm = ({ navigation, route }) => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (reason.id === 'viewing') {
+      setItemsList(items.map((item) => ({ ...item, quantity: 0 })));
+    } else {
+      setItemsList(items.map((item) => ({ ...item, quantity: item.quantity === 0 ? 0 : 1 })));
+    }
+  }, [reason, items]);
+
 
   useEffect(() => {
     if (itemsList.length === 1) {
@@ -263,10 +272,6 @@ const InventoryForm = ({ navigation, route }) => {
     let fieldName = '';
 
     switch (selectedType) {
-      case 'Select Reason':
-        items = reasons;
-        fieldName = 'reason';
-        break;
       case 'Sales':
         items = dropdown.invoice;
         fieldName = 'sales';
@@ -302,7 +307,6 @@ const InventoryForm = ({ navigation, route }) => {
       default:
         return null;
     }
-
     return (
       <DropdownSheet
         isVisible={isVisible}
@@ -429,14 +433,12 @@ const InventoryForm = ({ navigation, route }) => {
           value={boxName}
         />
         <FormInput
+          label={'Reason'}
+          dropIcon="menu-down"
           labelColor={COLORS.boxTheme}
-          label={'Select Reasons'}
-          placeholder={'Select Reason'}
-          dropIcon={'menu-down'}
           editable={false}
-          value={formData.reason?.label}
-          multiline={true}
-          onPress={() => toggleBottomSheet('Select Reason')}
+          placeholder={'reason'}
+          value={formData?.reason ? formData.reason.label : ''}
         />
         {renderDynamicField()}
         <Text style={styles.label}>Box Items</Text>

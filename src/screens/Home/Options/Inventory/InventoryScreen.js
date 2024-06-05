@@ -15,15 +15,17 @@ import { useDataFetching } from '@hooks';
 import { formatData } from '@utils/formatters';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import useAuthStore from '@stores/auth/authStore';
+import { ActivityIndicator } from 'react-native-paper';
 
 const InventoryScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [scanLoading, setScanLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchInventoryBoxRequest);
   const currentUser = useAuthStore(state => state.user)
   const warehouseId = currentUser?.warehouse?.warehouse_id || ''
-
 
   useEffect(() => {
     fetchData();
@@ -34,20 +36,36 @@ const InventoryScreen = ({ navigation }) => {
   };
 
   const handleScan = async (scannedData) => {
-    const inventoryDetails = await fetchInventoryDetails(scannedData)
-    if (inventoryDetails.length>0) {
-      navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
-    } else {
-      showToastMessage('No inventory box found for this box no');
+    setScanLoading(true);
+    try {
+      const inventoryDetails = await fetchInventoryDetails(scannedData);
+      if (inventoryDetails.length > 0) {
+        navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
+      } else {
+        showToastMessage('No inventory box found for this box no');
+      }
+    } catch (error) {
+      console.error('Error fetching inventory details:', error);
+      showToastMessage('Error fetching inventory details');
+    } finally {
+      setScanLoading(false);
     }
   };
 
   const handleModalInput = async (text) => {
-    const inventoryDetails = await fetchInventoryDetailsByName(text, warehouseId)
-    if (inventoryDetails.length > 0) {
-      navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
-    } else {
-      showToastMessage('No inventory box found for this box no');
+    setModalLoading(true);
+    try {
+      const inventoryDetails = await fetchInventoryDetailsByName(text, warehouseId);
+      if (inventoryDetails.length > 0) {
+        navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
+      } else {
+        showToastMessage('No inventory box found for this box no');
+      }
+    } catch (error) {
+      console.error('Error fetching inventory details by name:', error);
+      showToastMessage('Error fetching inventory details');
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -97,14 +115,13 @@ const InventoryScreen = ({ navigation }) => {
             <FAB.Group
               fabStyle={{ backgroundColor: COLORS.primaryThemeColor, borderRadius: 30 }}
               color={COLORS.white}
-              backdropColor='transparent'
+              backdropColor='rgba(0, 0, 2, 0.7)'
               open={isFabOpen}
               visible={isFocused}
               icon={isFabOpen ? 'arrow-up' : 'plus'}
               actions={[
-                { icon: 'barcode-scan', label: 'Scan', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => navigation.navigate('Scanner', { onScan: handleScan }) },
-                { icon: 'pencil', label: 'Box no', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => setIsVisibleModal(true) },
-                // { icon: 'pencil', label: 'Detail', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.primaryThemeColor }, onPress: () => navigation.navigate('InventoryDetails', {inventoryDetails: []}) },
+                { icon: 'barcode-scan', label: 'Scan', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.white }, onPress: () => navigation.navigate('Scanner', { onScan: handleScan }) },
+                { icon: 'pencil', label: 'Box no', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.white }, onPress: () => setIsVisibleModal(true) },
               ]}
               onStateChange={({ open }) => setIsFabOpen(open)}
             />
@@ -116,6 +133,14 @@ const InventoryScreen = ({ navigation }) => {
         onClose={() => setIsVisibleModal(false)}
         onSubmit={(text) => handleModalInput(text)}
       />
+      {(scanLoading || modalLoading) && (
+        <ActivityIndicator
+          animating={true}
+          size="large"
+          color={COLORS.primaryThemeColor}
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: [{ translateX: -25 }, { translateY: -25 }] }}
+        />
+      )}
     </SafeAreaView>
   );
 };

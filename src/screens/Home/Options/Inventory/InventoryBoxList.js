@@ -23,10 +23,10 @@ const InventoryBoxList = ({ item }) => {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    marginHorizontal: 10,
+    // marginHorizontal: 10,
     marginVertical: 5,
     backgroundColor:COLORS.boxTheme,
-    borderRadius: 15,
+    borderRadius: 8,
     borderWidth:2,
     borderColor:'white',
     ...Platform.select({

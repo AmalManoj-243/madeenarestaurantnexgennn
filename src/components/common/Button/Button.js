@@ -24,6 +24,7 @@ const Button = ({
         alignItems: 'center',
         borderRadius: 10,
         marginVertical:10,
+        paddingHorizontal:8,
         ...props
       }}>
       <Text style={[styles.title, {color: color}]}>

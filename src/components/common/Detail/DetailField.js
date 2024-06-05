@@ -7,15 +7,16 @@ import { FONT_FAMILY } from '@constants/theme';
 const DetailField = ({
   label,
   iconName,
+  labelColor,
   ...props
 }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
-        editable={false}
+          editable={false}
           autoCorrect={false}
           style={styles.input}
           {...props}
