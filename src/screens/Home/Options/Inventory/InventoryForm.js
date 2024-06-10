@@ -26,13 +26,21 @@ import { OverlayLoader } from '@components/Loader';
 
 const InventoryForm = ({ navigation, route }) => {
 
-  const { items = [], boxId, boxName = '', reason = {} } = route?.params || []
+  const { inventoryDetails = {}, reason = {} } = route?.params || {};
+
   const [itemsList, setItemsList] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [chosenItem, setChosenItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const currentUser = useAuthStore(state => state.user)
+  const isResponsible = (userId) => currentUser && (userId === currentUser.related_profile._id);
+
+  const hasPermission = () =>
+    currentUser &&
+    (isResponsible(inventoryDetails?.responsible_person?._id) ||
+      inventoryDetails?.employees?.some((employee) => isResponsible(employee._id)));
+
 
   const [formData, setFormData] = useState({
     reason: reason,
@@ -111,11 +119,11 @@ const InventoryForm = ({ navigation, route }) => {
 
   useEffect(() => {
     if (reason.id === 'viewing') {
-      setItemsList(items.map((item) => ({ ...item, quantity: 0 })));
+      setItemsList(inventoryDetails?.items.map((item) => ({ ...item, quantity: 0 })));
     } else {
-      setItemsList(items.map((item) => ({ ...item, quantity: item.quantity === 0 ? 0 : 1 })));
+      setItemsList(inventoryDetails?.items.map((item) => ({ ...item, quantity: item.quantity === 0 ? 0 : 1 })));
     }
-  }, [reason, items]);
+  }, [inventoryDetails?.items]);
 
 
   useEffect(() => {
@@ -153,7 +161,7 @@ const InventoryForm = ({ navigation, route }) => {
     }
     const newQuantity = parseInt(text) || 0;
     // Extract the maximum quantity from inventoryData
-    const maxQuantity = items.find(dataItem => dataItem._id === id)?.quantity;
+    const maxQuantity = inventoryDetails?.items.find(dataItem => dataItem._id === id)?.quantity;
     // Check if the reason requires quantity validation
     const reasonRequiresQuantityCheck =
       !['purchase',
@@ -225,7 +233,7 @@ const InventoryForm = ({ navigation, route }) => {
       reference_id: getReferenceId(),
       reference: getReferenceLabel(),
       remarks: formData.remarks,
-      box_id: boxId,
+      box_id: inventoryDetails?._id,
       sales_person_id: currentUser?.related_profile?._id || null,
       box_status: 'pending',
       request_status: 'requested',
@@ -423,13 +431,13 @@ const InventoryForm = ({ navigation, route }) => {
         onBackPress={() => navigation.goBack()}
       />
       <RoundedScrollContainer>
-        <OverlayLoader visible={loading} backgroundColor={true}/>
+        <OverlayLoader visible={loading} backgroundColor={true} />
         <FormInput
           label={'Inventory Box'}
           labelColor={COLORS.boxTheme}
           editable={false}
           placeholder={'Box no'}
-          value={boxName}
+          value={inventoryDetails?.name || '-'}
         />
         <FormInput
           label={'Reason'}
@@ -465,7 +473,15 @@ const InventoryForm = ({ navigation, route }) => {
           placeholder={'Enter remarks'}
           onChangeText={(text) => handleFieldChange('remarks', text)}
         />
-        <Button backgroundColor={loading ? COLORS.lightenBoxTheme : COLORS.boxTheme} title={'Submit'} disabled={loading} onPress={handleInventoryBoxRequest} />
+        {hasPermission() ?
+          (
+            <Button backgroundColor={loading ? COLORS.lightenBoxTheme : COLORS.boxTheme} title={'Submit'} disabled={loading} onPress={handleInventoryBoxRequest} />
+
+          ) :
+          (
+            <Text style={styles.notification}>You do not have permission to open the box request</Text>
+          )
+        }
         <View style={{ flex: 1, marginBottom: '20%' }} />
       </RoundedScrollContainer>
       {renderBottomSheet()}

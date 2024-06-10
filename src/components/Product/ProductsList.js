@@ -19,7 +19,7 @@ const ProductsList = ({ item, onPress, showPrice }) => {
 
     const [imageLoading, setImageLoading] = useState(true);
     const truncatedName =
-        item?.product_name?.length > 15 ? item?.product_name?.substring(0, 14) + '...' : item?.product_name;
+        item?.product_name?.length > 15 ? item?.product_name?.substring(0, 35) + '...' : item?.product_name;
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.container}>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         position: 'absolute',
-        top: 0,
+        top: 10,
         left: 0,
         right: 0,
         // bottom: -60,
@@ -71,7 +71,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     name: {
-        fontSize: 14,
+        marginHorizontal: 8,
+        marginVertical: 8,
+        fontSize: 12,
         textAlign: 'center',
         textTransform: 'capitalize',
         color: '#2E2B2B',
@@ -84,12 +86,10 @@ const styles = StyleSheet.create({
     },
     bottomBar: {
         position: 'absolute',
-        bottom: 8,
+        bottom: 0,
         left: 0,
         right: 0,
         paddingVertical: 5,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
     },

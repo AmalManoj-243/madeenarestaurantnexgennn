@@ -5,7 +5,7 @@ import { NavigationHeader } from '@components/Header';
 import { OverlayLoader } from '@components/Loader';
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { FlashList } from '@shopify/flash-list';
-import { InputModal } from '@components/Modal';
+import { InputModal, CustomListModal } from '@components/Modal';
 import { useIsFocused } from '@react-navigation/native';
 import { showToastMessage } from '@components/Toast';
 import InventoryList from './InventoryList';
@@ -15,6 +15,7 @@ import { useDataFetching } from '@hooks';
 import { formatData } from '@utils/formatters';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import useAuthStore from '@stores/auth/authStore';
+import { reasons } from '@constants/dropdownConst';
 
 const InventoryScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
@@ -22,9 +23,17 @@ const InventoryScreen = ({ navigation }) => {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [scanLoading, setScanLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+  const [getDetail, setGetDetail] = useState(null)
+  const [isVisibleCustomListModal, setIsVisibleCustomListModal] = useState(false);
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchInventoryBoxRequest);
-  const currentUser = useAuthStore(state => state.user)
-  const warehouseId = currentUser?.warehouse?.warehouse_id || ''
+  const currentUser = useAuthStore(state => state.user);
+  const warehouseId = currentUser?.warehouse?.warehouse_id || '';
+
+  const isResponsibleOrEmployee = (inventoryDetails) => {
+    const responsiblePersonId = inventoryDetails?.responsible_person?._id;
+    const employeeIds = inventoryDetails?.employees?.map(employee => employee._id) || [];
+    return currentUser && (currentUser.related_profile._id === responsiblePersonId || employeeIds.includes(currentUser.related_profile._id));
+  };
 
   useEffect(() => {
     fetchData();
@@ -34,16 +43,18 @@ const InventoryScreen = ({ navigation }) => {
     fetchMoreData();
   };
 
-  const renderOverlayLoader = () => (
-    <OverlayLoader visible={true} />
-  );
-
   const handleScan = async (scannedData) => {
     setScanLoading(true);
     try {
       const inventoryDetails = await fetchInventoryDetails(scannedData);
       if (inventoryDetails.length > 0) {
-        navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
+        const details = inventoryDetails[0];
+        setGetDetail(details)
+        if (isResponsibleOrEmployee(details)) {
+          setIsVisibleCustomListModal(true);
+        } else {
+          navigation.navigate('InventoryForm', { inventoryDetails: details });
+        }
       } else {
         showToastMessage('No inventory box found for this box no');
       }
@@ -60,7 +71,13 @@ const InventoryScreen = ({ navigation }) => {
     try {
       const inventoryDetails = await fetchInventoryDetailsByName(text, warehouseId);
       if (inventoryDetails.length > 0) {
-        navigation.navigate('InventoryDetails', { inventoryDetails: inventoryDetails[0] });
+        const details = inventoryDetails[0];
+        setGetDetail(details)
+        if (isResponsibleOrEmployee(details)) {
+          setIsVisibleCustomListModal(true);
+        } else {
+          navigation.navigate('InventoryForm', { inventoryDetails: details });
+        }
       } else {
         showToastMessage('No inventory box found for this box no');
       }
@@ -72,16 +89,22 @@ const InventoryScreen = ({ navigation }) => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    if (item.empty) {
-      return <EmptyItem />;
-    }
-    return <InventoryList item={item} />;
-  };
+  const renderItem = ({ item }) => (
+    item.empty ? <EmptyItem /> : <InventoryList item={item} />
+  );
 
   const renderEmptyState = () => (
     <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message={''} />
   );
+
+  const handleBoxOpeningRequest = (value) => {
+    if (value) {
+      navigation.navigate('InventoryForm', {
+        reason: value,
+        inventoryDetails: getDetail
+      });
+    }
+  };
 
   const renderContent = () => (
     <FlashList
@@ -97,12 +120,9 @@ const InventoryScreen = ({ navigation }) => {
     />
   );
 
-  const renderInventoryRequest = () => {
-    if (data.length === 0 && !loading) {
-      return renderEmptyState();
-    }
-    return renderContent();
-  };
+  const renderInventoryRequest = () => (
+    data.length === 0 && !loading ? renderEmptyState() : renderContent()
+  );
 
   return (
     <SafeAreaView>
@@ -111,7 +131,7 @@ const InventoryScreen = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
       <RoundedContainer>
-        {loading && renderOverlayLoader()}
+        {loading && <OverlayLoader visible />}
         {renderInventoryRequest()}
         {isFocused && (
           <Portal>
@@ -123,7 +143,7 @@ const InventoryScreen = ({ navigation }) => {
               visible={isFocused}
               icon={isFabOpen ? 'arrow-up' : 'plus'}
               actions={[
-                { icon: 'barcode-scan', label: 'Scan', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.white }, onPress: () => navigation.navigate('Scanner', { onScan: handleScan }) },
+                { icon: 'barcode-scan', label: 'Scan', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.white }, onPress: () => navigation.navigate('Scanner', { onScan: handleScan, onClose: true }) },
                 { icon: 'pencil', label: 'Box no', labelStyle: { fontFamily: FONT_FAMILY.urbanistSemiBold, color: COLORS.white }, onPress: () => setIsVisibleModal(true) },
               ]}
               onStateChange={({ open }) => setIsFabOpen(open)}
@@ -134,12 +154,16 @@ const InventoryScreen = ({ navigation }) => {
       <InputModal
         isVisible={isVisibleModal}
         onClose={() => setIsVisibleModal(false)}
-        onSubmit={(text) => handleModalInput(text)}
+        onSubmit={handleModalInput}
       />
-
-      {(scanLoading || modalLoading) && (
-        <OverlayLoader visible={true} bakgroundColor={true} />
-      )}
+      <CustomListModal
+        isVisible={isVisibleCustomListModal}
+        items={reasons}
+        title="Select Reason"
+        onClose={() => setIsVisibleCustomListModal(false)}
+        onValueChange={handleBoxOpeningRequest}
+      />
+      {(scanLoading || modalLoading) && <OverlayLoader visible />}
     </SafeAreaView>
   );
 };

@@ -123,7 +123,7 @@ const HomeScreen = ({ navigation }) => {
 
         {/* Section */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 8 }}>
-          <ImageContainer source={require('@assets/images/Home/section/pickup.png')} onPress={() => navigateToScreen('Pickup')} backgroundColor="#f37021" title="Pickup" />
+          <ImageContainer source={require('@assets/images/Home/section/inventory_management.png')} onPress={() => navigateToScreen('InventoryScreen')} backgroundColor="#f37021" title="INVMGT" />
           <ImageContainer source={require('@assets/images/Home/section/services.png')} onPress={() => navigateToScreen('Services')} backgroundColor="#f37021" title="Services" />
           <ImageContainer source={require('@assets/images/Home/section/customer.png')} onPress={() => navigateToScreen('Customer')} backgroundColor="#f37021" title="Customer" />
         </View>

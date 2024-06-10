@@ -13,6 +13,7 @@ export const styles = StyleSheet.create({
     // position:'absolute',
     marginTop: 10,
     alignSelf: 'center',
+    textAlign: 'center',
     // bottom: 50,
     fontSize: 14,
     color: 'red',

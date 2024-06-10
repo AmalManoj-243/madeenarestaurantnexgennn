@@ -20,6 +20,13 @@ const InventoryDetails = ({ navigation, route }) => {
   const currentUser = useAuthStore((state) => state.user);
   const isResponsible = (userId) => currentUser && (userId === currentUser.related_profile._id);
 
+
+  const hasPermission = () =>
+    currentUser &&
+    (isResponsible(inventoryDetails?.responsible_person?._id) ||
+      inventoryDetails?.employees?.some((employee) => isResponsible(employee._id)));
+
+      
   const renderItem = ({ item }) => {
     if (item.empty) return <EmptyItem />;
     return <InventoryBoxList item={item} />;
@@ -51,10 +58,6 @@ const InventoryDetails = ({ navigation, route }) => {
     } return null;
   };
 
-  const hasPermission = () =>
-    currentUser &&
-    (isResponsible(inventoryDetails?.responsible_person?._id) ||
-      inventoryDetails?.employees?.some((employee) => isResponsible(employee._id)));
 
   return (
     <SafeAreaView>
