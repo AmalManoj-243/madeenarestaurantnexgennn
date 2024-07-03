@@ -5,7 +5,6 @@ import { formatData } from '@utils/formatters';
 import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/containers';
 import { EmptyItem, EmptyState } from '@components/common/empty';
 import { NavigationHeader } from '@components/Header';
-import { FABButton } from '@components/common/Button';
 import Text from '@components/Text';
 import { fetchCustomers } from '@api/services/generalApi';
 import { TouchableOpacity, ActivityIndicator, View, Image } from 'react-native';
@@ -70,7 +69,7 @@ const CustomerScreen = ({ navigation }) => {
     />
   );
 
-  const renderAuditing = () => {
+  const renderCustomers = () => {
     if (data.length === 0 && !loading) {
       return renderEmptyState();
     }
@@ -85,8 +84,7 @@ const CustomerScreen = ({ navigation }) => {
       />
       <SearchContainer placeholder="Search Customers" onChangeText={handleSearchTextChange} />
       <RoundedContainer>
-        {renderAuditing()}
-        {/* <FABButton onPress={() => navigation.navigate('AuditForm')} /> */}
+        {renderCustomers()}
       </RoundedContainer>
     </SafeAreaView>
   );
