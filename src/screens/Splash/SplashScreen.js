@@ -5,13 +5,17 @@ import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { useAuthStore } from '@stores/auth';
+import Constants from 'expo-constants'
+import { getConfig } from '@utils/config';
 
 const SplashScreen = () => {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const setLoggedInUser = useAuthStore(state => state.login)
 
-
+    const appName = Constants.expoConfig.name
+    const config = getConfig(appName)
+    
     useEffect(() => {
         async function loadFonts() {
             await Font.loadAsync({

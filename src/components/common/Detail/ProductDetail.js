@@ -224,7 +224,7 @@ const ProductDetail = ({ navigation, route }) => {
           </View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
             <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Price:</Text>
-            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{details.cost || 'N/A'} AED</Text>
+            <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{details.cost || 'N/A'} OMR</Text>
           </View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
             <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Minimal Sales Price:</Text>
