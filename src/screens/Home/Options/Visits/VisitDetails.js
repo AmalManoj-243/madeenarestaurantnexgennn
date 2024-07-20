@@ -38,6 +38,8 @@ return (
       <NavigationHeader
         title="Customer Visits Details"
         onBackPress={() => navigation.goBack()}
+        iconName='edit'
+        logo={false}
       />
       <RoundedScrollContainer>
         <TouchableOpacity onPress={handleMapIconPress} activeOpacity={0.7}>
