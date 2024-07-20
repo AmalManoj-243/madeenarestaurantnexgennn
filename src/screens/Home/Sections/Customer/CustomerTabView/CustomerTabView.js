@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useState } from 'react';
 import Details from './Details';
 import OtherDetails from './OtherDetails';
 import Address from './Address';
 import ContactPerson from './ContactPerson';
-import { RoundedContainer, RoundedScrollContainer, SafeAreaView } from '@components/containers';
+import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 
 const CustomTabBar = (props) => {
+
   return (
     <TabBar
       scrollEnabled={true}
@@ -54,11 +55,46 @@ const CustomerTabView = ({ navigation }) => {
     currency: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  const handleFieldChange = (field, value) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [field]: value,
+    }));
+    if (errors[field]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: null,
+      }));
+    }
+  };
+
   const renderScene = SceneMap({
-    first: () => <Details formData={formData} setFormData={setFormData} />,
-    second: () => <OtherDetails formData={formData} setFormData={setFormData} />,
-    third: () => <Address formData={formData} setFormData={setFormData} />,
-    fourth: () => <ContactPerson formData={formData} setFormData={setFormData} />,
+    first: () => (
+      <Details
+        formData={formData}
+        onFieldChange={handleFieldChange}
+      />
+    ),
+    second: () => (
+      <OtherDetails
+        formData={formData}
+        onFieldChange={handleFieldChange}
+      />
+    ),
+    third: () => (
+      <Address
+        formData={formData}
+        onFieldChange={handleFieldChange}
+      />
+    ),
+    fourth: () => (
+      <ContactPerson
+        formData={formData}
+        onFieldChange={handleFieldChange}
+      />
+    )
   });
 
   const [index, setIndex] = useState(0);
@@ -76,9 +112,9 @@ const CustomerTabView = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
       <TabView
-        renderTabBar={CustomTabBar}
         navigationState={{ index, routes }}
         renderScene={renderScene}
+        renderTabBar={CustomTabBar}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
       />

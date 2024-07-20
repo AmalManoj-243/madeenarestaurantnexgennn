@@ -4,8 +4,8 @@ import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchsalesPersonDropdown, fetchmopDropdown } from '@api/dropdowns/dropdownApi';
-import { customerTypes } from '@constants/customerTypes';
-import { customerTitles } from '@constants/customerTitles';
+import { customerTypes } from '@constants/dropdownConst';
+import { customerTitles } from '@constants/dropdownConst';
 import { LoadingButton } from '@components/common/Button';
 
 const Details = ({ formData, setFormData }) => {
@@ -106,7 +106,7 @@ const Details = ({ formData, setFormData }) => {
         items={items}
         title={selectedType}
         onClose={() => setIsVisible(false)}
-        onValueChange={(value) => handleFieldChange(fieldName, value)}
+        onValueChange={(value) => onFieldChange(fieldName, value)}
       />
     );
   };

@@ -127,7 +127,7 @@ const OtherDetails = ({ formData, setFormData }) => {
         items={items}
         title={selectedType}
         onClose={() => setIsVisible(false)}
-        onValueChange={(value) => handleFieldChange(fieldName, value)}
+        onValueChange={(value) => onFieldChange(fieldName, value)}
       />
     );
   };

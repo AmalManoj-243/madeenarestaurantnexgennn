@@ -123,7 +123,7 @@ const Address = ({ formData, setFormData }) => {
         items={items}
         title={selectedType}
         onClose={() => setIsVisible(false)}
-        onValueChange={(value) => handleFieldChange(fieldName, value)}
+        onValueChange={(value) => onFieldChange(fieldName, value)}
       />
     );
   };
@@ -177,7 +177,8 @@ const Address = ({ formData, setFormData }) => {
         editable={false}
         validate={errors.country}
         value={formData.country?.label}
-        onPress={() => toggleBottomSheet("Country")}
+        onPress={() => toggleBottomSheet("Country")} 
+
       />
       <FormInput
         label= "State :"
