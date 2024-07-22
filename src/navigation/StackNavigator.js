@@ -13,8 +13,8 @@ import { InventoryDetails, InventoryForm, InventoryScreen } from "@screens/Home/
 import { ProductDetail } from "@components/common/Detail";
 import { CustomerDetails, CustomerScreen } from "@screens/Home/Sections/Customer";
 import { MarketStudyScreen } from "@screens/Home/Options/MarketStudy";
-import { VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan"; 
-import { VisitDetails, VisitForm, VisitScreen } from "@screens/Home/Options/Visits"; //customer visit
+import { VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan";
+import { EditVisit, VisitDetails, VisitForm, VisitScreen } from "@screens/Home/Options/Visits"; //customer visit
 import { CustomerTabView } from "@screens/Home/Sections/Customer/CustomerTabView";
 import { MapViewScreen } from "@components/MapViewScreen";
 
@@ -39,7 +39,7 @@ const StackNavigator = () => {
         component={Barcode}
         options={{ headerShown: false }}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="MapViewScreen"
         component={MapViewScreen}
         options={{ headerShown: false }}
@@ -135,37 +135,42 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
 
-       {/* Visits Plan */}
-       <Stack.Screen
+      {/* Visits Plan */}
+      <Stack.Screen
         name="VisitsPlanScreen"
         component={VisitsPlanScreen}
         options={{ headerShown: false }}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="VisitPlanForm"
         component={VisitPlanForm}
         options={{ headerShown: false }}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="CustomerTabView"
         component={CustomerTabView}
         options={{ headerShown: false }}
       />
 
-       {/* Customer Visits */}
-       <Stack.Screen
+      {/* Customer Visits */}
+      <Stack.Screen
         name="VisitScreen"
         component={VisitScreen}
         options={{ headerShown: false }}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="VisitForm"
         component={VisitForm}
         options={{ headerShown: false }}
       />
-         <Stack.Screen
+      <Stack.Screen
         name="VisitDetails"
         component={VisitDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditVisit"
+        component={EditVisit}
         options={{ headerShown: false }}
       />
 

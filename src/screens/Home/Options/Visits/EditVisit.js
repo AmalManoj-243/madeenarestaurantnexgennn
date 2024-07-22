@@ -14,7 +14,10 @@ import { useAuthStore } from '@stores/auth'
 import { showToast } from '@utils/common'
 import { post } from '@api/services/utils'
 
-const VisitForm = ({ navigation }) => {
+const EditVisit = ({ navigation, route }) => {
+
+const {details} = route?.params || {}
+console.log("🚀 ~ EditVisit ~ details:", details)
 
   const currentUser = useAuthStore((state) => state.user);
   const [selectedType, setSelectedType] = useState(null);
@@ -263,7 +266,7 @@ const submit = async () => {
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="New Customer Visit"
+        title="Edit Customer Visit"
         onBackPress={() => navigation.goBack()}
       />
       <RoundedScrollContainer>
@@ -336,4 +339,4 @@ const submit = async () => {
   )
 }
 
-export default VisitForm
+export default EditVisit

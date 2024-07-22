@@ -40,8 +40,8 @@ return (
         onBackPress={() => navigation.goBack()}
         // icon
         // iconName="edit"
-        // iconPress={()=> {}}
-        // logo={false}
+        // iconPress={()=> navigation.navigate('EditVisit', {details})}
+        logo={false}
       />
       <RoundedScrollContainer>
         <TouchableOpacity onPress={handleMapIconPress} activeOpacity={0.7}>
