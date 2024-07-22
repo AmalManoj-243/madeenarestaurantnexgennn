@@ -101,9 +101,8 @@ const VisitScreen = ({ navigation }) => {
     if (item.empty) {
       return <EmptyItem />;
     }
-
-    const { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks } = item;
-    const details = { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks };
+    const { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks, _id } = item;
+    const details = { longitude, latitude, date_time, customer, site_location, customer_contact, purpose_of_visit, remarks, _id };
     return <VisitList item={item} onPress={() => navigation.navigate('VisitDetails', { visitDetails: details })} />;
   };
 

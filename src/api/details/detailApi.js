@@ -150,3 +150,7 @@ export const fetchInventoryDetailsByName = async (name, warehouseId) => {
 export const fetchCustomerDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_CUSTOMERS, detailId);
 };
+
+export const fetchCustomerVisitDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_CUSTOMER_VISIT_LIST, detailId);
+};
