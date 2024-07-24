@@ -101,6 +101,7 @@ const OtherDetails = ({ formData, onFieldChange, errors }) => {
         label={"TRN No:"}
         placeholder={"Enter TRN"}
         editable={true}
+        keyboardType="numeric"
         validate={errors.trn}
         onChangeText={(value) => onFieldChange('trn', value)}
       />

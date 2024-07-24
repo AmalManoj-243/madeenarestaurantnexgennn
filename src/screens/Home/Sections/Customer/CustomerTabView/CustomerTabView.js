@@ -47,7 +47,7 @@ const CustomerTabView = ({ navigation }) => {
     whatsappNumber: "",
     landlineNumber: "",
     fax: "",
-    trn: "",
+    trn: null,
     customerBehaviour: "",
     customerAttitude: "",
     language: "",
@@ -76,7 +76,7 @@ const CustomerTabView = ({ navigation }) => {
     }
   };
 
-  console.log("🚀 ~ CustomerTabView ~ formData:", formData)
+  console.log("🚀 ~ CustomerTabView ~ formData:", JSON.stringify(formData, null, 2))
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -137,7 +137,7 @@ const CustomerTabView = ({ navigation }) => {
         customer_title: formData.customerTitles.label,
         customer_email: formData.emailAddress,
         sales_person_id: formData.salesPerson.id,
-        collection_agent_id: null,
+        collection_agent_id: formData.collectionAgent.id ?? null,
         mode_of_payment: formData.modeOfPayment?.value,
         customer_mobile: formData.mobileNumber,
         whatsapp_no: formData.whatsappNumber,
@@ -145,9 +145,9 @@ const CustomerTabView = ({ navigation }) => {
         fax: formData.fax,
         is_active: formData.isActive,
         is_supplier: formData.isSupplier,
-        trn_no: formData.trn,
-        customer_behaviour: formData.customerBehaviour,
-        customer_atitude: formData.customerAttitude,
+        trn_no: parseInt(formData.trn, 10) || null,
+        customer_behaviour: formData.customerBehaviour?.value,
+        customer_atitude: formData.customerAttitude?.value,
         language_id: formData.language.id,
         currency_id: formData.currency.id,
         address: formData.address,
