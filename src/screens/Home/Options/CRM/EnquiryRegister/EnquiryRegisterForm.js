@@ -11,7 +11,6 @@ import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchSourceDropdown } from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import moment from 'moment';
 import { useAuthStore } from '@stores/auth';
 import { formatDateTime } from '@utils/common/date';
 
@@ -62,8 +61,7 @@ const EnquiryRegisterForm = ({ navigation }) => {
   };
 
   const handleDateConfirm = (date) => {
-    const formattedDate = moment(date).format('DD-MM-YYYY');
-    handleFieldChange('dateTime', formattedDate);
+    handleFieldChange('dateTime', date);
     setIsDatePickerVisible(false);
   };
 
