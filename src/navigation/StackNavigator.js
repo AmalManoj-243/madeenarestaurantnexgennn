@@ -19,6 +19,7 @@ import { CustomerTabView } from "@screens/Home/Sections/Customer/CustomerTabView
 import { MapViewScreen } from "@components/MapViewScreen";
 import { CRMScreen } from "@screens/Home/Options/CRM";
 import { EnquiryRegisterScreen } from "@screens/Home/Options/CRM/EnquiryRegister";
+import EnquiryRegisterView from '@screens/Home/Options/CRM/EnquiryRegister/EnquiryRegisterView';
 
 const Stack = createNativeStackNavigator();
 
@@ -185,6 +186,11 @@ const StackNavigator = () => {
       <Stack.Screen
         name="EnquiryRegisterScreen"
         component={EnquiryRegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EnquiryRegisterView"
+        component={EnquiryRegisterView}
         options={{ headerShown: false }}
       />
 

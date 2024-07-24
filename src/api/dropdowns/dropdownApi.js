@@ -96,3 +96,4 @@ export const fetchLanguageDropdown = async () => {
 export const fetchCurrencyDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.VIEW_CURRENCY);
 }
+
