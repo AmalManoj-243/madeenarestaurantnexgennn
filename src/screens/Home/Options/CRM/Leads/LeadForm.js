@@ -115,7 +115,7 @@ const LeadForm = ({ navigation }) => {
       }
     });
 
-   
+
 
     setErrors(newErrors);
     return isValid;
@@ -189,9 +189,9 @@ const LeadForm = ({ navigation }) => {
           value={formData.source?.label}
           onPress={() => toggleDropdownSheet('Source')}
         />
-          <FormInput
+        <FormInput
           label="Sales Person"
-          placeholder="Select Source"
+          placeholder="Select Sales person"
           dropIcon="menu-down"
           editable={false}
           validate={errors.source}
@@ -199,7 +199,16 @@ const LeadForm = ({ navigation }) => {
           onPress={() => toggleDropdownSheet('Source')}
         />
         <FormInput
-          label="Name"
+          label="Priority"
+          placeholder="Select Priority"
+          dropIcon="menu-down"
+          editable={false}
+          validate={errors.source}
+          value={formData.source?.label}
+          onPress={() => toggleDropdownSheet('Source')}
+        />
+        <FormInput
+          label="Contact Name"
           placeholder="Enter Name"
           editable={true}
           validate={errors.name}
@@ -212,7 +221,21 @@ const LeadForm = ({ navigation }) => {
           onChangeText={(value) => handleFieldChange('companyName', value)}
         />
         <FormInput
-          label="Phone"
+          label="Job Position"
+          placeholder="Enter JobPosition"
+          editable={true}
+          onChangeText={(value) => handleFieldChange('companyName', value)}
+        />
+        <FormInput
+          label="Phone no."
+          placeholder="Enter Phone Number"
+          editable={true}
+          keyboardType="numeric"
+          validate={errors.phoneNumber}
+          onChangeText={(value) => handleFieldChange('phoneNumber', value)}
+        />
+        <FormInput
+          label="Watsapp no."
           placeholder="Enter Phone Number"
           editable={true}
           keyboardType="numeric"
@@ -234,8 +257,15 @@ const LeadForm = ({ navigation }) => {
           onChangeText={(value) => handleFieldChange('address', value)}
         />
         <FormInput
-          label="Enquiry Details"
-          placeholder="Enter Enquiry Details"
+          label="Expected Closing Date"
+          dropIcon="calendar"
+          editable={false}
+          value={formatDateTime(formData.dateTime)}
+          onPress={() => setIsDatePickerVisible(true)}
+        />
+        <FormInput
+          label="Remarks"
+          placeholder="Remarks"
           editable={true}
           multiline={true}
           numberOfLines={5}

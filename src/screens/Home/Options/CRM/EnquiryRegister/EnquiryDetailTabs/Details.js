@@ -1,35 +1,36 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
+import { TextInput as FormInput } from '@components/common/TextInput';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { formatDateTime } from '@utils/common/date';
 import { DetailField } from '@components/common/Detail';
 import { useFocusEffect } from '@react-navigation/native';
-import { showToastMessage } from '@components/Toast';
 
 const Details = ({ enquiryId }) => {
 
 
-  const [details, setDetails] = useState(initialDetails);
+  const [details, setDetails] = useState('');
 
-  const fetchDetails = async () => {
-    try {
-      const updatedDetails = await f(enquiryId);
-      setDetails(updatedDetails[0]);
-    } catch (error) {
-      console.error('Error fetching visit details:', error);
-      showToastMessage('Failed to fetch visit details');
-    }
-  };
+  // const fetchDetails = async () => {
+  //   try {
+  //     const updatedDetails = await fetchCustomerVisitDetails(enquiryId);
+  //     setDetails(updatedDetails[0]);
+  //   } catch (error) {
+  //     console.error('Error fetching visit details:', error);
+  //     showToastMessage('Failed to fetch visit details');
+  //   }
+  // };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchDetails();
-    }, [id])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchDetails();
+  //   }, [])
+  // );
 
   return (
     <RoundedScrollContainer>
       <DetailField
         label="Date Time"
-      
         
       />
       <DetailField
