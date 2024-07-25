@@ -43,7 +43,7 @@ const EnquiryRegisterScreen = ({ navigation }) => {
   };
 
   const renderEmptyState = () => (
-    <EmptyState imageSource={require('@assets/images/EmptyData/empty_data.png')} message={''} />
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_data.png')} message={'No Data'} />
   );
 
   const renderContent = () => (
@@ -83,7 +83,7 @@ const EnquiryRegisterScreen = ({ navigation }) => {
       />
       {/* <SearchContainer placeholder="Search Products" onChangeText={handleSearchTextChange} /> */}
       <RoundedContainer>
-        {/* {renderEnquiryRegister()} */}
+        renderEnquiryRegister()
         <FABButton onPress={() => navigation.navigate('EnquiryRegisterForm')} />
       </RoundedContainer>
     </SafeAreaView>
