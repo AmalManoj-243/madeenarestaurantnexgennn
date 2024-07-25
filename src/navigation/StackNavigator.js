@@ -15,10 +15,10 @@ import { CustomerDetails, CustomerScreen } from "@screens/Home/Sections/Customer
 import { MarketStudyScreen } from "@screens/Home/Options/MarketStudy";
 import { VisitPlanForm, VisitsPlanScreen } from "@screens/Home/Options/VisitsPlan";
 import { EditVisit, VisitDetails, VisitForm, VisitScreen } from "@screens/Home/Options/Visits"; //customer visit
-import { CustomerTabView } from "@screens/Home/Sections/Customer/CustomerTabView";
 import { MapViewScreen } from "@components/MapViewScreen";
 import { CRMScreen } from "@screens/Home/Options/CRM";
 import { EnquiryRegisterForm, EnquiryRegisterScreen } from "@screens/Home/Options/CRM/EnquiryRegister";
+import {CustomerFormTabs} from "@screens/Home/Sections/Customer/CustomerFormTabs";
 
 const Stack = createNativeStackNavigator();
 
@@ -149,8 +149,8 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="CustomerTabView"
-        component={CustomerTabView}
+        name="CustomerFormTabs"
+        component={CustomerFormTabs}
         options={{ headerShown: false }}
       />
 

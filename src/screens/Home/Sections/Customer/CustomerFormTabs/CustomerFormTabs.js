@@ -30,7 +30,7 @@ const CustomTabBar = (props) => {
   );
 };
 
-const CustomerTabView = ({ navigation }) => {
+const CustomerFormTabs = ({ navigation }) => {
 
   const layout = useWindowDimensions();
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -76,7 +76,7 @@ const CustomerTabView = ({ navigation }) => {
     }
   };
 
-  console.log("🚀 ~ CustomerTabView ~ formData:", JSON.stringify(formData, null, 2))
+  console.log("🚀 ~ CustomerFormTabs ~ formData:", JSON.stringify(formData, null, 2))
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -211,4 +211,4 @@ const CustomerTabView = ({ navigation }) => {
   );
 };
 
-export default CustomerTabView;
+export default CustomerFormTabs;

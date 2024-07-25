@@ -86,7 +86,7 @@ const CustomerScreen = ({ navigation }) => {
       <SearchContainer placeholder="Search Customers" onChangeText={handleSearchTextChange} />
       <RoundedContainer>
         {renderCustomers()}
-        <FABButton onPress={() => navigation.navigate('CustomerTabView')} />
+        <FABButton onPress={() => navigation.navigate('CustomerFormTabs')} />
 
       </RoundedContainer>
     </SafeAreaView>
