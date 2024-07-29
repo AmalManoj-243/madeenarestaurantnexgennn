@@ -25,7 +25,6 @@ const PipelineDetailTabs = ({ navigation, route }) => {
     { key: 'fifth', title: 'Call History' },
     { key: 'sixth', title: 'Whatsapp History' },
     { key: 'seventh', title: 'Meetings Tab' },
-    { key: 'first', title: 'Details' },
   ]);
 
   const renderScene = ({ route }) => {
