@@ -32,17 +32,18 @@ const EnquiryDetailTabs = ({ navigation, route }) => {
       <NavigationHeader
         title="Enquiry Register Details"
         onBackPress={() => navigation.goBack()}
+        logo={false}
         iconOneName="edit"
         iconOnePress={() => { }}
-        iconTwoName="delete"
-        iconTwoPress={() => { }}
-        iconThreeName="add"
+        iconTwoName="plus"
+        iconTwoPress={() => { navigation.navigate('LeadForm', { enquiryId: id }) }}
+        iconThreeName="delete"
         iconThreePress={() => { }}
       />
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
-        renderTabBar={props => <CustomTabBar {...props} />}
+        renderTabBar={props => <CustomTabBar {...props} scrollEnabled={false} />}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
       />

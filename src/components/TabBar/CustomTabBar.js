@@ -2,9 +2,10 @@ import React from 'react';
 import { TabBar } from 'react-native-tab-view';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 
-const CustomTabBar = (props) => (
+const CustomTabBar = ({ scrollEnabled = true, ...props }) => (
   <TabBar
     {...props}
+    scrollEnabled={scrollEnabled}
     style={{
       backgroundColor: COLORS.tabColor,
       justifyContent: 'center',

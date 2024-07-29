@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Keyboard, View } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
@@ -14,10 +14,15 @@ import { useAuthStore } from '@stores/auth';
 import { formatDate } from '@utils/common/date';
 import { priority } from '@constants/dropdownConst';
 import { validateFields } from '@utils/validation';
+import { fetchEnquiryRegisterDetails } from '@api/details/detailApi';
+import { useFocusEffect } from '@react-navigation/native';
+import { OverlayLoader } from '@components/Loader';
 
-const LeadForm = ({ navigation }) => {
-
+const LeadForm = ({ navigation, route }) => {
+  const { enquiryId } = route?.params || {};
   const currentUser = useAuthStore((state) => state.user);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDropdownType, setSelectedDropdownType] = useState(null);
@@ -25,7 +30,7 @@ const LeadForm = ({ navigation }) => {
 
   const [formData, setFormData] = useState({
     date: new Date(),
-    source: '',
+    source: { id: '', label: '' },
     salesPerson: { id: currentUser?.related_profile?._id || null, label: currentUser?.related_profile?.name || '' },
     priority: '',
     contactName: '',
@@ -42,24 +47,48 @@ const LeadForm = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [dropdowns, setDropdowns] = useState({ source: [], salesPerson: [] });
 
+  const fetchDetails = async (enquiryId) => {
+    setIsLoading(true);
+    try {
+      const enquiryDetails = await fetchEnquiryRegisterDetails(enquiryId);
+      const detail = enquiryDetails[0];
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        source: { id: detail?.source?.source_id || '', label: detail?.source?.source_name || '' },
+        contactName: detail?.name || '',
+        companyName: detail?.company_name || '',
+        phoneNumber: detail?.mobile_no || '',
+        emailAddress: detail?.email || '',
+        address: detail?.address || '',
+        remarks: detail?.enquiry_details || '',
+      }));
+    } catch (error) {
+      console.error('Error fetching enquiry details:', error);
+      showToast({ type: 'error', title: 'Error', message: 'Failed to fetch enquiry details. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (enquiryId) {
+        fetchDetails(enquiryId);
+      }
+    }, [enquiryId])
+  );
+
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
         const sourceDropdown = await fetchSourceDropdown();
-        const salesPersonDropdown = await fetchEmployeesDropdown()
-        setDropdowns((prevDropdown) => ({
-          ...prevDropdown,
-          source: sourceDropdown.map(data => ({
-            id: data._id,
-            label: data.source_name,
-          })),
-          salesPerson: salesPersonDropdown.map(data => ({
-            id: data._id,
-            label: data.name,
-          })),
-        }));
+        const salesPersonDropdown = await fetchEmployeesDropdown();
+        setDropdowns({
+          source: sourceDropdown.map(data => ({ id: data._id, label: data.source_name })),
+          salesPerson: salesPersonDropdown.map(data => ({ id: data._id, label: data.name })),
+        });
       } catch (error) {
-        console.error('Error fetching source dropdown data:', error);
+        console.error('Error fetching dropdown data:', error);
       }
     };
 
@@ -67,15 +96,9 @@ const LeadForm = ({ navigation }) => {
   }, []);
 
   const handleFieldChange = (field, value) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [field]: value,
-    }));
+    setFormData((prevFormData) => ({ ...prevFormData, [field]: value }));
     if (errors[field]) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [field]: null,
-      }));
+      setErrors((prevErrors) => ({ ...prevErrors, [field]: null }));
     }
   };
 
@@ -150,30 +173,20 @@ const LeadForm = ({ navigation }) => {
         priority: formData.priority?.value,
         expected_closing_date: formData.expectedClosingDate || null,
         created_by_id: currentUser?.related_profile?._id || null,
-        created_by_name: currentUser?.related_profile?.name || null
+        created_by_name: currentUser?.related_profile?.name || null,
+        enquiry_register_id: enquiryId || null,
       };
+      console.log("🚀 ~ handleSubmit ~ leadData:", JSON.stringify(leadData, null, 2))
       try {
         const response = await post("/createLead", leadData);
         if (response.success) {
-          showToast({
-            type: "success",
-            title: "Success",
-            message: response.message || "Leads created successfully",
-          });
+          showToast({ type: "success", title: "Success", message: response.message || "Leads created successfully" });
           navigation.navigate("LeadScreen");
         } else {
-          showToast({
-            type: "error",
-            title: "ERROR",
-            message: response.message || "Create Leads failed",
-          });
+          showToast({ type: "error", title: "Error", message: response.message || "Create Leads failed" });
         }
       } catch (error) {
-        showToast({
-          type: "error",
-          title: "ERROR",
-          message: "An unexpected error occurred. Please try again later.",
-        });
+        showToast({ type: "error", title: "Error", message: "An unexpected error occurred. Please try again later." });
       } finally {
         setIsSubmitting(false);
       }
@@ -182,10 +195,7 @@ const LeadForm = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-      <NavigationHeader
-        title="Add Leads"
-        onBackPress={() => navigation.goBack()}
-      />
+      <NavigationHeader title="Add Leads" onBackPress={() => navigation.goBack()} />
       <RoundedScrollContainer>
         <FormInput
           label="Date"
@@ -227,6 +237,7 @@ const LeadForm = ({ navigation }) => {
           label="Contact Name"
           required
           placeholder="Enter Name"
+          value={formData.contactName}
           validate={errors.contactName}
           onChangeText={(value) => handleFieldChange('contactName', value)}
         />
@@ -234,6 +245,7 @@ const LeadForm = ({ navigation }) => {
           label="Company Name"
           placeholder="Enter Company Name"
           onChangeText={(value) => handleFieldChange('companyName', value)}
+          value={formData.companyName}
         />
         <FormInput
           label="Job Position"
@@ -245,6 +257,7 @@ const LeadForm = ({ navigation }) => {
           required
           placeholder="Enter Phone no."
           keyboardType="numeric"
+          value={formData.phoneNumber}
           validate={errors.phoneNumber}
           onChangeText={(value) => handleFieldChange('phoneNumber', value)}
         />
@@ -258,12 +271,14 @@ const LeadForm = ({ navigation }) => {
           label="Email"
           placeholder="Enter Email"
           validate={errors.emailAddress}
+          value={formData.emailAddress}
           onChangeText={(value) => handleFieldChange('emailAddress', value)}
         />
         <FormInput
           label="Address"
           placeholder="Enter Address"
           validate={errors.address}
+          value={formData.address}
           onChangeText={(value) => handleFieldChange('address', value)}
         />
         <FormInput
@@ -280,6 +295,7 @@ const LeadForm = ({ navigation }) => {
           multiline={true}
           numberOfLines={5}
           textAlignVertical="top"
+          value={formData.remarks}
           marginTop={10}
           onChangeText={(value) => handleFieldChange('remarks', value)}
         />
@@ -292,6 +308,7 @@ const LeadForm = ({ navigation }) => {
           onCancel={() => setIsDatePickerVisible(false)}
         />
         <View style={{ marginBottom: 10 }} />
+        <OverlayLoader visible={isLoading} />
       </RoundedScrollContainer>
     </SafeAreaView>
   );
