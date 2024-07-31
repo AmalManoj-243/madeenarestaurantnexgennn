@@ -13,7 +13,7 @@ const WhatsAppHistory = () => {
     return (
         <RoundedScrollContainer>
             <TouchableOpacity onPress={openWhatsApp} style={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}>
-                <Image source={require('@assets/icons/common/watsapp_1.png')} style={{ width: 35, height: 35, tintColor:COLORS.primaryThemeColor }} />
+                <Image source={require('@assets/icons/common/watsapp.png')} style={{ width: 35, height: 35 }} />
             </TouchableOpacity>
         </RoundedScrollContainer>
     )
