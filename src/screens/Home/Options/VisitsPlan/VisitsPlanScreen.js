@@ -14,29 +14,32 @@ import { formatData } from '@utils/formatters';
 import { EmptyState } from '@components/common/empty';
 import AnimatedLoader from '@components/Loader/AnimatedLoader';
 import { formatDate } from 'date-fns';
+import { useAuthStore } from '@stores/auth';
 
 const VisitsPlanScreen = ({ navigation }) => {
     const isFocused = useNavigation()
+    const currentUserId = useAuthStore(state => state.user?.related_profile?._id)
+    console.log("🚀 ~ file: VisitsPlanScreen.js:22 ~ VisitsPlanScreen ~ currentUserId:", currentUserId)
     const [isVisible, setIsVisible] = useState(false)
     const [date, setDate] = useState(new Date());
-    const formattedDate = formatDate(date, 'yyyy-MM-dd')    
+    const formattedDate = formatDate(date, 'yyyy-MM-dd')
 
     const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchVisitPlan);
 
     useFocusEffect(
         useCallback(() => {
-            fetchData({date: formattedDate});
+            fetchData({ date: formattedDate });
         }, [date])
     );
 
     useEffect(() => {
         if (isFocused) {
-            fetchData({date: formattedDate});
+            fetchData({ date: formattedDate });
         }
     }, [isFocused, date]);
 
     const handleLoadMore = () => {
-        fetchMoreData({date: formattedDate});
+        fetchMoreData({ date: formattedDate });
     };
 
     const renderItem = ({ item }) => {
@@ -83,12 +86,11 @@ const VisitsPlanScreen = ({ navigation }) => {
         <SafeAreaView>
             <NavigationHeader
                 title="Visits Plan "
-                logo={false}
                 onBackPress={() => navigation.goBack()}
             // iconOneName='questioncircleo'
             // iconOnePress={() => setIsVisible(!isVisible)}
             />
-            <LoadingButton width={'30%'} height={40} alignSelf={'flex-end'} marginVertical={0} marginBottom={10} marginHorizontal={20} title={'Send Approval'}/>
+            {/* <LoadingButton width={'30%'} height={40} alignSelf={'flex-end'} marginVertical={0} marginBottom={10} marginHorizontal={20} title={'Send Approval'}/> */}
             <RoundedContainer borderTopLeftRadius={20} borderTopRightRadius={20}>
                 <View style={{ marginVertical: 15 }}>
                     <VerticalScrollableCalendar date={date} onChange={(newDate) => setDate(newDate)} />

@@ -6,5 +6,6 @@ import EmployeeListModal from "./EmployeeLIstModal";
 import RulesModal from "./RulesModal";
 import AddUpdateModal from "./AddUpdateModal";
 import MeetingsScheduleModal from "./MeetingsScheduleModal";
+import ConfirmationModal from "./ConfirmationModal";
 
-export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal }
+export { ActionModal, LogoutModal, InputModal, CustomListModal, EmployeeListModal, RulesModal, AddUpdateModal, MeetingsScheduleModal, ConfirmationModal }
