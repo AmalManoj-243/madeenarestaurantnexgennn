@@ -19,7 +19,7 @@ const FollowUp = ({ pipelineId }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [followUpHistory, setFollowUpHistory] = useState([]);
 
-    const fetchDetails = async () => {
+    const fetchDetails = async () => {  // copy
         setIsLoading(true);
         try {
             const updatedDetails = await fetchPipelineDetails(pipelineId);

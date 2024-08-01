@@ -25,6 +25,7 @@ import { LeadDetailTabs } from "@screens/Home/Options/CRM/Leads/LeadDetailTabs";
 import { EditPipeline, PipelineForm, PipelineScreen } from "@screens/Home/Options/CRM/Pipeline";
 import { PipelineDetailTabs } from "@screens/Home/Options/CRM/Pipeline/PipelineDetailTabs";
 import { VisitPlanDetailTabs } from "@screens/Home/Options/VisitsPlan/VisitPlanDetailTabs";
+import PipelineVisitForm from "@screens/Home/Options/Visits/PipelineVisitForm";
 
 const Stack = createNativeStackNavigator();
 
@@ -181,6 +182,11 @@ const StackNavigator = () => {
         component={VisitForm}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+      name="PipelineVisitForm"
+      component={PipelineVisitForm}
+      options={{ headerShown: false }}
+    />
       <Stack.Screen
         name="VisitDetails"
         component={VisitDetails}
