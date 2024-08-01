@@ -70,7 +70,7 @@ const Meetings = ({ pipelineId }) => {
     return (
         <RoundedScrollContainer paddingHorizontal={0}>
             <FlatList
-                data={details.customer_schedules}
+                data={details}
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <FollowUpList
