@@ -11,7 +11,7 @@ const CustomTabBar = ({ scrollEnabled = true, ...props }) => (
       justifyContent: 'center',
     }}
     indicatorStyle={{ backgroundColor: COLORS.tabIndicator, height: 3 }}
-    labelStyle={{ color: COLORS.white, fontFamily: FONT_FAMILY.urbanistBold, fontSize: 13, textTransform: 'capitalize' }}
+    labelStyle={{ color: COLORS.white, fontFamily: FONT_FAMILY.urbanistBlack, fontSize: 14, textTransform: 'capitalize' }}
     pressColor='#2e294e'
     pressOpacity={0.5}
   />

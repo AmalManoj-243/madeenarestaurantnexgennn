@@ -216,6 +216,16 @@ const PipelineForm = ({ navigation }) => {
           onPress={() => setIsDatePickerVisible(true)}
         />
         <FormInput
+          label="Customer"
+          placeholder="Select Customer"
+          dropIcon="menu-down"
+          editable={false}
+          required
+          validate={errors.customer}
+          value={formData.customer?.label?.trim()}
+          onPress={() => toggleBottomSheet('Customer')}
+        />
+        <FormInput
           label="Source"
           placeholder="Select Source"
           dropIcon="menu-down"
@@ -254,16 +264,6 @@ const PipelineForm = ({ navigation }) => {
           validate={errors.opportunity}
           value={formData.opportunity?.label}
           onPress={() => toggleBottomSheet('Opportunity')}
-        />
-        <FormInput
-          label="Customer"
-          placeholder="Select Customer"
-          dropIcon="menu-down"
-          editable={false}
-          required
-          validate={errors.customer}
-          value={formData.customer?.label?.trim()}
-          onPress={() => toggleBottomSheet('Customer')}
         />
         <FormInput
           label="Remarks"

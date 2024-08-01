@@ -88,9 +88,6 @@ const VisitsPlanScreen = ({ navigation }) => {
             // iconOneName='questioncircleo'
             // iconOnePress={() => setIsVisible(!isVisible)}
             />
-            {/* <TouchableOpacity style={{padding:10, backgroundColor: 'white', alignSelf: 'flex-end'}}>
-
-            </TouchableOpacity> */}
             <LoadingButton width={'30%'} height={40} alignSelf={'flex-end'} marginVertical={0} marginBottom={10} marginHorizontal={20} title={'Send Approval'}/>
             <RoundedContainer borderTopLeftRadius={20} borderTopRightRadius={20}>
                 <View style={{ marginVertical: 15 }}>
