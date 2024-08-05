@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
-import { format } from 'date-fns';
 
 const MeetingsList = ({ item  }) => {
     return (
@@ -11,10 +10,10 @@ const MeetingsList = ({ item  }) => {
                 <Text style={styles.titles}>{item?.title || '-'}</Text>
                 <View style={styles.detailsContainer}>
                     <Text style={styles.detailText}>
-                        {item?.start? format(new Date(item.start), "dd-MM-yyyy") : '-'} {item?.time ? `at ${format(new Date(item.time), "HH:mm:ss")}` : ''}
+                        {/* {item?.start? format(new Date(item.start), "dd-MM-yyyy") : '-'} {item?.time ? `at ${format(new Date(item.time), "HH:mm:ss")}` : ''} */}
                     </Text>
                     <Text style={styles.reminderText}>
-                        {item?.is_Remainder ? `Reminder in ${item?.minutes || 0} minutes` : 'No Reminder'}
+                        {/* {item?.is_Remainder ? `Reminder in ${item?.minutes || 0} minutes` : 'No Reminder'} */}
                     </Text>
                 </View>
             </View>

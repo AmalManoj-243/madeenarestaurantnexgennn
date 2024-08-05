@@ -9,6 +9,10 @@ import { showToast } from '@utils/common';
 import { post } from '@api/services/utils';
 import { validateFields } from '@utils/validation';
 import { CustomTabBar } from '@components/TabBar';
+import Details from './Details';
+import OtherDetails from './OtherDetails';
+import Address from './Address';
+import ContactPerson from './ContactPerson';
 
 
 const CustomerFormTabs = ({ navigation }) => {
