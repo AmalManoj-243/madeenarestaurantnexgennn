@@ -37,7 +37,7 @@ const VisitForm = ({ navigation, route }) => {
   })
 
   const [isCustomerSelected, setIsCustomerSelected] = useState(false);
-  
+
   useEffect(() => {
     setIsCustomerSelected(!!formData.customer);
   }, [formData.customer]);
@@ -245,7 +245,7 @@ const VisitForm = ({ navigation, route }) => {
   };
 
   const submit = async () => {
-    const fieldsToValidate = ['customer',  'dateAndTime','remarks', 'visitPurpose'];
+    const fieldsToValidate = ['customer', 'dateAndTime', 'remarks', 'visitPurpose'];
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const visitData = {
@@ -302,6 +302,7 @@ const VisitForm = ({ navigation, route }) => {
       />
       <RoundedScrollContainer>
         <FormInput
+          required
           label={"Date & Time"}
           dropIcon={"calendar"}
           editable={false}
@@ -313,6 +314,7 @@ const VisitForm = ({ navigation, route }) => {
           dropIcon={"menu-down"}
           editable={false}
           multiline={true}
+          required
           value={formData.customer?.label}
           validate={errors.customer}
           onPress={() => toggleBottomSheet('Customers')}
@@ -349,6 +351,7 @@ const VisitForm = ({ navigation, route }) => {
           placeholder={"Select purpose of visit"}
           dropIcon={"menu-down"}
           editable={false}
+          required
           value={formData.visitPurpose?.label}
           validate={errors.visitPurpose}
           onPress={() => toggleBottomSheet('Visit Purpose')}
@@ -359,6 +362,7 @@ const VisitForm = ({ navigation, route }) => {
           multiline={true}
           textAlignVertical='top'
           numberOfLines={5}
+          required
           value={formData.remarks}
           validate={errors.remarks}
           onChangeText={(value) => handleFieldChange('remarks', value)}

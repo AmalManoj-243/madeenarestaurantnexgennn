@@ -197,6 +197,7 @@ const VisitPlanForm = ({ navigation }) => {
           value={formData?.customer?.label}
           dropIcon={"menu-down"}
           editable={false}
+          required
           multiline
           validate={errors.customer}
           onPress={() => toggleBottomSheet('Customers')}
@@ -207,12 +208,14 @@ const VisitPlanForm = ({ navigation }) => {
           dropIcon={"menu-down"}
           value={formData?.assignedTo?.label}
           editable={false}
+          required
           onPress={() => toggleBottomSheet('Employees')}
         />
         <FormInput
           label={"Date & Time"}
           placeholder={"Select visit time"}
           dropIcon={"menu-down"}
+          required
           editable={false}
           value={formData.dateAndTime ? formatDate(formData.dateAndTime, 'dd-MM-yyyy HH:mm:ss') : "Select visit time"}
           validate={errors.dateAndTime}
@@ -223,12 +226,14 @@ const VisitPlanForm = ({ navigation }) => {
           placeholder={"Select purpose of visit"}
           dropIcon={"menu-down"}
           editable={false}
+          required
           value={formData?.visitPurpose?.label}
           validate={errors.visitPurpose}
           onPress={() => toggleBottomSheet('Visit Purpose')}
         />
         <FormInput
           label={"Remarks"}
+          required
           placeholder={"Enter remarks"}
           multiline={true}
           numberOfLines={5}
