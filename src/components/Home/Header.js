@@ -11,7 +11,7 @@ const Header = () => {
         style={styles.backgroundImage} 
       />
       <Image 
-        source={require('@assets/images/Home/Header/notification.gif')} 
+        source={require('@assets/images/Home/Header/notification.png')} 
         style={styles.notificationIcon} 
       />
     </View>
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   notificationIcon: {
     width: width * 0.25,
-    aspectRatio: 2 / 1,
+    aspectRatio: 3 / 1,
     resizeMode: 'contain',
     // Add any additional styles for the notification icon if needed
   }

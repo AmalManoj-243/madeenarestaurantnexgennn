@@ -183,6 +183,7 @@ const HomeScreen = ({ navigation }) => {
           <BottomSheetFlatList
             data={formatData(data, 3)}
             numColumns={3}
+            initialNumToRender={5}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={{ paddingBottom: "25%" }}
