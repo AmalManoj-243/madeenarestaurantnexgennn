@@ -109,7 +109,7 @@ export const fetchenquiryTypeDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.ENQUIRY_TYPE);
 }
 
-export const fetchboxNameDropdown = async () => {
+export const fetchNonInspectedBox = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.NON_INSPECTED);
 }
 

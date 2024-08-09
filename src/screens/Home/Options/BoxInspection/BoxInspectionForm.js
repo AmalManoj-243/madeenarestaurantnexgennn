@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Keyboard, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Keyboard, View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { LoadingButton } from '@components/common/Button';
@@ -8,60 +8,50 @@ import { post } from '@api/services/utils';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchboxNameDropdown, fetchsalesPersonDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchNonInspectedBox } from '@api/dropdowns/dropdownApi';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuthStore } from '@stores/auth';
 import { formatDateTime } from '@utils/common/date';
 import { validateFields } from '@utils/validation';
+import { fetchInventoryDetails } from '@api/details/detailApi';
+import NonInspectedBoxItems from './NonInspectedBoxItems';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
+import { ActivityIndicator } from 'react-native-paper';
+import { OverlayLoader } from '@components/Loader';
+import { EmptyState } from '@components/common/empty';
+import { showToastMessage } from '@components/Toast';
 
 const BoxInspectionForm = ({ navigation }) => {
   const currentUser = useAuthStore(state => state.user);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDropdownType, setSelectedDropdownType] = useState(null);
   const [isDropdownSheetVisible, setIsDropdownSheetVisible] = useState(false);
-  const [inspectedItems, setInspectedItems] = useState([])
-
-
-  const addInspectedItems = (data) => {
-    setInspectedItems([...inspectedItems, data])
-  }
+  const [boxItems, setBoxItems] = useState([])
+  console.log("🚀 ~ file: BoxInspectionForm.js:27 ~ BoxInspectionForm ~ boxItems:", boxItems)
 
   const [formData, setFormData] = useState({
     dateTime: new Date(),
-    boxName: '',
-    inspectedItems: '',
+    box: '',
     salesPerson: { id: currentUser?.related_profile?._id || '', label: currentUser?.related_profile?.name },
-    warehouseName: { id: currentUser?.related_profile?._id || '', label: currentUser?.related_profile?.warehouse_name },
+    warehouse: { id: currentUser?.warehouse?.warehouse_id || '', label: currentUser?.warehouse?.warehouse_name },
   });
 
   const [errors, setErrors] = useState({});
-  const [dropdownOptions, setDropdownOptions] = useState({
-    boxName: [],
-    salesPerson: [],
-  });
+  const [dropdownOptions, setDropdownOptions] = useState({ box: [] });
 
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [boxNameData, salesPersonData] = await Promise.all([
-          fetchboxNameDropdown(),
-          fetchsalesPersonDropdown(),
-        ]);
-
+        const boxData = await fetchNonInspectedBox()
         setDropdownOptions({
-          boxName: boxNameData.map(data => ({
-            id: data._id,
+          box: boxData.map(data => ({
+            id: data.box_id,
             label: data.box_name,
-          })),
-          salesPerson: salesPersonData.map(data => ({
-            id: data._id,
-            label: data.name,
-          })),
+          }))
         });
       } catch (error) {
-        console.error('Error fetching dropdown data:', error);
         showToast({
           type: 'error',
           title: 'Error',
@@ -69,9 +59,34 @@ const BoxInspectionForm = ({ navigation }) => {
         });
       }
     };
-
     fetchDropdownData();
   }, []);
+
+  useEffect(() => {
+    if (formData.box) {
+      setLoading(true);
+      const fetchInventoryBoxItems = async () => {
+        try {
+          const [boxItems] = await fetchInventoryDetails(formData.box.id)
+          setBoxItems(boxItems?.items.map((item) => ({
+            ...item,
+            quantity: item.quantity,
+            inspectedQuantity: 0
+          })))
+
+        } catch (error) {
+          showToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Failed to fetch dropdown data. Please try again later.',
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchInventoryBoxItems()
+    }
+  }, [formData.box])
 
   const handleFieldChange = (field, value) => {
     setFormData(prevFormData => ({
@@ -101,26 +116,66 @@ const BoxInspectionForm = ({ navigation }) => {
       return (
         <DropdownSheet
           isVisible={isDropdownSheetVisible}
-          items={dropdownOptions.boxName}
+          items={dropdownOptions.box}
           title={selectedDropdownType}
           onClose={() => setIsDropdownSheetVisible(false)}
-          onValueChange={(value) => handleFieldChange('boxName', value)}
-        />
-      );
-    }
-    if (selectedDropdownType === 'Sales Person') {
-      return (
-        <DropdownSheet
-          isVisible={isDropdownSheetVisible}
-          items={dropdownOptions.salesPerson}
-          title={selectedDropdownType}
-          onClose={() => setIsDropdownSheetVisible(false)}
-          onValueChange={(value) => handleFieldChange('salesPerson', value)}
+          onValueChange={(value) => handleFieldChange('box', value)}
         />
       );
     }
     return null;
   };
+  const renderEmptyState = () => (
+    <EmptyState imageSource={require('@assets/images/EmptyData/empty_inventory_box.png')} message="Inspected items is empty" />
+  );
+
+  // const handleQuantityChange = useCallback((id, text) => {
+  //   const newQuantity = parseInt(text) || 0;
+  //   setBoxItems((prevItems) =>
+  //     prevItems.map((item) =>
+  //       item._id === id
+  //         ? { ...item, inspectedQuantity: newQuantity }
+  //         : item
+  //     )
+  //   );
+  // }, []);
+
+  const handleQuantityChange = useCallback((id, text) => {
+    const newQuantity = parseInt(text) || 0;
+  
+    setBoxItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item._id === id) {
+          if (newQuantity > item.quantity) {
+            showToastMessage('Inspected quantity cannot exceed available quantity.')
+            return item;
+          }
+          return { ...item, inspectedQuantity: newQuantity };
+        }
+        return item;
+      })
+    );
+  }, []);
+  
+
+  const renderContent = () => (
+    <FlatList
+      data={boxItems || []}
+      ListHeaderComponent={(<View><Text style={styles.label}>Inspected Items</Text></View>)}
+      numColumns={1}
+      renderItem={({ item }) => (
+        <NonInspectedBoxItems
+          item={item}
+        // onChoose={() => handleChooseItem(item)}
+        onQuantityChange={(id, text) => handleQuantityChange(id, text)}
+        />
+      )}
+      keyExtractor={(item, index) => index.toString()}
+      showsVerticalScrollIndicator={false}
+      estimatedItemSize={100}
+    />
+  );
+
 
   const validateForm = (fieldsToValidate) => {
     Keyboard.dismiss();
@@ -168,10 +223,6 @@ const BoxInspectionForm = ({ navigation }) => {
     }
   };
 
-  const handleAddItemsPress = () => {
-    navigation.navigate("AddInspectionItems", { addInspectedItems });
-  };
-
   return (
     <SafeAreaView>
       <NavigationHeader
@@ -187,14 +238,13 @@ const BoxInspectionForm = ({ navigation }) => {
           onPress={() => setIsDatePickerVisible(true)}
         />
         <FormInput
-          label="Box Name"
-          required
-          placeholder="Select Box Name"
+          label="Warehouse"
           dropIcon="menu-down"
           editable={false}
-          validate={errors.boxName}
-          value={formData.boxName?.label || ''}
-          onPress={() => toggleDropdownSheet('Box Name')}
+          required
+          validate={errors.salesPerson}
+          value={formData.warehouse?.label || ''}
+          onPress={() => { }}
         />
         <FormInput
           label="Inspected By"
@@ -206,23 +256,17 @@ const BoxInspectionForm = ({ navigation }) => {
           onPress={() => { }}
         />
         <FormInput
-          label="Warehouse Name"
+          label="Box Name"
+          required
+          placeholder="Select Box Name"
           dropIcon="menu-down"
           editable={false}
-          required
-          validate={errors.salesPerson}
-          value={formData.salesPerson?.label || ''}
-          onPress={() => { }}
+          validate={errors.boxName}
+          value={formData.box?.label || ''}
+          onPress={() => toggleDropdownSheet('Box Name')}
         />
-        {renderDropdownSheet()}
-
-        <View style={styles.inspectionItemsContainer}>
-          <Text style={styles.inspectionItemsLabel}>Inspection Items</Text>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddItemsPress}>
-            <Text style={styles.addButtonText}>Add Items</Text>
-          </TouchableOpacity>
-        </View>
-
+        {boxItems?.length === 0 ? renderEmptyState() : renderContent()}
+        <OverlayLoader visible={loading} />
         <LoadingButton title="SAVE" onPress={handleSubmit} loading={isSubmitting} marginTop={10} />
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
@@ -230,36 +274,21 @@ const BoxInspectionForm = ({ navigation }) => {
           onConfirm={handleDateConfirm}
           onCancel={() => setIsDatePickerVisible(false)}
         />
+        {renderDropdownSheet()}
+
       </RoundedScrollContainer>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  inspectionItemsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  inspectionItemsLabel: {
-    fontSize: 16,
-    color: COLORS.primaryThemeColor,
-    fontFamily: FONT_FAMILY.urbanistSemiBold,
-  },
-  addButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-  },
-  addButtonText: {
-    flex: 2 / 3,
+  label: {
     marginVertical: 5,
     fontSize: 16,
     color: COLORS.primaryThemeColor,
     fontFamily: FONT_FAMILY.urbanistSemiBold,
   },
-});
+})
+
 
 export default BoxInspectionForm;
