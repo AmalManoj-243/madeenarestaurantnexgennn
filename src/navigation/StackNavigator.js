@@ -268,7 +268,7 @@ const StackNavigator = () => {
 
       {/* BoxInspection */}
       <Stack.Screen
-        name="BoxInspection"
+        name="BoxInspectionScreen"
         component={BoxInspectionScreen}
         options={{ headerShown: false }}
       />

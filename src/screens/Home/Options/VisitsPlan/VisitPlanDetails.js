@@ -114,6 +114,7 @@ const VisitPlanDetails = ({ navigation, route }) => {
           />}
         <OverlayLoader visible={isLoading} />
         <ConfirmationModal
+          headerMessage='Are you sure want to Approved'
           isVisible={isConfirmationModalVisible}
           onCancel={() => setIsConfirmationModalVisible(false)}
           onConfirm={updateApprovalStatus}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FlatList } from 'react-native'
 import { NavigationHeader } from '@components/Header';
 import { RoundedContainer, SafeAreaView } from '@components/containers'
@@ -10,8 +10,13 @@ import { useLoader } from '@hooks';
 import { fetchProductDetailsByBarcode } from "@api/details/detailApi";
 import { showToastMessage } from '@components/Toast';
 import { OverlayLoader } from '@components/Loader';
+import { ConfirmationModal } from '@components/Modal';
 
 const OptionsScreen = ({ navigation }) => {
+
+  // Box inpection confirmations latest updates
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+
 
   const [loading, startLoading, stopLoading] = useLoader(false);
 
@@ -47,7 +52,7 @@ const OptionsScreen = ({ navigation }) => {
       { title: 'Market Study', image: require('@assets/images/Home/options/market_study_1.png'), onPress: () => navigation.navigate('MarketStudyScreen') },
       { title: 'Attendance', image: require('@assets/images/Home/options/attendance.png'), onPress: () => navigation.navigate('') },
       { title: 'Inventory Management', image: require('@assets/images/Home/options/inventory_management_1.png'), onPress: () => navigation.navigate('InventoryScreen') },
-      { title: 'Box Inspection', image: require('@assets/images/Home/options/box_inspection.png'), onPress: () => navigation.navigate('BoxInspection') },
+      { title: 'Box Inspection', image: require('@assets/images/Home/options/box_inspection.png'), onPress: () => setIsConfirmationModalVisible(!isConfirmationModalVisible)},
     ]
 
   const renderItem = ({ item }) => {
@@ -74,10 +79,17 @@ const OptionsScreen = ({ navigation }) => {
           renderItem={renderItem}
           numColumns={2}
           keyExtractor={(item, index) => index.toString()}
-          
+
         />
         <OverlayLoader visible={loading} />
       </RoundedContainer>
+
+      <ConfirmationModal
+      onCancel={()=> setIsConfirmationModalVisible(!isConfirmationModalVisible)}
+        isVisible={isConfirmationModalVisible}
+        onConfirm={()=> navigation.navigate('BoxInspectionScreen')}
+        headerMessage='Are you sure want to Start Box Inspection ?. '
+      />
     </SafeAreaView>
   )
 }

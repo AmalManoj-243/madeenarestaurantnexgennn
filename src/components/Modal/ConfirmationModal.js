@@ -5,7 +5,7 @@ import Text from '@components/Text';
 import { NavigationHeader } from '@components/Header';
 import { FONT_FAMILY } from '@constants/theme';
 
-const ConfirmationModal = ({ isVisible, onConfirm, onCancel, header = 'Are you sure want to Confirm Sent for Approval ?' }) => {
+const ConfirmationModal = ({ isVisible, onConfirm, onCancel, headerMessage = 'Are you sure want to Confirm Sent for Approval ?' }) => {
     return (
         <Modal
             isVisible={isVisible}
@@ -20,7 +20,7 @@ const ConfirmationModal = ({ isVisible, onConfirm, onCancel, header = 'Are you s
             <View style={styles.modalContainer}>
                 <NavigationHeader onBackPress={() => onCancel()} title={'Confirmation'} />
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalHeader}>{header}</Text>
+                    <Text style={styles.modalHeader}>{headerMessage}</Text>
                     <View style={styles.modalButtons}>
                         <TouchableOpacity style={styles.modalButton} onPress={onConfirm}>
                             <Text style={styles.modalButtonText}>Yes</Text>
