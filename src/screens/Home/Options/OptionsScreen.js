@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 import { NavigationHeader } from '@components/Header';
 import { RoundedContainer, SafeAreaView } from '@components/containers';
@@ -12,7 +12,8 @@ import { showToastMessage } from '@components/Toast';
 import { OverlayLoader } from '@components/Loader';
 import { ConfirmationModal } from '@components/Modal';
 import { useAuthStore } from '@stores/auth';
-import { post } from '@api/services/utils'; // Ensure this path is correct
+import { post } from '@api/services/utils';
+import { BackHandler } from 'react-native';
 
 const OptionsScreen = ({ navigation }) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -65,7 +66,7 @@ const OptionsScreen = ({ navigation }) => {
     setIsLoading(true);
     try {
       const boxInspectionGroupingData = {
-        date: new Date(),
+        start_date_time: new Date(),
         sales_person_id: currentUser.related_profile?._id || null,
         warehouse_id: currentUser.warehouse?.warehouse_id || null,
       };

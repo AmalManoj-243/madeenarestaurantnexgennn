@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { RoundedContainer, SafeAreaView, SearchContainer } from '@components/containers';
@@ -14,13 +14,30 @@ import { fetchNonInspectedBoxDropdown } from '@api/dropdowns/dropdownApi';
 import { fetchInventoryDetails } from '@api/details/detailApi';
 import { formatData } from '@utils/formatters';
 import { ConfirmationModal } from '@components/Modal';
+import { BackHandler } from 'react-native';
 
-const BoxInspectionScreen = ({ navigation }) => {
+const BoxInspectionScreen = ({ navigation, route }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const currentUser = useAuthStore(state => state.user);
   const warehouseId = currentUser?.warehouse?.warehouse_id || '';
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+
+  const { groupId } = route.params;
+
+  useEffect(() => {
+    const onBackPress = () => {
+      setIsConfirmationModalVisible(true);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   const fetchNonInspectedBoxList = useCallback(async () => {
     setLoading(true);
@@ -70,7 +87,7 @@ const BoxInspectionScreen = ({ navigation }) => {
         };
         const response = await post('/createInventoryBoxRequest', requestPayload);
         if (response.success) {
-          navigation.navigate('BoxInspectionForm', { item });
+          navigation.navigate('BoxInspectionForm', { item, groupId });
         } else {
           showToast({ type: 'error', title: 'Error', message: "You don't have permission to open this box." });
         }
@@ -82,6 +99,30 @@ const BoxInspectionScreen = ({ navigation }) => {
     },
     [currentUser, navigation]
   );
+
+  const handleUpdateBoxInspectionGrouping = async () => {
+    try {
+      const requestPayload = {
+        box_inspection_grouping_id: groupId,
+        end_date_time: new Date(),
+      };
+
+      console.log('payload:', requestPayload);
+
+      const response = await post('/updateBoxInspectionGrouping', requestPayload);
+      console.log(response, "Response")
+
+      // if (response.success) {
+      //   showToast({ type: 'success', title: 'Success', message: 'Box inspection grouping updated successfully.' });
+      //   navigation.goBack(); 
+      // } else {
+      //   showToast({ type: 'error', title: 'Error', message: 'Failed to update box inspection grouping.' });
+      // }
+    } catch (error) {
+      console.error('Failed to update box inspection grouping:', error);
+      showToast({ type: 'error', title: 'Error', message: 'An error occurred while updating box inspection grouping.' });
+    }
+  };
 
   const renderItem = useCallback(
     ({ item }) =>
@@ -122,14 +163,13 @@ const BoxInspectionScreen = ({ navigation }) => {
       <SearchContainer placeholder="Search Boxes..." onChangeText={() => { }} />
       <RoundedContainer>
         {data.length === 0 && !loading ? renderEmptyState() : renderContent()}
-        {/* <FABButton onPress={() => navigation.navigate('BoxInspectionForm')} /> */}
       </RoundedContainer>
 
       <ConfirmationModal
         isVisible={isConfirmationModalVisible}
         onCancel={() => setIsConfirmationModalVisible(false)}
         onConfirm={() => {
-          navigation.goBack();
+          handleUpdateBoxInspectionGrouping();
           setIsConfirmationModalVisible(false);
         }}
         headerMessage="Are you sure that you completed the box inspection?"

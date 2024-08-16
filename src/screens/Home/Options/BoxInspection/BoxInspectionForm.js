@@ -18,7 +18,7 @@ import { EmptyState } from '@components/common/empty';
 import Text from '@components/Text';
 
 const BoxInspectionForm = ({ navigation, route }) => {
-  const { boxId, boxName } = route?.params?.item || {};
+  const { boxId, boxName } = route?.params?.item?.groupId || {};
   const currentUser = useAuthStore(state => state.user);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,6 +118,7 @@ const BoxInspectionForm = ({ navigation, route }) => {
       try {
         const response = await post("/createBoxInspection", requestPayload);
         if (response.success) {
+          console.log(response, "sucess")
           showToast({
             type: "success",
             title: "Success",
