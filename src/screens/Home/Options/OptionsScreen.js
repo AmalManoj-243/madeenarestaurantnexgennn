@@ -17,6 +17,7 @@ import { post } from '@api/services/utils'; // Ensure this path is correct
 const OptionsScreen = ({ navigation }) => {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [loading, startLoading, stopLoading] = useLoader(false);
+  const [isLoading, setIsLoading] = useState(false);
   const currentUser = useAuthStore(state => state.user);
 
   const handleScan = async (code) => {
@@ -60,18 +61,18 @@ const OptionsScreen = ({ navigation }) => {
     return <ListItem title={item.title} image={item.image} onPress={item.onPress} />;
   };
 
-  const handleFunctionStart = async () => {
-    startLoading();
+  const handleBoxInspectionStart = async () => {
+    setIsLoading(true);
     try {
       const boxInspectionGroupingData = {
         date: new Date(),
         sales_person_id: currentUser.related_profile?._id || null,
         warehouse_id: currentUser.warehouse?.warehouse_id || null,
       };
-
       const response = await post('/createBoxInspectionGrouping', boxInspectionGroupingData);
-      if (response.success === 'true') {
+      if (response.success) {
         showToastMessage('Box Inspection Grouping created successfully');
+        navigation.navigate('BoxInspectionScreen', { groupId: response?.data?._id })
       } else {
         showToastMessage('Box Inspection Grouping creation failed');
       }
@@ -79,8 +80,7 @@ const OptionsScreen = ({ navigation }) => {
       console.log('API Error:', error);
       showToastMessage(`Error creating Box Inspection Grouping: ${error.message}`);
     } finally {
-      fetchDetails(); // Ensure `fetchDetails` is defined or remove if not needed
-      stopLoading();
+      setIsLoading(false);
     }
   };
 
@@ -101,14 +101,14 @@ const OptionsScreen = ({ navigation }) => {
           numColumns={2}
           keyExtractor={(item, index) => index.toString()}
         />
-        <OverlayLoader visible={loading} />
+        <OverlayLoader visible={loading || isLoading} />
       </RoundedContainer>
 
       <ConfirmationModal
         onCancel={() => setIsConfirmationModalVisible(false)}
         isVisible={isConfirmationModalVisible}
         onConfirm={() => {
-          handleFunctionStart();
+          handleBoxInspectionStart();
           setIsConfirmationModalVisible(false);
         }}
         headerMessage='Are you sure that you want to start Box Inspection?'
