@@ -30,6 +30,9 @@ import { AttendanceScreen } from "@screens/Home/Options/Attendance";
 import { MarkAttendance, PunchingScreen } from "@screens/Home/Options/Attendance/Punching";
 import ServiceScreen from "@screens/Home/Sections/Services/ServiceScreen";
 import ServiceFormTabs from "@screens/Home/Sections/Services/ServiceFormTabs/ServiceFormTabs";
+import ServiceDetailTabs from "@screens/Home/Sections/Services/ServiceDetailTabs/ServiceDetailTabs";
+import { UpdateDetailTabs } from "@screens/Home/Sections/Services/UpdateDetailTabs";
+import UpdateDetail from "@screens/Home/Sections/Services/UpdateDetailTabs/UpdateDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -153,13 +156,23 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ServiceDetails"
-        component={Servi}
+        name="ServiceDetailTabs"
+        component={ServiceDetailTabs}
         options={{ headerShown: false }}
       />
       <Stack.Screen
         name="ServiceFormTabs"
         component={ServiceFormTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UpdateDetailTabs"
+        component={UpdateDetailTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UpdateDetail"
+        component={UpdateDetail}
         options={{ headerShown: false }}
       />
 

@@ -158,6 +158,10 @@ export const fetchEnquiryRegisterDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_ENQUIRY_REGISTER, detailId);
 };
 
+export const fetchServiceDetails = async (detailId) => {
+  return fetchDetails(API_ENDPOINTS.VIEW_SERVICE, detailId);
+};
+
 export const fetchLeadDetails = async (detailId) => {
   return fetchDetails(API_ENDPOINTS.VIEW_LEAD, detailId);
 };

@@ -97,13 +97,13 @@ const handleSubmit = async () => {
       setIsSubmitting(true);
       const serviceData = {
         customer_name: formData.customerName?.label ?? null,
-        phone_no: formData.phoneNumber || null,
-        email: formData.emailAddress || null,
+        customer_mobile: formData.phoneNumber || null,
+        customer_email: formData.emailAddress || null,
         address: formData.address || null,
         trn_no: parseInt(formData.trn, 10) || null,
         warehouse_name: formData.warehouse?.label ?? null,
-        device_name: formData.device?.label ?? null,
         brand_name: formData.brand?.label ?? null,
+        device_name: formData.device?.label ?? null,
         consumer_model_name: formData.consumerModel?.label ?? null,
         serial_no: formData.serialNumber || null,
         imei_no: formData.imeiNumber || null,
@@ -113,7 +113,7 @@ const handleSubmit = async () => {
         pre_condition: formData.preCondition || null,
         estimation: formData.estimation || null,
         remarks: formData.remarks || null,
-        accessories: formData.accessories?.label ?? null,
+        accessory_name: formData.accessories?.label ?? null,
         complaints: formData.complaints?.label ?? null,
         sub_complaints: formData.subComplaints?.label ?? null,
       };

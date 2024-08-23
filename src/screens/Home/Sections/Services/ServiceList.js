@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginTop: 5,
     fontSize: 16,
-    marginLeft: 270,
     fontFamily: FONT_FAMILY.urbanistSemiBold,
     textTransform: 'capitalize',
   },

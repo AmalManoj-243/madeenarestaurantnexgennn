@@ -1,3 +1,3 @@
-import ServicesDetailTabs from "./ServiceFormTabs";
+import ServiceFormTabs from "./ServiceFormTabs";
 
-export {ServicesDetailTabs}
+export {ServiceFormTabs}
