@@ -26,7 +26,6 @@ import { fetchProductDetailsByBarcode } from "@api/details/detailApi";
 import { OverlayLoader } from "@components/Loader";
 
 const { height } = Dimensions.get("window");
-console.log("🚀 ~ file: HomeScreen.js:29 ~ height:", height)
 
 const HomeScreen = ({ navigation }) => {
   const [backPressCount, setBackPressCount] = useState(0);

@@ -1257,10 +1257,10 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.17.12":
-  version "0.17.12"
-  resolved "https://registry.npmjs.org/@expo/cli/-/cli-0.17.12.tgz"
-  integrity sha512-HIv55FSSRFk53hdwxt+JKGMSCCMABhpakm1BSxGm0ymWa7nIM6llV/0gUWbHNXGkvmRPNWJqMNqVlV/vcPa8oA==
+"@expo/cli@0.17.13":
+  version "0.17.13"
+  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.17.13.tgz#ab6acbd1b15a25a0fcc86a6c4f4ed7e60cfda457"
+  integrity sha512-n13yxOmI3I0JidzMdFCH68tYKGDtK4XlDFk1vysZX7AIRKeDVRsSbHhma5jCla2bDt25RKmJBHA9KtzielwzAA==
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"
@@ -1270,7 +1270,7 @@
     "@expo/env" "~0.2.2"
     "@expo/image-utils" "^0.4.0"
     "@expo/json-file" "^8.2.37"
-    "@expo/metro-config" "~0.17.0"
+    "@expo/metro-config" "0.17.8"
     "@expo/osascript" "^2.0.31"
     "@expo/package-manager" "^1.1.1"
     "@expo/plist" "^0.1.0"
@@ -1460,10 +1460,10 @@
     json5 "^2.2.2"
     write-file-atomic "^2.3.0"
 
-"@expo/metro-config@0.17.7", "@expo/metro-config@~0.17.0":
-  version "0.17.7"
-  resolved "https://registry.npmjs.org/@expo/metro-config/-/metro-config-0.17.7.tgz"
-  integrity sha512-3vAdinAjMeRwdhGWWLX6PziZdAPvnyJ6KVYqnJErHHqH0cA6dgAENT3Vq6PEM1H2HgczKr2d5yG9AMgwy848ow==
+"@expo/metro-config@0.17.8":
+  version "0.17.8"
+  resolved "https://registry.yarnpkg.com/@expo/metro-config/-/metro-config-0.17.8.tgz#8a5b46af0bef3397eac17607fc249670fdbbab9a"
+  integrity sha512-XNjI5Q5bW3k2ieNtQBSX9BnIysRxG4UyNsaWcysv3AzY+rahay6fAp5xzJey8xBOlzs9u7H4AdMoeJsUje3lcQ==
   dependencies:
     "@babel/core" "^7.20.0"
     "@babel/generator" "^7.20.5"
@@ -3937,16 +3937,16 @@ expo-status-bar@~1.11.1:
   resolved "https://registry.npmjs.org/expo-status-bar/-/expo-status-bar-1.11.1.tgz"
   integrity sha512-ddQEtCOgYHTLlFUe/yH67dDBIoct5VIULthyT3LRJbEwdpzAgueKsX2FYK02ldh440V87PWKCamh7R9evk1rrg==
 
-expo@~50.0.19:
-  version "50.0.19"
-  resolved "https://registry.npmjs.org/expo/-/expo-50.0.19.tgz"
-  integrity sha512-9weIVMGylJhNVN41mId1c1Kog3VmGA28oY0RpJKdJNrKGt5NKQAXV26TIwxw/PyDG1J4q2T/wZZoK+F1C64aIw==
+expo@~50.0.20:
+  version "50.0.20"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-50.0.20.tgz#b2ec213e0657859647109ac1917d3916ba0346d8"
+  integrity sha512-7ySpJL6rvbVUDdPAShc9ByU+v2CmUX3z4k3H7HkIRB9d/kTZpHWQmyr9ynWf5i3oCBnE82HcO74k2nW4GykNog==
   dependencies:
     "@babel/runtime" "^7.20.0"
-    "@expo/cli" "0.17.12"
+    "@expo/cli" "0.17.13"
     "@expo/config" "8.5.6"
     "@expo/config-plugins" "7.9.2"
-    "@expo/metro-config" "0.17.7"
+    "@expo/metro-config" "0.17.8"
     "@expo/vector-icons" "^14.0.0"
     babel-preset-expo "~10.0.2"
     expo-asset "~9.0.2"

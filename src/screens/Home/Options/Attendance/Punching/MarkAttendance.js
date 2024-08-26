@@ -7,11 +7,12 @@ import { TextInput as FormInput } from '@components/common/TextInput';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 import { formatDate } from '@utils/common/date';
-import { Button, LoadingButton } from '@components/common/Button';
+import { Button } from '@components/common/Button';
 import { View } from 'react-native';
 import { post, put } from '@api/services/utils'; // Adjusted to include PUT
 import { useAuthStore } from '@stores/auth';
 import { fetchAttendance } from '@api/services/generalApi';
+import { OverlayLoader } from '@components/Loader';
 
 const MarkAttendanceScreen = ({ navigation, route }) => {
     const { date } = route?.params;
@@ -53,8 +54,6 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
                     requestPayload.afternoon_out = new Date();
                     requestPayload.attendance_id = attendanceId
                 }
-
-                console.log("🚀 ~ file: MarkAttendance.js:35 ~ handleMarkAttendance ~ requestPayload:", requestPayload)
                 await put(endpoint, requestPayload);
             }
 
@@ -92,38 +91,40 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
         }
     };
 
+    const fetchAttendanceApi = async () => {
+        const response = await fetchAttendance({
+            userId: currentUser?._id,
+            date: formattedDate,
+        });
+        if (response && response.length > 0) {
+            const currentStatus = response?.[0].status;
+            setAttendanceId(response?.[0]?._id)
+            setAttendanceStatus(currentStatus);
+            updateButtonTitle(currentStatus);
+        }
+    };
     useEffect(() => {
-        const fetchAttendanceApi = async () => {
-            const response = await fetchAttendance({
-                userId: currentUser?._id,
-                date: formattedDate,
-            });
-            console.log("🚀 ~ file: MarkAttendance.js ~ fetchAttendance ~ response:", response);
-            if (response && response.length > 0) {
-                const currentStatus = response?.[0].status;
-                setAttendanceId(response?.[0]?._id)
-                setAttendanceStatus(currentStatus);
-                updateButtonTitle(currentStatus);
-            }
-        };
-
-        fetchAttendanceApi();
-
         (async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
+            console.log("🚀 ~ file: MarkAttendance.js:110 ~ status:", status);
             if (status !== 'granted') {
                 console.log('Permission to access location was denied');
                 setLoading(false);
                 return;
             }
-
-            const location = await Location.getCurrentPositionAsync({});
-            setLocationData({
-                longitude: location.coords.longitude,
-                latitude: location.coords.latitude,
-            });
-            setLoading(false);
+            try {
+                const location = await Location.getCurrentPositionAsync({});
+                setLocationData({
+                    longitude: location.coords.longitude,
+                    latitude: location.coords.latitude,
+                });
+            } catch (error) {
+                console.log('Error getting location:', error);
+            } finally {
+                setLoading(false);
+            }
         })();
+        fetchAttendanceApi();
     }, []);
 
     return (
@@ -138,7 +139,9 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
                 <Button title={buttonTitle} onPress={handleMarkAttendance} disabled={isButtonDisabled} width={'80%'} alignSelf={'center'} />
                 <View style={{ marginBottom: 100 }} />
                 <Text style={{ fontFamily: FONT_FAMILY.urbanistSemiBold }}>You should be inside your shop</Text>
-                {!loading && (
+                {loading ? (
+                    <OverlayLoader visible={loading} />
+                ) : (
                     <MapViewComponent
                         longitude={locationData.longitude}
                         latitude={locationData.latitude}
