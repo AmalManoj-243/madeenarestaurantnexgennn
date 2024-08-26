@@ -104,25 +104,6 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
         }
     };
     useEffect(() => {
-        (async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                setLoading(false);
-                return;
-            }
-            try {
-                const location = await Location.getCurrentPositionAsync({});
-                setLocationData({
-                    longitude: location.coords.longitude,
-                    latitude: location.coords.latitude,
-                });
-            } catch (error) {
-                console.log('Error getting location:', error);
-            } finally {
-                setLoading(false);
-            }
-        })();
         fetchAttendanceApi();
     }, []);
 
@@ -136,16 +117,20 @@ const MarkAttendanceScreen = ({ navigation, route }) => {
             <RoundedScrollContainer>
                 <FormInput label={'Date & Time'} editable={false} value={formatDate(date, 'yyyy-MM-dd')} />
                 <Button title={buttonTitle} onPress={handleMarkAttendance} disabled={isButtonDisabled} width={'80%'} alignSelf={'center'} />
-                <View style={{ marginBottom: 100 }} />
-                <Text style={{ fontFamily: FONT_FAMILY.urbanistSemiBold }}>You should be inside your shop</Text>
+                {/* <View style={{ marginBottom: 100 }} />
                 {loading ? (
                     <OverlayLoader visible={loading} />
                 ) : (
-                    <MapViewComponent
-                        longitude={locationData.longitude}
-                        latitude={locationData.latitude}
-                    />
-                )}
+                    locationData.latitude && locationData.longitude && (
+                        <>
+                        <Text style={{ fontFamily: FONT_FAMILY.urbanistSemiBold }}>You should be inside your shop</Text>
+                        <MapViewComponent
+                            longitude={locationData.longitude}
+                            latitude={locationData.latitude}
+                        />
+                        </>
+                    )
+                )} */}
             </RoundedScrollContainer>
         </SafeAreaView>
     );

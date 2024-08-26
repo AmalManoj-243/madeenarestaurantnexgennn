@@ -87,7 +87,7 @@ const BoxInspectionScreen = ({ navigation, route }) => {
           warehouse_id: currentUser.warehouse?.warehouse_id,
         };
         const response = await post('/createInventoryBoxRequest', requestPayload);
-        if (response.success) {
+        if (response.success === false) {
           navigation.navigate('BoxInspectionForm', { item, groupId });
         } else {
           showToast({ type: 'error', title: 'Error', message: "You don't have permission to open this box." });

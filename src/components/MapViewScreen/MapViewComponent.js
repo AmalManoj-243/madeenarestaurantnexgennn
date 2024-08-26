@@ -2,8 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { showToastMessage } from '@components/Toast';
 
 const MapViewComponent = ({ longitude, latitude }) => {
+      // Validate latitude and longitude
+      if (!latitude || !longitude) {
+        showToastMessage("Invalid Coordinates Latitude or Longitude is missing.");
+        return null;
+    }
     return (
             <MapView
                 style={styles.map}
