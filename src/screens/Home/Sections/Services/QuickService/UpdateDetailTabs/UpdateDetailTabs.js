@@ -3,7 +3,6 @@ import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 import { useState } from 'react';
 import UpdateDetail from './UpdateDetail';
-import FollowUp from './FollowUp';
 import { SafeAreaView } from '@components/containers';
 import NavigationHeader from '@components/Header/NavigationHeader';
 import { CustomTabBar } from '@components/TabBar';
@@ -19,15 +18,12 @@ const UpdateDetailTabs = ({ navigation }) => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'Update Details' },
-    { key: 'second', title: 'Follow Up' },
   ]);
 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case 'first':
         return <UpdateDetail serviceId={id} details={details} />;
-      case 'second':
-        return <FollowUp serviceId={id} />;
       default:
         return null;
     }

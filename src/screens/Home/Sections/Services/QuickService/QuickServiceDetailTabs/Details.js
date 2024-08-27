@@ -76,7 +76,7 @@ const Details = ({ serviceId }) => {
             };
             const response = await post('/createJobApproveQuote', updateJobData);
             if (response.success === "true") {
-                showToastMessage('Job successfully updated!');
+                // showToastMessage('Job successfully updated!');
                 navigation.navigate('UpdateDetailTabs', {
                     id: serviceId,
                     details: {

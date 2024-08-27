@@ -25,9 +25,21 @@ const UpdateDetail = ({ serviceId }) => {
     const [unitPrice, setUnitPrice] = useState('');
     const [uom, setUom] = useState(null);
     const [tax, setTax] = useState('');
+    const [serviceCharge, setServiceCharge] = useState('');
     const [subTotal, setSubTotal] = useState('');
     const [savedItems, setSavedItems] = useState([]);
     console.log("🚀 ~ file: UpdateDetail.js:30 ~ UpdateDetail ~ savedItems:", savedItems)
+
+    const [formData, setFormData] = useState({
+        spareName: '',
+        description: '',
+        quantity: '',
+        uom: '',
+        unitPrice: '',
+        tax: '',
+        serviceCharge: '',
+        subTotal: '',
+    });
 
     const [dropdown, setDropdown] = useState({
         products: [],
@@ -44,6 +56,7 @@ const UpdateDetail = ({ serviceId }) => {
                         id: data._id,
                         label: data.product_name?.trim(),
                         unit_price: data.sale_price,
+                        product_description: data.product_description,
                     })),
                 }));
             } catch (error) {
@@ -63,6 +76,7 @@ const UpdateDetail = ({ serviceId }) => {
                     unitofmeasure: UnitOfMeasureData.map(data => ({
                         id: data._id,
                         label: data.uom_name,
+                        product_description: data.product_description,
                     })),
                 }));
             } catch (error) {
@@ -104,27 +118,29 @@ const UpdateDetail = ({ serviceId }) => {
         setIsVisible(!isVisible);
     };
 
-    const handleSave = () => {
-        if (!spareName || !description || !quantity || !uom || !unitPrice || !tax || !subTotal) {
-            showToastMessage('Please fill out all fields.');
+    const handleSubmit = () => {
+        if (!spareName || !tax || !serviceCharge) {
+            showToastMessage('Please select Spare Name, Service Charge and Tax To Proceed');
             return;
         }
-        const newItem = {
-            spareName: spareName.label,
-            description,
-            quantity,
-            uom: uom.label,
-            unitPrice,
-            tax,
-            subTotal,
+        const spareItem = {
+            spareName: spareName?.label || '',
+            description: description || '',
+            quantity: quantity || '',
+            uom: uom?.label || '',
+            unitPrice: unitPrice || '',
+            tax: tax || '',
+            serviceCharge: serviceCharge || '',
+            subTotal: subTotal || '',
         };
-        setSavedItems([...savedItems, newItem]);
+        setSavedItems([...savedItems, spareItem]);
         setSpareName(null);
         setDescription('');
         setQuantity('');
         setUom(null);
         setUnitPrice('');
         setTax('');
+        setServiceCharge(''),
         setSubTotal('');
         setShowForm(false);
     };
@@ -137,8 +153,11 @@ const UpdateDetail = ({ serviceId }) => {
         setSpareName(selectedProduct);
         const unitPrice = selectedProduct.unit_price ? selectedProduct.unit_price.toString() : '0';
         setUnitPrice(unitPrice);
-        const calculatedSubTotal = calculateSubTotal(unitPrice, quantity);
+        const defaultQuantity = '1';
+        setQuantity(defaultQuantity);
+        const calculatedSubTotal = calculateSubTotal(unitPrice, defaultQuantity);
         setSubTotal(calculatedSubTotal);
+        setDescription(selectedProduct.product_description || '');
     };
 
     const handleQuantityChange = (value) => {
@@ -197,6 +216,7 @@ const UpdateDetail = ({ serviceId }) => {
                         placeholder="Select Product Name"
                         dropIcon="menu-down"
                         multiline
+                        required
                         editable={false}
                         items={dropdown.products}
                         value={spareName?.label?.trim()}
@@ -229,7 +249,7 @@ const UpdateDetail = ({ serviceId }) => {
                     <FormInput
                         label="Unit Price"
                         placeholder="Enter Unit Price"
-                        editable={true}
+                        editable={false}
                         keyboardType="numeric"
                         value={unitPrice}
                         onChangeText={setUnitPrice}
@@ -238,9 +258,18 @@ const UpdateDetail = ({ serviceId }) => {
                         label="Taxes"
                         placeholder="Enter Tax"
                         editable={true}
+                        required
                         keyboardType="numeric"
                         value={tax}
                         onChangeText={setTax}
+                    />
+                    <FormInput
+                        label="Service Charge"
+                        placeholder="Enter Service Charge"
+                        editable={true}
+                        keyboardType="numeric"
+                        value={serviceCharge}
+                        onChangeText={setServiceCharge}
                     />
                     <FormInput
                         label="Sub Total"
@@ -250,7 +279,7 @@ const UpdateDetail = ({ serviceId }) => {
                         value={subTotal}
                         onChangeText={setSubTotal}
                     />
-                  <Button title={'Save'} onPress={handleSave} backgroundColor={COLORS.primaryThemeColor}/>
+                    <Button title={'Save'} onPress={handleSubmit} backgroundColor={COLORS.primaryThemeColor} />
                 </>
             )}
 
@@ -276,7 +305,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.primaryThemeColor,
         fontFamily: FONT_FAMILY.urbanistSemiBold,
-      },
+    },
 });
 
 export default UpdateDetail;

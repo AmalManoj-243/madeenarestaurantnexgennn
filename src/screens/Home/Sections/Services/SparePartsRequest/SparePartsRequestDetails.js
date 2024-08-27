@@ -22,26 +22,26 @@ const SparePartsRequestDetails = () => {
         }
     }, [updatedData]);
 
-    // const fetchDetails = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const updatedDetails = await fetchSparePartsDetails(serviceId);
-    //         setDetails(updatedDetails[0] || {});
-    //     } catch (error) {
-    //         console.error('Error fetching service details:', error);
-    //         showToastMessage('Failed to fetch service details. Please try again.');
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
+    const fetchDetails = async () => {
+        setIsLoading(true);
+        try {
+            const updatedDetails = await fetchSparePartsDetails(serviceId);
+            setDetails(updatedDetails[0] || {});
+        } catch (error) {
+            console.error('Error fetching service details:', error);
+            showToastMessage('Failed to fetch service details. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         if (serviceId) {
-    //             fetchDetails(serviceId);
-    //         }
-    //     }, [serviceId])
-    // );
+    useFocusEffect(
+        useCallback(() => {
+            if (serviceId) {
+                fetchDetails(serviceId);
+            }
+        }, [serviceId])
+    );
 
     const renderSavedItem = ({ item }) => (
         <View style={styles.savedItem}>
