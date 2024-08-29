@@ -13,6 +13,7 @@ import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { put } from '@api/services/utils';
 
 const UpdateDetails = ({ route, navigation }) => {
     const { id } = route.params || {};
@@ -100,7 +101,7 @@ const UpdateDetails = ({ route, navigation }) => {
           }
           console.log("🚀 ~ submit ~ spareData:", JSON.stringify(spareData, null, 2));
           try {
-            const response = await post("/updateJobRegistration", spareData);
+            const response = await put("/updateJobRegistration", spareData);
             console.log("🚀 ~ submit ~ response:", response);
             if (response.success === 'true') {
               showToast({
@@ -108,8 +109,7 @@ const UpdateDetails = ({ route, navigation }) => {
                 title: "Success",
                 message: response.message || "Spare Parts Request updated successfully",
               });
-    
-              navigation.navigate("SparePartsRequestScreen");
+              navigation.navigate("QuickServiceScreen");
             } else {
               console.error("Spare Parts Request Failed:", response.message);
               showToast({
