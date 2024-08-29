@@ -15,9 +15,7 @@ const KPIDashboardScreen = ({ navigation }) => {
     const screenWidth = Dimensions.get('window').width;
     const isFocused = useIsFocused();
     const currentUser = useAuthStore((state)=> state.user);
-    console.log("currentUSer",currentUser);
     const currentUserId = currentUser?.related_profile?._id || '';
-    console.log("currentUserId",currentUserId);
     const [dashBoardDetails, setDashBoardDetails] = useState({
         assignedKpiData: [],
         importantKpiData: [],
@@ -48,6 +46,7 @@ const KPIDashboardScreen = ({ navigation }) => {
         //     service_kpi_data: data.service_kpi_data || [],
         //     task_managments: data.task_managments || [],
         //     in_progress_kpi: data.in_progress_kpi || [],
+        //     completedKpi: data.completed_kpi || []
         // });
         } catch(error){
             console.error('Error fetching visit details:', error);
@@ -72,7 +71,7 @@ const KPIDashboardScreen = ({ navigation }) => {
     };
 
     const DotLegend = ({ color, label, value, onPress }) => (
-        <TouchableOpacity onPress={onPress} style={styles.itemContainer}>
+        <TouchableOpacity onPress={() => onPress(label)}  style={styles.itemContainer}>
             <View style={[styles.legendDot, { backgroundColor: color }]} />
             <Text style={styles.legendLabel}>{`${label}: ${value}`}</Text>
         </TouchableOpacity>
@@ -90,16 +89,15 @@ const KPIDashboardScreen = ({ navigation }) => {
     const PieSection = ({ data, title, count }) => (
         <View style={styles.chartContainer}>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.countText}>{count}</Text>
             <View style={styles.divider} />
             <View style={styles.chartLegendContainer}>
                 <PieChart
                     data={data}
-                    width={screenWidth / 2}
+                    width={screenWidth * 0.45} 
                     chartConfig={chartConfig}
                     accessor={'value'}
                     backgroundColor={'transparent'}
-                    center={[30, 0]}
+                    center={[35, -10]}  
                     height={175.24}
                     absolute
                     hasLegend={false}
@@ -111,13 +109,15 @@ const KPIDashboardScreen = ({ navigation }) => {
                             color={item.color}
                             label={item.name}
                             value={item.value}
-                            onPress={item.navigation}
+                            onPress={(category) => navigation.navigate('KPIListingScreen', { kpiCategory: category })}
                         />
                     ))}
                 </View>
             </View>
         </View>
     );
+    
+    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         backgroundColor: 'white',
         borderRadius: 15,
-        padding: 20,
+        padding: 15,
         ...Platform.select({
           android: {
             elevation: 4,

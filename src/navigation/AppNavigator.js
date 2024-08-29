@@ -53,7 +53,7 @@ const AppNavigator = () => {
       />
       <Tab.Screen
         name="Cart"
-        component={CartScreen}
+        component={KPIDashboardScreen}
         options={{
           tabBarIcon: ({ focused }) =>
             <TabBarIcon

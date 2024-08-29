@@ -34,6 +34,7 @@ import { ServiceScreen } from "@screens/Home/Sections/Services";
 import { SparePartsRequestScreen } from "@screens/Home/Sections/Services/SparePartsRequest";
 import SparePartsRequestDetails from "@screens/Home/Sections/Services/SparePartsRequest/SparePartsRequestDetails";
 import { AddSpareParts, ServiceDetails, UpdateDetails } from "@screens/Home/Sections/Services/QuickService";
+import { KPIListingScreen } from "@screens/KPIDashboard";
 
 const Stack = createNativeStackNavigator();
 
@@ -348,6 +349,11 @@ const StackNavigator = () => {
         name="MarkAttendance"
         component={MarkAttendance}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+      name="KPIListingScreen"
+      component={KPIListingScreen}
+      options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
