@@ -9,6 +9,7 @@ import { Button } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
+import { put } from '@api/services/utils';
 
 const AddSpareParts = ({ navigation, route }) => {
 
@@ -132,20 +133,73 @@ const AddSpareParts = ({ navigation, route }) => {
         return isValid;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const fieldsToValidate = ['spareParts', 'tax'];
         if (validateForm(fieldsToValidate)) {
-            const spareItem = {
-                spareParts: formData.spareParts?.label || '',
-                description: formData.description || '',
-                quantity: formData.quantity || '',
-                uom: formData.uom?.label || '',
-                unitPrice: formData.unitPrice || '',
-                tax: formData.tax || '',
-                subTotal: formData.subTotal || '',
+            const requestBody = {
+                job_registration_id: "66cc681fbf21f17a3e23c6ba",
+                date: "2024-08-26T11:33:53.718Z",
+                status: "waiting for parts",
+                created_by: null,
+                created_by_name: "",
+                assigned_to: "66aca087b8b0f7479320d8c3",
+                assigned_to_name: "Akhil",
+                warehouse_id: formData?.warehouse.id ?? null,
+                warehouse_name: formData.warehouse?.label ?? null,
+                job_diagnosis_ids: [
+                    {
+                        job_diagnosis_id: "66cc6838bf21f17a3e23c6e2",
+                        job_diagnosis_parts: [
+                            {
+                                product_id: formData.spareParts.id,
+                                product_name: formData.spareParts.label ?? null,
+                                description: formData.description,
+                                uom_id: formData.uom,
+                                uom: dropdown.unitofmeasure.find(uom => uom.id === formData.uom)?.label || '',
+                                quantity: parseFloat(formData.quantity),
+                                unit_price: parseFloat(formData.unitPrice),
+                                unit_cost: parseFloat(formData.serviceCharge),
+                                tax_type_id: "648d9b54ef9cd868dfbfa37b",
+                                tax_type_name: formData.tax,
+                                job_diagnosis_id: "66cc6838bf21f17a3e23c6e2",
+                                status: "out_of_stock",
+                                id: "66cc6838bf21f17a3e23c6e6",
+                                _v: 0
+                            }
+                        ]
+                    }
+                ],
+                sales_person_id: formData?.assignedTo.id ?? null,
+                sales_person_name: formData.assignedTo?.label ?? null,
             };
+
+            try {
+                const response = await put("/updateJobRegistration", requestBody);
+                if (response.message === 'Succesfully updated Spare Part Request') {
+                    showToast({
+                        type: "success",
+                        title: "Success",
+                        message: response.message || "Spare Part Request updated successfully",
+                    });
+                    navigation.goBack();
+                } else {
+                    showToast({
+                        type: "error",
+                        title: "ERROR",
+                        message: response.message || "Spare Part Request updation failed",
+                    });
+                }
+            } catch (error) {
+                showToast({
+                    type: "error",
+                    title: "ERROR",
+                    message: "An unexpected error occurred. Please try again later.",
+                });
+            } finally {
+                setIsSubmitting(false);
+            }
             addSpareParts(spareItem);
-            navigation.navigate('UpdateDetail', { updatedItem: spareItem });
+                navigation.navigate('UpdateDetail', { updatedItem: spareItem });
         }
     };
 
@@ -269,7 +323,6 @@ const AddSpareParts = ({ navigation, route }) => {
 
 export default AddSpareParts
 
-// import axios from 'axios';
 // import React, { useState, useEffect } from 'react';
 // import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 // import { TextInput as FormInput } from '@components/common/TextInput';
@@ -281,6 +334,7 @@ export default AddSpareParts
 // import { COLORS } from '@constants/theme';
 // import { Keyboard, Alert } from 'react-native';
 // import { validateFields } from '@utils/validation';
+// import { put } from '@api/services/utils';
 
 // const AddSpareParts = ({ navigation, route }) => {
 
@@ -445,39 +499,30 @@ export default AddSpareParts
 //     };
 
 //     try {
-//         const response = await post("/createJobApproveQuote", requestBody);
-//         // console.log("🚀 ~ submit ~ response:", response);
-// if (response.success === 'true') {
+//         const response = await put("/updateJobRegistration", requestBody);
+// if (response.message === 'Succesfully updated Spare Part Request') {
 //     showToast({
-//       type: "success",
-//       title: "Success",
-//       message: response.message || "Spare Parts created successfully",
+//         type: "success",
+//         title: "Success",
+//         message: response.message || "Spare Part Request updated successfully",
 //     });
-
-//     navigation.goBack()
-//   } else {
-//     console.error("Spare Parts request Failed:", response.message);
+//     navigation.goBack();
+// } else {
 //     showToast({
-//       type: "error",
-//       title: "ERROR",
-//       message: response.message || "Spare Parts Service creation failed",
+//         type: "error",
+//         title: "ERROR",
+//         message: response.message || "Spare Part Request updation failed",
 //     });
-//   }
+// }
 // } catch (error) {
-//   console.error("Error Creating Spare Parts request Failed:", error);
-//   showToast({
+// showToast({
 //     type: "error",
 //     title: "ERROR",
 //     message: "An unexpected error occurred. Please try again later.",
-//   });
+// });
 // } finally {
-//   setIsSubmitting(false);
+// setIsSubmitting(false);
 // }
-//         navigation.goBack();
-//     } catch (error) {
-//         console.error('Error submitting spare parts data:', error);
-//         Alert.alert('Error', 'There was an error submitting the spare parts data.');
-//     }
 // }
 // };
 
