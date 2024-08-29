@@ -136,42 +136,39 @@ const AddSpareParts = ({ navigation, route }) => {
     const handleSubmit = async () => {
         const fieldsToValidate = ['spareParts', 'tax'];
         if (validateForm(fieldsToValidate)) {
-            const requestBody = {
-                job_registration_id: "66cc681fbf21f17a3e23c6ba",
-                date: "2024-08-26T11:33:53.718Z",
-                status: "waiting for parts",
-                created_by: null,
-                created_by_name: "",
-                assigned_to: "66aca087b8b0f7479320d8c3",
-                assigned_to_name: "Akhil",
-                warehouse_id: formData?.warehouse.id ?? null,
-                warehouse_name: formData.warehouse?.label ?? null,
-                job_diagnosis_ids: [
-                    {
-                        job_diagnosis_id: "66cc6838bf21f17a3e23c6e2",
-                        job_diagnosis_parts: [
-                            {
-                                product_id: formData.spareParts.id,
-                                product_name: formData.spareParts.label ?? null,
-                                description: formData.description,
-                                uom_id: formData.uom,
-                                uom: dropdown.unitofmeasure.find(uom => uom.id === formData.uom)?.label || '',
-                                quantity: parseFloat(formData.quantity),
-                                unit_price: parseFloat(formData.unitPrice),
-                                unit_cost: parseFloat(formData.serviceCharge),
-                                tax_type_id: "648d9b54ef9cd868dfbfa37b",
-                                tax_type_name: formData.tax,
-                                job_diagnosis_id: "66cc6838bf21f17a3e23c6e2",
-                                status: "out_of_stock",
-                                id: "66cc6838bf21f17a3e23c6e6",
-                                _v: 0
-                            }
-                        ]
-                    }
-                ],
-                sales_person_id: formData?.assignedTo.id ?? null,
-                sales_person_name: formData.assignedTo?.label ?? null,
-            };
+            // const requestBody =
+            // {
+            //     _id: id,
+            //     job_stage: 'Waiting for spare',
+            //     create_job_diagnosis: [
+            //         {
+            //             job_registration_id: id,
+            //             proposed_action_id: null,
+            //             proposed_action_name: null,
+            //             done_by_id: currentuser.related_profile?._id,
+            //             untaxed_total_amount: 12,
+            //             done_by_name: currentuser.related name,
+            //             parts_or_service_required: null,
+            //             service_type: null,
+            //             service_charge: 100,
+            //             total_amount: 112.6,
+            //             parts: sparePartsItems?.map(items => ({
+            //                     product_id: items.s,
+            //                     product_name: ENCLOSURE KIT CASE 2.5 SATA,
+            //                     description: ,
+            //                     uom_id: 66506f212e5cf73d8446ff52,
+            //                     uom: Pcs,
+            //                     quantity: 1,
+            //                     unit_price: 12,
+            //                     sub_total: 12,
+            //                     unit_cost: 150,
+            //                     tax_type_name: vat 5%,
+            //                     tax_type_id: 648d9b54ef9cd868dfbfa37b
+                        
+            //         })
+            //         }
+            //     ]
+            // }
 
             try {
                 const response = await put("/updateJobRegistration", requestBody);
