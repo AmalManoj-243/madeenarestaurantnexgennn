@@ -18,6 +18,7 @@ const UpdateDetails = ({ route, navigation }) => {
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [sparePartsItems, setSparePartsItems] = useState([]);
+    console.log(sparePartsItems, "Spare")
 
     // adding spare parts list items
     const addSpareParts = (addedItems) => {
@@ -44,6 +45,73 @@ const UpdateDetails = ({ route, navigation }) => {
             }
         }, [id])
     );
+
+    const handleSubmit = async () => {
+        const fieldsToValidate = ['spareParts', 'tax'];
+        if (validateForm(fieldsToValidate)) {
+            const requestBody =
+            {
+                _id: id,
+                job_stage: 'Waiting for spare',
+                create_job_diagnosis: [
+                    {
+                        job_registration_id: id,
+                        proposed_action_id: null,
+                        proposed_action_name: null,
+                        untaxed_total_amount: "",
+                        done_by_id: currentUser?.related_profile?._id ?? null,
+                        done_by_name: currentUser.related_profile.name ?? null,
+                        parts_or_service_required: null,
+                        service_type: null,
+                        service_charge: formData?.serviceCharge || null,
+                        total_amount: null,
+                        parts: sparePartsItems?.map(items => ({
+                            product_id: items.formData?.spareParts.id ?? null,
+                            product_name: items.formData?.spareParts.label ?? null,
+                            description: items.formData.description || null,
+                            uom_id: items.formData?.uom.id ?? null,
+                            uom: items.formData?.uom.label ?? null,
+                            quantity: items.formData.quantity || null,
+                            unit_price: items.formData.unitPrice || null,
+                            sub_total: items.formData.subTotal || null,
+                            unit_cost: null,
+                            tax_type_name: items.formData?.tax.id ?? null,
+                            tax_type_id: items.formData?.tax.label ?? null,
+
+                        }))
+                    }
+                ]
+            }
+
+            try {
+                const response = await put("/updateJobRegistration", requestBody);
+                if (response.message === 'Succesfully updated Spare Part Request') {
+                    showToast({
+                        type: "success",
+                        title: "Success",
+                        message: response.message || "Spare Part Request updated successfully",
+                    });
+                    addSpareParts(spareItem);
+                    navigation.navigate('UpdateDetail', { updatedItem: spareItem });
+                } else {
+                    showToast({
+                        type: "error",
+                        title: "ERROR",
+                        message: response.message || "Spare Part Request updation failed",
+                    });
+                }
+            } catch (error) {
+                showToast({
+                    type: "error",
+                    title: "ERROR",
+                    message: "An unexpected error occurred. Please try again later.",
+                });
+            } finally {
+                setIsSubmitting(false);
+            }
+        }
+    };
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
