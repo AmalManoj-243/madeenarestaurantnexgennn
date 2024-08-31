@@ -13,7 +13,7 @@ import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { post } from '@api/services/utils';
+import { post, put } from '@api/services/utils';
 import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 import { TextInput as FormInput } from '@components/common/TextInput';
