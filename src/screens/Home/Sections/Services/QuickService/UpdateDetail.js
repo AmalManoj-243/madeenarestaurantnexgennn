@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from '@components/containers';
@@ -13,7 +13,7 @@ import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { post, put } from '@api/services/utils';
+import { post } from '@api/services/utils';
 import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
 import { TextInput as FormInput } from '@components/common/TextInput';
@@ -25,6 +25,7 @@ const UpdateDetails = ({ route, navigation }) => {
   const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); 
   const [sparePartsItems, setSparePartsItems] = useState([]);
   const [formData, setFormData] = useState({
     subTotal: null,
@@ -154,15 +155,15 @@ const UpdateDetails = ({ route, navigation }) => {
         });
         navigation.navigate("QuickServiceScreen");
       } else {
-        console.error("Spare Parts Request Failed:", response.message);
+        console.error("Submit Failed:", response.message);
         showToast({
           type: "error",
           title: "ERROR",
-          message: response.message || "Spare Parts Request updation failed",
+          message: response.message || "Spare Parts Request update failed",
         });
       }
     } catch (error) {
-      console.error("Error Updating Spare Parts Request Failed:", error);
+      console.error("Error Submitting Spare Parts Request:", error);
       showToast({
         type: "error",
         title: "ERROR",
@@ -216,12 +217,21 @@ const UpdateDetails = ({ route, navigation }) => {
           keyExtractor={(item, index) => index.toString()}
         />
         <Button
+          title={'SAVE'}
+          width={'50%'}
+          alignSelf={'center'}
+          backgroundColor={isSaving ? COLORS.gray : COLORS.primaryThemeColor}
+          onPress={handleSave}
+          disabled={isSaving || isSubmitting}
+        />
+        <Button
           title={'SUBMIT'}
           width={'50%'}
           alignSelf={'center'}
-          backgroundColor={COLORS.primaryThemeColor}
+          backgroundColor={COLORS.orange}
           onPress={handleSubmit}
         />
+
       </RoundedScrollContainer>
       {isLoading && <OverlayLoader />}
     </SafeAreaView>
