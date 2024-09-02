@@ -25,6 +25,7 @@ const UpdateDetails = ({ route, navigation }) => {
   const [details, setDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); 
   const [sparePartsItems, setSparePartsItems] = useState([]);
   const [formData, setFormData] = useState({
     subTotal: null,
