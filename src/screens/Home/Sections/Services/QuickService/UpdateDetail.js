@@ -28,9 +28,11 @@ const UpdateDetails = ({ route, navigation }) => {
   // console.log("🚀 ~ file: UpdateDetail.js:28 ~ UpdateDetails ~ sparePartsItems:", JSON.stringify(sparePartsItems, null, 3))
   const [subTotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
+  const [calculatedTax, setCalculatedTax] = useState(0);
   const [formData, setFormData] = useState({
     subTotal: null,
     serviceCharge: 100,
+    spareTotalPrice: null,
     total: null,
   })
 
@@ -43,39 +45,48 @@ const UpdateDetails = ({ route, navigation }) => {
       uom_id: addedItems?.uom?.id,
       uom: addedItems?.uom.label,
       unit_price: addedItems.unitPrice,
-      unit_cost: null,
-      tax_type_id: addedItems?.tax?.id,
-      tax_type_name: addedItems?.tax?.label,
+      unit_cost: addedItems.unitCost,    // undefined
+      tax_type_id: addedItems?.tax?.id,   // undefined
+      tax_type_name: addedItems?.tax?.label,    // undefined
+      tax: addedItems?.tax,
+      spareTotalPrice: addedItems?.spareTotalPrice,
+      total: addedItems?.total,
     }
     setSparePartsItems(prevItems => [...prevItems, structureSpareItems]);
-    console.log(structureSpareItems, "Success")
+    console.log("Structure Spare Items", structureSpareItems)
   };
 
   const calculateTotals = () => {
-    // // here we want to display the addspareParts total amount + service charge
     let calculatedSparePartsTotal = sparePartsItems.reduce(
-    (sum, item) => sum + item.unit_price * item.quantity,0);
+      (sum, item) => sum + parseFloat(item.spareTotalPrice || 0), 0);
+
+    let accumulatedSparePartsTax = sparePartsItems.reduce(
+    (sum, item) => sum + parseFloat(item.tax || 0), 0);
 
     const serviceCharge = parseFloat(formData.serviceCharge) || 0;
+    const serviceChargeTax = serviceCharge * 0.05;
+
+    const totalTax = accumulatedSparePartsTax + serviceChargeTax;
+    setCalculatedTax(totalTax);
+
     const calculatedSubTotal = calculatedSparePartsTotal + serviceCharge;
     setSubTotal(calculatedSubTotal);
 
-    const tax = serviceCharge * 0.05;
-    const total = calculatedSubTotal + tax;
+    const total = calculatedSubTotal + totalTax;
     setTotal(total);
   };
-
-  useEffect(() => {
-    calculateTotals();
-  }, [sparePartsItems, formData.serviceCharge]);
-
-  const fetchDetails = async () => {
-    setIsLoading(true);
-    try {
-      const [updatedDetails] = await fetchServiceDetails(id);
-      setDetails(updatedDetails || {});
-      const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
-        diagnosis.job_diagnosis_parts?.map(part => {
+  
+    useEffect(() => {
+      calculateTotals();
+    }, [sparePartsItems, formData.serviceCharge]);
+    
+    const fetchDetails = async () => {
+      setIsLoading(true);
+      try {
+        const [updatedDetails] = await fetchServiceDetails(id);
+        setDetails(updatedDetails || {});
+        const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
+          diagnosis.job_diagnosis_parts?.map(part => {
           const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
           return cleanPart;
         }) || []
@@ -102,7 +113,7 @@ const UpdateDetails = ({ route, navigation }) => {
     }, [id])
   );
 
-  const handleJobApproveQuate = async (approveJobs) => {
+  const handleJobApproveQuote = async (approveJobs) => {
     const requestPayload = {
       job_registration_id: id,
       date: new Date(),
@@ -120,7 +131,7 @@ const UpdateDetails = ({ route, navigation }) => {
       sales_person_id: currentUser?.related_profile?._id,
       sales_person_name: currentUser?.related_profile?.name,
     }
-    console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuate ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
+    console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuote ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
     try {
       const response = await post("/createJobApproveQuote", requestPayload);
       console.log("🚀 ~ submit ~ response:", JSON.stringify(response, null, 2));
@@ -161,13 +172,13 @@ const UpdateDetails = ({ route, navigation }) => {
           job_registration_id: id,
           proposed_action_id: null,
           proposed_action_name: null,
-          done_by_id: currentUser?.related_profile?._id || null,
-          untaxed_total_amount: 120,
-          done_by_name: currentUser?.related_profile?.name || '',
+          done_by_id: currentUser?.related_profile?._id || null,  //
+          done_by_name: currentUser?.related_profile?.name || '', // 
+          untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),  // NAN
           parts_or_service_required: null,
           service_type: null,
           service_charge: parseInt(formData.serviceCharge, 0),
-          total_amount: 100,
+          total_amount: parseInt(formData.total, 0),    // // NAN
           parts: sparePartsItems.map((items) => ({
             product_id: items?.product_id,
             product_name: items?.product_name,
@@ -175,8 +186,9 @@ const UpdateDetails = ({ route, navigation }) => {
             quantity: items?.quantity,
             uom_id: items?.uom_id,
             uom: items?.uom,
-            unit_price: items.unit_price,
-            unit_cost: '',
+            unit_price: items?.unit_price,
+            total: items?.total,
+            unit_cost: items?.unit_cost,  // undefined
             tax_type_id: items?.tax_type_id,
             tax_type_name: items?.tax_type_name,
           }))
@@ -185,8 +197,9 @@ const UpdateDetails = ({ route, navigation }) => {
     }
     try {
       const response = await put("/updateJobRegistration", requestPayload);
+      console.log("Console Of Request", requestPayload)
       if (response.success === 'true') {
-        handleJobApproveQuate(response);
+        handleJobApproveQuote(response);
         showToast({
           type: "success",
           title: "Success",
@@ -261,7 +274,7 @@ const UpdateDetails = ({ route, navigation }) => {
         </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Tax : </Text>
-            <Text style={styles.totalValue}>{(parseFloat(formData.serviceCharge) * 0.05).toFixed(2)}</Text>
+            <Text style={styles.totalValue}>{calculatedTax.toFixed(2)}</Text>
           </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Total : </Text>

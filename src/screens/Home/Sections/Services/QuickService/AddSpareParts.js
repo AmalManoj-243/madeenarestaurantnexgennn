@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchProductsDropdown, fetchUnitOfMeasureDropdown, fetchTaxDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchProductsDropdown,fetchUnitOfMeasureDropdown,fetchTaxDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
@@ -9,7 +9,6 @@ import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
 import { CheckBox } from '@components/common/CheckBox';
-import { View, Text, StyleSheet } from 'react-native';
 
 const AddSpareParts = ({ navigation, route }) => {
     const { id, addSpareParts } = route?.params || {};
@@ -29,7 +28,7 @@ const AddSpareParts = ({ navigation, route }) => {
         uom: '',
         unitPrice: '',
         isInclusive: false,
-        tax: '',
+        tax: '',       // VAT 5% id and its label
         subTotal: '',
     });
 
@@ -198,24 +197,34 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
 
 
     useEffect(() => {
-        const fetchTaxes = async () => {
+        const fetchTax = async () => {
             try {
-                const TaxesData = await fetchTaxDropdown();
+                const TaxData = await fetchTaxDropdown();
+                const taxItems = TaxData.map(data => ({
+                    id: data._id,
+                    label: data.tax_type_name,
+                }));
+    
+                const defaultTax = taxItems.find(tax => tax.label === 'VAT 5%');
                 setDropdown(prevDropdown => ({
                     ...prevDropdown,
-                    taxes: TaxesData.map(data => ({
-                        id: data._id,
-                        label: data.tax_type_name,
-                    })),
+                    taxes: taxItems,
                 }));
+    
+                if (defaultTax) {
+                    setFormData(prevFormData => ({
+                        ...prevFormData,
+                        tax: defaultTax,
+                    }));
+                }
             } catch (error) {
                 console.error('Error fetching Tax dropdown data:', error);
             }
         };
-
-        fetchTaxes();
+    
+        fetchTax();
     }, []);
-
+    
     const toggleBottomSheet = (type) => {
         setSelectedType(isVisible ? null : type);
         setIsVisible(!isVisible);
@@ -239,6 +248,8 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
                 unitPrice: formData.unitPrice || '',
                 tax: formData.tax || '',
                 subTotal: formData.subTotal || '',
+                spareTotalPrice: formData.spareTotalPrice || '',
+                total: formData.total || '',
             };
             addSpareParts(spareItem);
             navigation.navigate('UpdateDetail', { id });
@@ -258,7 +269,7 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
                 items = dropdown.unitofmeasure;
                 fieldName = 'uom';
                 break;
-            case 'Taxes':
+            case 'Tax':
                 items = dropdown.taxes;
                 fieldName = 'tax';
                 break;
@@ -333,7 +344,7 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
                     dropIcon="menu-down"
                     required
                     editable={false}
-                    value={"VAT 5%"}
+                    value={formData.tax?.label || 'VAT 5%'}
                 />
                 <CheckBox
                     checked={formData.isInclusive}
@@ -355,18 +366,6 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
                     editable={false}
                     value={formData.total}
                 />
-                {/* <View style={styles.totalSection}>
-                    <Text style={styles.totalLabel}>Spare Total Price: </Text>
-                    <Text style={styles.totalValue}>{formData.spareTotalPrice}</Text>
-                </View>
-                <View style={styles.totalSection}>
-                    <Text style={styles.totalLabel}>Spare Tax: </Text>
-                    <Text style={styles.totalValue}>{formData.tax}</Text>
-                </View>
-                <View style={styles.totalSection}>
-                    <Text style={styles.totalLabel}>Total: </Text>
-                    <Text style={styles.totalValue}>{formData.total}</Text>
-                </View> */}
                 <Button
                     title={'Add Item'}
                     width={'50%'}
@@ -379,29 +378,5 @@ const calculateTax = (unitPrice, quantity, isInclusive) => {
         </SafeAreaView>
     );
 };
-
-// const styles = StyleSheet.create({
-//     label: {
-//         marginVertical: 5,
-//         fontSize: 16,
-//         color: COLORS.primaryThemeColor,
-//         fontFamily: FONT_FAMILY.urbanistSemiBold,
-//     },
-//     totalSection: {
-//         flexDirection: 'row',
-//         marginVertical: 5,
-//         margin: 10,
-//         alignSelf: "center",
-//       },
-//       totalLabel: {
-//         fontSize: 16,
-//         fontFamily: FONT_FAMILY.urbanistBold,
-//       },
-//       totalValue: {
-//         fontSize: 16,
-//         fontFamily: FONT_FAMILY.urbanistBold,
-//         color: '#666666',
-//       },
-// });
 
 export default AddSpareParts;
