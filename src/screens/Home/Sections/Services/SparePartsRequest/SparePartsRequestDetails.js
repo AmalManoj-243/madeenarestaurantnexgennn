@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import NavigationHeader from '@components/Header/NavigationHeader';
@@ -12,22 +12,19 @@ import { OverlayLoader } from '@components/Loader';
 import { LoadingButton } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
 import { post } from '@api/services/utils';
-import { ConfirmationModal } from '@components/Modal';
 
 const SparePartsRequestDetails = ({ navigation, route }) => {
     const { id: serviceId } = route?.params || {};
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
-    const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
     const [closingReason, setClosingReason] = useState('');
-    const [actionToPerform, setActionToPerform] = useState(null);
 
     const fetchDetails = async () => {
         setIsLoading(true);
         try {
             const updatedDetails = await fetchSparePartsDetails(serviceId);
+            console.log('Fetched details:', updatedDetails); // Log details
             setDetails(updatedDetails[0] || {});
         } catch (error) {
             console.error('Error fetching service details:', error);
@@ -52,7 +49,8 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
                 service_id: serviceId,
                 reason: closingReason,
             };
-            const response = await post('/deleteJobData', deleteJobData);  //
+            const response = await post('/deleteJobData', deleteJobData);
+            console.log('Delete job response:', response); // Log delete response
             if (response.success === "true") {
                 showToastMessage('Job successfully deleted!');
             } else {
@@ -64,7 +62,6 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
         } finally {
             fetchDetails();
             setIsSubmitting(false);
-            setIsConfirmationModalVisible(false);
             setClosingReason('');
         }
     };
@@ -75,9 +72,11 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
             const issueJobData = {
                 service_id: serviceId,
             };
-            const response = await post('/issueJObDAta', issueJobData);  ///
+            const response = await post('/createSparePartsIssue', issueJobData);
+            console.log('Issue job response:', response); // Log issue response
+            console.log('Details before navigation:', details); // Log details before navigation
             if (response.success === "true") {
-                navigation.navigate('SparePartsIssue', {
+                navigation.navigate('SparePartsIssueCreation', {
                     id: serviceId,
                     details: {
                         date: details.date,
@@ -96,7 +95,6 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
         } finally {
             fetchDetails();
             setIsSubmitting(false);
-            setIsUpdateModalVisible(false);
         }
     };
 
@@ -118,41 +116,16 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
                         width={'50%'}
                         backgroundColor={COLORS.lightRed}
                         title="DELETE"
-                        onPress={() => {
-                            setActionToPerform('close');
-                            setIsConfirmationModalVisible(true);
-                        }}
+                        onPress={handleDeleteJob}
                     />
                     <View style={{ width: 5 }} />
                     <LoadingButton
                         width={'50%'}
                         backgroundColor={COLORS.green}
                         title="ISSUE"
-                        onPress={() => {
-                            setActionToPerform('update');
-                            setIsUpdateModalVisible(true);
-                        }}
+                        onPress={handleIssueJob}
                     />
                 </View>
-
-                <ConfirmationModal
-                    isVisible={isConfirmationModalVisible}
-                    onCancel={() => setIsConfirmationModalVisible(false)}
-                    onConfirm={() => {
-                        if (actionToPerform === 'close') {
-                            handleDeleteJob();
-                        }
-                    }}
-                    headerMessage='Are you sure you want to delete?'
-                />
-
-                <ConfirmationModal
-                    isVisible={isUpdateModalVisible}
-                    onCancel={() => setIsUpdateModalVisible(false)}
-                    onConfirm={handleIssueJob}
-                    headerMessage='Are you sure you want to issue this?'
-                />
-
                 <OverlayLoader visible={isLoading || isSubmitting} />
             </RoundedScrollContainer>
         </SafeAreaView>
