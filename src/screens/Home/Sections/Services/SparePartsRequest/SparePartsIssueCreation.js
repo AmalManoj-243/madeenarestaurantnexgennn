@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
-import { fetchProductsDropdown, fetchUnitOfMeasureDropdown, fetchTaxDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchProductsDropdown,fetchUnitOfMeasureDropdown,fetchTaxDropdown } from '@api/dropdowns/dropdownApi';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
-import { COLORS } from '@constants/theme';
+import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
 import { CheckBox } from '@components/common/CheckBox';
 
-const AddSpareParts = ({ navigation, route }) => {
+const SparePartsIssueCreation = ({ navigation, route }) => {
     const { id, addSpareParts } = route?.params || {};
     const [selectedType, setSelectedType] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -28,33 +28,54 @@ const AddSpareParts = ({ navigation, route }) => {
         uom: '',
         unitPrice: '',
         isInclusive: false,
-        tax: '',
+        tax: '',       // VAT 5% id and its label
         subTotal: '',
+        taxType: ''
     });
+
+   console.log('Formdata-------------------------------', formData) 
 
     const [errors, setErrors] = useState({});
 
-    const calculateTax = (subTotal, isInclusive) => {
-        return isInclusive ? 0 : (parseFloat(subTotal) * 0.05).toFixed(2);
-    };
+    const calculateSubTotal = (unitPrice, quantity, isInclusive) => {
+        const subtotal = parseFloat(unitPrice) * parseFloat(quantity);
 
-    const calculateSubTotal = (unitPrice, quantity, tax, isInclusive) => {
-        const initialSubTotal = unitPrice && quantity ? (parseFloat(unitPrice) * parseFloat(quantity)).toFixed(2) : '0';
         if (isInclusive) {
-            return initialSubTotal;
+            const tax = (subtotal / 1.05) * 0.05;
+            return (subtotal - tax).toFixed(2);
         } else {
-            return initialSubTotal && tax ? (parseFloat(initialSubTotal) + parseFloat(tax)).toFixed(2) : initialSubTotal;
+            return subtotal.toFixed(2);
         }
     };
 
+    const handleQuantityChange = (value, ) => {
+        const spareTotalPrice = calculateSpareTotalPrice(formData.unitPrice, value, formData.isInclusive);
+        const tax = calculateTax(formData.unitPrice, value, formData.isInclusive);
+        const total = calculateTotal(spareTotalPrice, tax);
+    
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            quantity: value,
+            spareTotalPrice,
+            tax,
+            total,
+        }));
+    };
+    
     const handleFieldChange = (field, value) => {
         let updatedFormData = { ...formData, [field]: value };
     
         if (field === 'unitPrice' || field === 'quantity') {
-            const subTotal = calculateSubTotal(updatedFormData.unitPrice, updatedFormData.quantity, updatedFormData.tax, updatedFormData.isInclusive);
+            const spareTotalPrice = calculateSpareTotalPrice(updatedFormData.unitPrice, updatedFormData.quantity, updatedFormData.isInclusive);
+            const tax = calculateTax(updatedFormData.unitPrice, updatedFormData.quantity, updatedFormData.isInclusive);
+            const total = calculateTotal(spareTotalPrice, tax);
+    
             updatedFormData = {
                 ...updatedFormData,
-                subTotal,
+                subTotal: calculateSubTotal(updatedFormData.unitPrice, updatedFormData.quantity, tax, updatedFormData.isInclusive),
+                spareTotalPrice,
+                tax,
+                total,
             };
         }
     
@@ -67,40 +88,49 @@ const AddSpareParts = ({ navigation, route }) => {
             }));
         }
     };
-
-    const handleQuantityChange = (value) => {
-        const initialSubTotal = (parseFloat(formData.unitPrice) * parseFloat(value)).toFixed(2);
-        const tax = calculateTax(initialSubTotal, formData.isInclusive);
-        const subTotal = calculateSubTotal(formData.unitPrice, value, tax, formData.isInclusive);
     
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            quantity: value,
-            tax,
-            subTotal,
-        }));
-    };
-
     const handleInclusiveChange = (isInclusive) => {
-        const initialSubTotal = (parseFloat(formData.unitPrice) * parseFloat(formData.quantity)).toFixed(2);
-        const tax = calculateTax(initialSubTotal, isInclusive);
-        const subTotal = calculateSubTotal(formData.unitPrice, formData.quantity, tax, isInclusive);
+        const spareTotalPrice = calculateSpareTotalPrice(formData.unitPrice, formData.quantity, isInclusive);
+        const tax = calculateTax(formData.unitPrice, formData.quantity, isInclusive);
+        const total = calculateTotal(spareTotalPrice, tax);
     
         setFormData(prevFormData => ({
             ...prevFormData,
             isInclusive,
+            spareTotalPrice,
             tax,
-            subTotal,
+            total,
         }));
     };
+    
+const calculateSpareTotalPrice = (unitPrice, quantity, isInclusive) => {
+    const subtotal = parseFloat(unitPrice) * parseFloat(quantity);
+    
+    if (isInclusive) {
+        const spareTotalWithoutTax = (subtotal / 1.05).toFixed(2);
+        return spareTotalWithoutTax;
+    } else {
+        return subtotal.toFixed(2);
+    }
+};
+
+const calculateTax = (unitPrice, quantity, isInclusive) => {
+    const subtotal = parseFloat(unitPrice) * parseFloat(quantity);
+    if (isInclusive) {
+        return (subtotal - (subtotal / 1.05)).toFixed(2);
+    } else {
+        return (subtotal * 0.05).toFixed(2);
+    }
+};
 
     const handleProductSelection = (selectedProduct) => {
         const unitPrice = selectedProduct.unitPrice ? selectedProduct.unitPrice.toString() : '0';
         const description = selectedProduct.productDescription || '';
-        const defaultQuantity = '1';
+        const defaultQuantity = "1";
         const initialSubTotal = (parseFloat(unitPrice) * parseFloat(defaultQuantity)).toFixed(2);
-        const tax = calculateTax(initialSubTotal, formData.isInclusive);
-        const calculatedSubTotal = calculateSubTotal(unitPrice, defaultQuantity, tax);
+        const tax = calculateTax(initialSubTotal,defaultQuantity,formData.isInclusive);
+        const total = calculateTotal(initialSubTotal,tax)
+        const spareTotalPrice = initialSubTotal
 
         setFormData(prevFormData => ({
             ...prevFormData,
@@ -109,8 +139,13 @@ const AddSpareParts = ({ navigation, route }) => {
             unitPrice,
             quantity: defaultQuantity,
             tax,
-            subTotal: calculatedSubTotal,
+            spareTotalPrice,
+            total,
         }));
+    };
+
+    const calculateTotal = (spareTotalPrice, tax,) => {
+        return (parseFloat(spareTotalPrice) + parseFloat(tax)).toFixed(2);
     };
 
     useEffect(() => {
@@ -138,13 +173,23 @@ const AddSpareParts = ({ navigation, route }) => {
         const fetchUnitOfMeasure = async () => {
             try {
                 const UnitOfMeasureData = await fetchUnitOfMeasureDropdown();
+                const uomItems = UnitOfMeasureData.map(data => ({
+                    id: data._id,
+                    label: data.uom_name,
+                }));
+
+                const defaultUOM = uomItems.find(uom => uom.label === 'Pcs');
                 setDropdown(prevDropdown => ({
                     ...prevDropdown,
-                    unitofmeasure: UnitOfMeasureData.map(data => ({
-                        id: data._id,
-                        label: data.uom_name,
-                    })),
+                    unitofmeasure: uomItems,
                 }));
+
+                if (defaultUOM) {
+                    setFormData(prevFormData => ({
+                        ...prevFormData,
+                        uom: defaultUOM,
+                    }));
+                }
             } catch (error) {
                 console.error('Error fetching Unit Of Measure dropdown data:', error);
             }
@@ -153,25 +198,37 @@ const AddSpareParts = ({ navigation, route }) => {
         fetchUnitOfMeasure();
     }, []);
 
+
     useEffect(() => {
-        const fetchTaxes = async () => {
+        const fetchTax = async () => {
             try {
-                const TaxesData = await fetchTaxDropdown();
-                setDropdown(prevDropdown => ({
-                    ...prevDropdown,
-                    taxes: TaxesData.map(data => ({
-                        id: data._id,
-                        label: data.tax_type_name,
-                    })),
+                const TaxData = await fetchTaxDropdown();
+                const taxItems = TaxData.map(data => ({
+                    id: data._id,
+                    label: data.tax_type_name,
                 }));
+    
+                const defaultTax = taxItems.find(tax => tax.label === "vat 5%");
+                console.log("🚀 ~ file: AddSpareParts.js:210 ~ fetchTax ~ defaultTax:", defaultTax)
+                // setDropdown(prevDropdown => ({
+                //     ...prevDropdown,
+                //     taxes: taxItems,
+                // }));
+    
+                if (defaultTax) {
+                    setFormData(prevFormData => ({
+                        ...prevFormData,
+                        taxType: defaultTax,
+                    }));
+                }
             } catch (error) {
                 console.error('Error fetching Tax dropdown data:', error);
             }
         };
-
-        fetchTaxes();
+    
+        fetchTax();
     }, []);
-
+    
     const toggleBottomSheet = (type) => {
         setSelectedType(isVisible ? null : type);
         setIsVisible(!isVisible);
@@ -195,6 +252,9 @@ const AddSpareParts = ({ navigation, route }) => {
                 unitPrice: formData.unitPrice || '',
                 tax: formData.tax || '',
                 subTotal: formData.subTotal || '',
+                spareTotalPrice: formData.spareTotalPrice || '',
+                total: formData.total || '',
+                taxType: formData.taxType || '',
             };
             addSpareParts(spareItem);
             navigation.navigate('UpdateDetail', { id });
@@ -214,9 +274,9 @@ const AddSpareParts = ({ navigation, route }) => {
                 items = dropdown.unitofmeasure;
                 fieldName = 'uom';
                 break;
-            case 'Taxes':
+            case 'Tax':
                 items = dropdown.taxes;
-                fieldName = 'uom';
+                fieldName = 'tax';
                 break;
             default:
                 return null;
@@ -271,11 +331,10 @@ const AddSpareParts = ({ navigation, route }) => {
                 />
                 <FormInput
                     label="UOM"
-                    placeholder="Select Unit Of Measure"
+                    placeholder="Unit Of Measure"
                     dropIcon="menu-down"
                     editable={false}
-                    value={formData.uom?.label}
-                    onPress={() => toggleBottomSheet('UOM')}
+                    value={formData.uom?.label || 'Pcs'}
                 />
                 <FormInput
                     label="Unit Price"
@@ -284,36 +343,45 @@ const AddSpareParts = ({ navigation, route }) => {
                     keyboardType="numeric"
                     value={formData.unitPrice}
                 />
-                <CheckBox
-                    checked={formData.isInclusive}
-                    onPress={() => handleInclusiveChange(!formData.isInclusive)}
-                    label="Set Inclusive"
-                />
                 <FormInput
                     label="Tax"
                     placeholder="Enter Tax"
                     dropIcon="menu-down"
                     required
-                    editable={!formData.isInclusive}
-                    keyboardType="numeric"
-                    value={formData.isInclusive ? `VAT 5%` : '0'} //(${formData.tax})
+                    editable={false}
+                    value={formData.taxType?.label || 'VAT 5%'}
+                />
+                <CheckBox
+                    checked={formData.isInclusive}
+                    onPress={() => handleInclusiveChange(!formData.isInclusive)}
+                    label="Is Inclusive"
                 />
                 <FormInput
-                    label="Subtotal"
+                    label="Spare Item Total"
                     editable={false}
-                    value={formData.subTotal}
+                    value={formData.spareTotalPrice}
+                />
+                <FormInput
+                    label="Spare Item Tax"
+                    editable={false}
+                    value={formData.tax}
+                />
+                <FormInput
+                    label="Total"
+                    editable={false}
+                    value={formData.total}
                 />
                 <Button
-                    title={'SAVE'}
+                    title={'Add Item'}
                     width={'50%'}
                     alignSelf={'center'}
                     backgroundColor={COLORS.primaryThemeColor}
                     onPress={handleAddItems}
-                />
+                /> 
+                {renderBottomSheet()}
             </RoundedScrollContainer>
-            {renderBottomSheet()}
         </SafeAreaView>
     );
 };
 
-export default AddSpareParts;
+export default SparePartsIssueCreation;
