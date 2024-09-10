@@ -182,11 +182,8 @@ const QuickServiceFormTabs = ({ navigation }) => {
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="Job Quick Registration "
+        title="Quick Job Registration "
         onBackPress={() => navigation.goBack()}
-      // logo={false}
-      // iconOneName='edit'
-      // iconOnePress={() => navigation.navigate('EditService', { serviceId: id })}
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={{ flex: 1 }}>
         <TabView

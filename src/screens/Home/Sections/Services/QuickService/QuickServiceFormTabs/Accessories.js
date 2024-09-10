@@ -8,7 +8,6 @@ const Accessories = ({ formData, onFieldChange, errors }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
-
   const [dropdown, setDropdown] = useState({
     accessories: [],
   });

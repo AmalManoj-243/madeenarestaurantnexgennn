@@ -3,9 +3,9 @@ import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 
-const SparePartsIssueList = ({ item }) => {
+const SparePartsCreationList = ({ item, onPress }) => {
   return (
-    <TouchableOpacity activeOpacity={0.8} style={styles.itemContainer}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
         <Text style={styles.head}>{item?.name?.trim() || '-'}</Text>
         <View style={styles.rightColumn}>
@@ -14,9 +14,6 @@ const SparePartsIssueList = ({ item }) => {
       </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>{item?.uom || '-'}</Text>
-      </View>
-      <View style={styles.rightColumn}>
-        <Text style={styles.contentRight}>{item?.status || '-'}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -56,16 +53,15 @@ const styles = StyleSheet.create({
   content: {
     color: '#666666',
     marginBottom: 5,
-    fontSize:14,
+    fontSize:15,
     fontFamily: FONT_FAMILY.urbanistSemiBold,
     textTransform:'capitalize'
   },
- 
   contentRight: {
     color: '#666666',
     fontFamily: FONT_FAMILY.urbanistSemiBold,
-    fontSize:14,
+    fontSize:15,
   },
 });
 
-export default SparePartsIssueList;
+export default SparePartsCreationList;
