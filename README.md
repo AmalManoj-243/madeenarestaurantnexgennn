@@ -1,525 +1,90 @@
-# 369AI Project Documentation
+# **369ai.Biz** 
 
-This project is a comprehensive Expo React Native application for mobile platforms that integrates various features such as CRM, inventory, and API handling. This documentation provides an overview of the project structure, key components, and API integrations.
+## **Table of Contents**
 
-## Table of Contents
+1. [Introduction](#1-introduction)  
+   1.1 [Overview](#11-overview)  
+   1.2 [Purpose of the Project](#12-purpose-of-the-project)  
+   1.3 [Technologies Used](#13-technologies-used)  
+   1.4 [Prerequisites](#14-prerequisites)
 
-1. [Project Structure](#project-structure)
-2. [Directory Overview](#directory-overview)
-3. [Components](#components)
-4. [API Integration](#api-integration)
-5. [Assets](#assets)
-6. [Scripts and Configurations](#scripts-and-configurations)
-7. [Usage](#usage)
-8. [Running the Application](#running-the-application)
+2. [Project Structure](#2-project-structure)  
+   2.1 [Overview](#21-overview)  
+   2.2 [Explanation of Folder and File Organization](#22-explanation-of-folder-and-file-organization)  
+   2.3 [Detailed Project Structure for 369ai.Biz](https://github.com/ingointo/369ai-doc/blob/main/project-structure.md)
 
----
+3. [Components Documentation](#3-components-documentation)  
+   3.1 [Overview](#31-overview)  
+   3.2 [Component Index](#32-component-index) 
 
-## Project Structure
+4. [Store Documentation](#4-store-documentation)  
+   4.1 [Overview](#31-overview)  
+   4.2 [Component Index](#32-component-index) 
+## 1. Introduction
+
+### 1.1 Overview
+369ai.Biz is a comprehensive cross-platform employee management and enterprise resource planning (ERP) application designed to streamline business operations across various domains. Built using React Native, it offers an all-in-one solution for managing multiple facets of a company’s workflow, from employee attendance, task manager, transaction auditing, visits plan, customer visits, customer relationship management (CRM) and inventory management(INVMGT) ,...
+
+The application is designed for businesses seeking to improve operational efficiency by centralizing core functions into a single, accessible platform. The app targets business managers, employees, and administrative staff who need to track tasks, manage projects, and handle client relationships efficiently.
+
+### 1.2 Purpose of the Project
+
+The purpose of **369ai.Biz** is to provide businesses with a powerful, unified platform that simplifies and automates critical operational processes. By integrating multiple modules—such as employee management, inventory tracking, task management, CRM, and auditing—into a single, cross-platform mobile application, this project aims to:
+
+- **Streamline Business Operations**: Centralize various business functions to reduce complexity, minimize errors, and enhance productivity.
+- **Improve Workflow Efficiency**: Enable managers and employees to handle tasks, track progress, and collaborate effectively from any location.
+- **Enhance Customer Relationship Management**: Provide tools for managing leads, enquiries, and pipelines to improve customer interactions and business growth.
+- **Optimize Resource Management**: Inventory, spare parts request, and quick service to ensure the effective use of company resources.
+<!-- - **Ensure Compliance and Auditing**: Facilitate proper documentation and transaction auditing to maintain compliance with business processes and regulations. -->
+
+### 1.3 Technologies Used
+
+- **React Native**: A framework for building native applications using React.
+- **Expo**: A platform that streamlines the development and deployment of React Native apps.
+- **Zustand**: A lightweight state management library for React and React Native applications.
+- **React Navigation**: A robust library for managing routing and navigation within React Native apps, including stack, tab, and drawer navigators.
+  - **`@react-navigation/native-stack`**: Provides stack navigation with a more native-like experience.
+  - **`@react-navigation/bottom-tabs`**: Tab navigation for switching between screens.
+  - **`@react-navigation/material-top-tabs`**: Provides top tab navigation.
+- **Axios**: A promise-based HTTP client for making API requests.
+- **Date-fns**: A modern JavaScript library for working with dates.
+- **Lodash**: A utility library offering helpful functions for working with arrays, objects, and other data types.
+- **Immer**: A library for creating immutable state updates.
+- **React Native Reanimated**: Enables smooth animations and gesture handling.
+- **React Native Gesture Handler**: Enhances touch-based interactions in React Native applications.
+- **React Native Paper**: A UI component library that adheres to Material Design principles.
+- **React Native Maps**: Provides maps functionality in React Native applications.
+- **React Native Camera & Barcode Scanner**: Enables camera access and barcode scanning functionalities.
+- **Lottie React Native**: Used to add animations in the app with minimal effort.
+- **Tailwind CSS**: A utility-first CSS framework used for styling React Native components through the NativeWind library.
+- **Moment.js**: A library for parsing, manipulating, and formatting dates and times.
+- **React Native SVG & Charts**: Used for rendering SVG elements and charts.
+- **React Native Modal**: Provides modal views for custom user interactions.
+- **React Native Toast Message**: Displays customizable toast notifications within the app.
+- **React Native Webview**: Embeds web content in React Native apps.
+- **React Native Signature Canvas**: Allows users to capture signatures within the application.
+- **Babel**: A JavaScript compiler that helps transform your JavaScript code to be compatible across different browsers and environments.
+
+### 1.4 Prerequisites
+- Node.js (v14 or later)
+- Expo CLI
+- Yarn or npm (use yarn instead of npm that is better & faster in my exp.. )
+- eas login 
+
+## 2. Project Structure
+
+### 2.1 Overview
 
 The following is the structure of the project that provides an organized overview of directories and files:
 
-```
-.
-├── App.js
-├── app.json
-├── assets
-│   ├── android
-│   │   ├── icon_background.png
-│   │   ├── icon_foreground.png
-│   │   ├── icon_monochrome.png
-│   │   └── icon.png
-│   ├── animations
-│   │   ├── category_loading.json
-│   │   ├── loading.json
-│   │   └── loading_up_down.json
-│   ├── favicon.png
-│   ├── fonts
-│   │   └── Urbanist
-│   │       ├── Urbanist-Black.ttf
-│   │       ├── Urbanist-Bold.ttf
-│   │       ├── Urbanist-ExtraBold.ttf
-│   │       ├── Urbanist-ExtraLight.ttf
-│   │       ├── Urbanist-Light.ttf
-│   │       ├── Urbanist-Medium.ttf
-│   │       ├── Urbanist-Regular.ttf
-│   │       ├── Urbanist-SemiBold.ttf
-│   │       └── Urbanist-Thin.ttf
-│   ├── icon.png
-│   ├── icons
-│   │   ├── bottom_tabs
-│   │   │   ├── cart.png
-│   │   │   ├── category.png
-│   │   │   ├── home.png
-│   │   │   ├── order.png
-│   │   │   └── profile.png
-│   │   ├── common
-│   │   │   ├── box.png
-│   │   │   ├── call_history.png
-│   │   │   ├── gmail_history.png
-│   │   │   ├── map_icon.png
-│   │   │   ├── user_bg.png
-│   │   │   └── watsapp.png
-│   │   └── modal
-│   │       ├── camera.png
-│   │       ├── cancel.png
-│   │       ├── cancel_rectangle.png
-│   │       ├── gallery_upload.png
-│   │       └── image_upload.png
-│   ├── images
-│   │   ├── EmptyData
-│   │   │   ├── empty_cart.png
-│   │   │   ├── empty_data.png
-│   │   │   ├── empty_inventory_box.png
-│   │   │   ├── empty_items.png
-│   │   │   ├── empty.png
-│   │   │   ├── empty_visits.png
-│   │   │   └── transaction_empty.png
-│   │   ├── error
-│   │   │   └── error.png
-│   │   ├── header
-│   │   │   ├── check_button.png
-│   │   │   ├── logo_header_bg_white.png
-│   │   │   ├── logo_header.png
-│   │   │   ├── refresh_button.png
-│   │   │   └── transparent_logo_header.png
-│   │   ├── Home
-│   │   │   ├── Banner
-│   │   │   │   ├── banner_phone_1.jpg
-│   │   │   │   ├── banner_phone_2.jpg
-│   │   │   │   ├── banner_phone_3.jpg
-│   │   │   │   ├── banner_phone_4.jpg
-│   │   │   │   ├── banner_phone_5.jpg
-│   │   │   │   └── banner_phone_6.jpg
-│   │   │   ├── Header
-│   │   │   │   ├── barcode_scanner.png
-│   │   │   │   ├── header.png
-│   │   │   │   ├── header_transparent_bg.png
-│   │   │   │   ├── notification_2.png
-│   │   │   │   ├── notification.png
-│   │   │   │   └── search.png
-│   │   │   ├── options
-│   │   │   │   ├── attendance
-│   │   │   │   │   ├── attendance_requests.png
-│   │   │   │   │   ├── dashboard.png
-│   │   │   │   │   ├── leave_request.png
-│   │   │   │   │   └── punching.png
-│   │   │   │   ├── attendance.png
-│   │   │   │   ├── box_inspection.png
-│   │   │   │   ├── crm
-│   │   │   │   │   ├── enquiry_register.png
-│   │   │   │   │   ├── lead.png
-│   │   │   │   │   └── pipeline.png
-│   │   │   │   ├── crm.png
-│   │   │   │   ├── customer_visit.png
-│   │   │   │   ├── inventory_management_1.png
-│   │   │   │   ├── inventory_management.png
-│   │   │   │   ├── market_study_1.png
-│   │   │   │   ├── market_study.png
-│   │   │   │   ├── pickup.png
-│   │   │   │   ├── product_enquiry.png
-│   │   │   │   ├── product_purchase_requisition.png
-│   │   │   │   ├── scan_barcode.png
-│   │   │   │   ├── search_product.png
-│   │   │   │   ├── tasK_manager_1.png
-│   │   │   │   ├── task_manager.png
-│   │   │   │   ├── transaction_auditing.png
-│   │   │   │   └── visits_plan.png
-│   │   │   └── section
-│   │   │       ├── customer.png
-│   │   │       ├── inventory_management.png
-│   │   │       ├── pickup.png
-│   │   │       ├── service.png
-│   │   │       ├── services.png
-│   │   │       └── spare_parts.png
-│   │   ├── logo
-│   │   │   └── logo.png
-│   │   ├── Profile
-│   │   │   ├── profile_bg.png
-│   │   │   └── user.png
-│   │   ├── scanner
-│   │   │   └── scanner.png
-│   │   └── Splash
-│   │       └── splash.png
-│   └── splash.png
-├── babel.config.js
-├── eas.json
-├── generateAppJson.js
-├── jsconfig.json
-├── package.json
-├── project_structure.txt
-├── README.md
-├── src
-│   ├── api
-│   │   ├── config
-│   │   │   ├── apiConfig.js
-│   │   │   └── index.js
-│   │   ├── details
-│   │   │   ├── detailApi.js
-│   │   │   └── index.js
-│   │   ├── dropdowns
-│   │   │   └── dropdownApi.js
-│   │   ├── endpoints
-│   │   │   ├── endpoints.js
-│   │   │   └── index.js
-│   │   ├── services
-│   │   │   ├── generalApi.js
-│   │   │   └── utils.js
-│   │   ├── uploads
-│   │   │   ├── index.js
-│   │   │   └──  uploadApi.js
-│   │   └── utils
-│   │       └── handleApiError.js
-│   ├── components
-│   │   ├── Calendar
-│   │   │   ├── CalendarScreen.js
-│   │   │   ├── index.js
-│   │   │   └── VerticalScrollableCalendar.js
-│   │   ├── Categories
-│   │   │   ├── CategoryList.js
-│   │   │   └── index.js
-│   │   ├── common
-│   │   │   ├── BottomSheets
-│   │   │   │   ├── DropdownSheet.js
-│   │   │   │   ├── index.js
-│   │   │   │   └── MultiSelectDropdownSheet.js
-│   │   │   ├── Button
-│   │   │   │   ├── Button.js
-│   │   │   │   ├── FABButton.js
-│   │   │   │   ├── index.js
-│   │   │   │   ├── LoadingButton.js
-│   │   │   │   └── PressableInput.js
-│   │   │   ├── CheckBox
-│   │   │   │   ├── CheckBox.js
-│   │   │   │   └── index.js
-│   │   │   ├── DatePicker
-│   │   │   │   ├── DatePicker.js
-│   │   │   │   └── index.js
-│   │   │   ├── Detail
-│   │   │   │   ├── DetailCheckBox.js
-│   │   │   │   ├── DetailField.js
-│   │   │   │   ├── index.js
-│   │   │   │   └── ProductDetail.js
-│   │   │   ├── empty
-│   │   │   │   ├── EmptyItem.js
-│   │   │   │   ├── EmptyState.js
-│   │   │   │   ├── index.js
-│   │   │   │   └── styles.js
-│   │   │   └── TextInput
-│   │   │       ├── index.js
-│   │   │       └── TextInput.js
-│   │   ├── containers
-│   │   │   ├── ButtonContainer.js
-│   │   │   ├── index.js
-│   │   │   ├── RoundedContainer.js
-│   │   │   ├── RoundedScrollContainer.js
-│   │   │   ├── SafeAreaView.js
-│   │   │   └── SearchContainer.js
-│   │   ├── CRM
-│   │   │   ├── FollowUpList.js
-│   │   │   ├── index.js
-│   │   │   ├── Meetingslist.js
-│   │   │   └── VisitList.js
-│   │   ├── Header
-│   │   │   ├── BottomSheetHeader.js
-│   │   │   ├── index.js
-│   │   │   └── NavigationHeader.js
-│   │   ├── Home
-│   │   │   ├── CarouselPagination.js
-│   │   │   ├── Header.js
-│   │   │   ├── ImageContainer.js
-│   │   │   ├── index.js
-│   │   │   ├── ListHeader.js
-│   │   │   └── NavigationBar.js
-│   │   ├── Loader
-│   │   │   ├── AnimatedLoader.js
-│   │   │   ├── index.js
-│   │   │   └── OverlayLoader.js
-│   │   ├── MapViewScreen
-│   │   │   ├── index.js
-│   │   │   ├── MapViewComponent.js
-│   │   │   └── MapViewScreen.js
-│   │   ├── Modal
-│   │   │   ├── ActionModal.js
-│   │   │   ├── AddUpdateModal.js
-│   │   │   ├── backupEmployeeListModal.txt
-│   │   │   ├── ConfirmationModal.js
-│   │   │   ├── CustomListModal.js
-│   │   │   ├── EmployeeLIstModal.js
-│   │   │   ├── index.js
-│   │   │   ├── InputModal.js
-│   │   │   ├── LogoutModal.js
-│   │   │   ├── MeetingsScheduleModal.js
-│   │   │   └── RulesModal.js
-│   │   ├── Options
-│   │   │   ├── index.js
-│   │   │   └── ListItem.js
-│   │   ├── Product
-│   │   │   ├── index.js
-│   │   │   └── ProductsList.js
-│   │   ├── Scanner
-│   │   │   ├── Barcode_backup.txt
-│   │   │   ├── Barcode.js
-│   │   │   ├── index.js
-│   │   │   └── Scanner.js
-│   │   ├── SignaturePad.js
-│   │   ├── TabBar
-│   │   │   ├── CustomTabBar.js
-│   │   │   ├── index.js
-│   │   │   └── TabBarIcon.js
-│   │   ├── Text.js
-│   │   └── Toast
-│   │       ├── CustomToast.js
-│   │       ├── index.js
-│   │       └── ToastAndroid.js
-│   ├── constants
-│   │   ├── dropdownConst.js
-│   │   ├── links.js
-│   │   └── theme.js
-│   ├── hooks
-│   │   ├── index.js
-│   │   ├── useDataFetching.js
-│   │   ├── useDebouncedSearch.js
-│   │   ├── useDropdownFetching.js
-│   │   └── useLoader.js
-│   ├── navigation
-│   │   ├── AppNavigator.js
-│   │   └── StackNavigator.js
-│   ├── screens
-│   │   ├── Auth
-│   │   │   ├── index.js
-│   │   │   ├── LoginScreen.js
-│   │   │   └── PrivacyPolicy.js
-│   │   ├── Cart
-│   │   │   ├── CartScreen.js
-│   │   │   └── index.js
-│   │   ├── Categories
-│   │   │   ├── CategoriesScreen.js
-│   │   │   ├── index.js
-│   │   │   └── styles.js
-│   │   ├── Dashboard
-│   │   │   ├── DashboardScreen.js
-│   │   │   └── index.js
-│   │   ├── Home
-│   │   │   ├── HomeScreen.js
-│   │   │   ├── index.js
-│   │   │   ├── Options
-│   │   │   │   ├── Attendance
-│   │   │   │   │   ├── AttendanceScreen.js
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   └── Punching
-│   │   │   │   │       ├── index.js
-│   │   │   │   │       ├── MarkAttendance.js
-│   │   │   │   │       └── PunchingScreen.js
-│   │   │   │   ├── Audit
-│   │   │   │   │   ├── AuditForm.js
-│   │   │   │   │   ├── AuditList.js
-│   │   │   │   │   ├── AuditScreen.js
-│   │   │   │   │   └── index.js
-│   │   │   │   ├── BoxInspection
-│   │   │   │   │   ├── BoxInspectionForm.js
-│   │   │   │   │   ├── BoxInspectionList.js
-│   │   │   │   │   ├── BoxInspectionScreen.js
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   └── NonInspectedBoxItems.js
-│   │   │   │   ├── CRM
-│   │   │   │   │   ├── CRMScreen.js
-│   │   │   │   │   ├── EnquiryRegister
-│   │   │   │   │   │   ├── EnquiryDetailTabs
-│   │   │   │   │   │   │   ├── Details.js
-│   │   │   │   │   │   │   ├── EnquiryDetailTabs.js
-│   │   │   │   │   │   │   ├── FollowUp.js
-│   │   │   │   │   │   │   └── index.js
-│   │   │   │   │   │   ├── EnquiryRegisterForm.js
-│   │   │   │   │   │   ├── EnquiryRegisterList.js
-│   │   │   │   │   │   ├── EnquiryRegisterScreen.js
-│   │   │   │   │   │   └── index.js
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── Leads
-│   │   │   │   │   │   ├── EditLead.js
-│   │   │   │   │   │   ├── index.js
-│   │   │   │   │   │   ├── LeadDetailTabs
-│   │   │   │   │   │   │   ├── CallHistory.js
-│   │   │   │   │   │   │   ├── Details.js
-│   │   │   │   │   │   │   ├── EmailHistory.js
-│   │   │   │   │   │   │   ├── FollowUp.js
-│   │   │   │   │   │   │   ├── index.js
-│   │   │   │   │   │   │   ├── LeadDetailTabs.js
-│   │   │   │   │   │   │   └── WhatsAppHistory.js
-│   │   │   │   │   │   ├── LeadForm.js
-│   │   │   │   │   │   ├── LeadList.js
-│   │   │   │   │   │   └── LeadScreen.js
-│   │   │   │   │   └── Pipeline
-│   │   │   │   │       ├── EditPipeline.js
-│   │   │   │   │       ├── index.js
-│   │   │   │   │       ├── PipelineDetailTabs
-│   │   │   │   │       │   ├── CallHistory.js
-│   │   │   │   │       │   ├── CustomerVisit.js
-│   │   │   │   │       │   ├── Details.js
-│   │   │   │   │       │   ├── EmailHistory.js
-│   │   │   │   │       │   ├── FollowUp.js
-│   │   │   │   │       │   ├── index.js
-│   │   │   │   │       │   ├── Meetings.js
-│   │   │   │   │       │   ├── PipelineDetailTabs.js
-│   │   │   │   │       │   └── WhatsAppHistory.js
-│   │   │   │   │       ├── PipelineForm.js
-│   │   │   │   │       ├── PipelineList.js
-│   │   │   │   │       └── PipelineScreen.js
-│   │   │   │   ├── index.js
-│   │   │   │   ├── Inventory
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── InventoryBoxList.js
-│   │   │   │   │   ├── InventoryDetails.js
-│   │   │   │   │   ├── InventoryForm.js
-│   │   │   │   │   ├── InventoryList.js
-│   │   │   │   │   ├── InventoryRequestItem.js
-│   │   │   │   │   ├── InventoryScreen.js
-│   │   │   │   │   └── styles.js
-│   │   │   │   ├── MarketStudy
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── MarketStudyForm.js
-│   │   │   │   │   ├── MarketStudyList.js
-│   │   │   │   │   └── MarketStudyScreen.js
-│   │   │   │   ├── OptionsScreen.js
-│   │   │   │   ├── Pickup
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── PickupDetailTabs
-│   │   │   │   │   │   ├── Details.js
-│   │   │   │   │   │   ├── FollowUp.js
-│   │   │   │   │   │   └── PickupDetailsTabs.js
-│   │   │   │   │   ├── PickupList.js
-│   │   │   │   │   └── PickupScreen.js
-│   │   │   │   ├── TaskManager
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── TaskManagerDetails.js
-│   │   │   │   │   ├── TaskManagerForm.js
-│   │   │   │   │   ├── TaskManagerList.js
-│   │   │   │   │   └── TaskManagerScreen.js
-│   │   │   │   ├── Visits
-│   │   │   │   │   ├── EditVisit.js
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   ├── VisitDetails.js
-│   │   │   │   │   ├── VisitForm.js
-│   │   │   │   │   └── VisitScreen.js
-│   │   │   │   └── VisitsPlan
-│   │   │   │       ├── EditVisitPlan.js
-│   │   │   │       ├── index.js
-│   │   │   │       ├── VisitPlanDetails.js
-│   │   │   │       ├── VisitPlanDetailTabs
-│   │   │   │       │   ├── CustomerVisit.js
-│   │   │   │       │   ├── Details.js
-│   │   │   │       │   ├── index.js
-│   │   │   │       │   └── VisitPlanDetailTabs.js
-│   │   │   │       ├── VisitPlanForm.js
-│   │   │   │       ├── VisitPlanList.js
-│   │   │   │       └── VisitsPlanScreen.js
-│   │   │   └── Sections
-│   │   │       ├── Customer
-│   │   │       │   ├── CustomerDetails.js
-│   │   │       │   ├── CustomerFormTabs
-│   │   │       │   │   ├── Address.js
-│   │   │       │   │   ├── ContactPerson.js
-│   │   │       │   │   ├── CustomerFormTabs.js
-│   │   │       │   │   ├── Details.js
-│   │   │       │   │   ├── index.js
-│   │   │       │   │   └── OtherDetails.js
-│   │   │       │   ├── CustomerList.js
-│   │   │       │   ├── CustomerScreen.js
-│   │   │       │   ├── index.js
-│   │   │       │   └── styles.js
-│   │   │       ├── Pickup
-│   │   │       │   └── index.js
-│   │   │       └── Services
-│   │   │           ├── index.js
-│   │   │           ├── QuickService
-│   │   │           │   ├── AddSpareParts.js
-│   │   │           │   ├── index.js
-│   │   │           │   ├── QuickServiceFormTabs
-│   │   │           │   │   ├── Accessories.js
-│   │   │           │   │   ├── Assignee.js
-│   │   │           │   │   ├── Complaints.js
-│   │   │           │   │   ├── CustomerDetails.js
-│   │   │           │   │   ├── index.js
-│   │   │           │   │   ├── Product.js
-│   │   │           │   │   └── QuickServiceFormTabs.js
-│   │   │           │   ├── QuickServiceList.js
-│   │   │           │   ├── QuickServiceScreen.js
-│   │   │           │   ├── ServiceDetails.js
-│   │   │           │   ├── SparePartsList.js
-│   │   │           │   ├── UpdateDetail.js
-│   │   │           │   └── UpdateDetails.backup.txt
-│   │   │           ├── ServiceScreen.js
-│   │   │           └── SparePartsRequest
-│   │   │               ├── index.js
-│   │   │               ├── SparePartsRequestDetails.js
-│   │   │               ├── SparePartsRequestList.js
-│   │   │               └── SparePartsRequestScreen.js
-│   │   ├── index.js
-│   │   ├── KPIDashboard
-│   │   │   ├── index.js
-│   │   │   ├── KPIDashboardScreen.js
-│   │   │   ├── KPIListingScreen.js
-│   │   │   └── KpiList.js
-│   │   ├── MyOrders
-│   │   │   ├── index.js
-│   │   │   └── MyOrdersScreen.js
-│   │   ├── Products
-│   │   │   ├── index.js
-│   │   │   ├── ProductsScreen.js
-│   │   │   └── styles.js
-│   │   ├── Profile
-│   │   │   ├── index.js
-│   │   │   └── ProfileScreen.js
-│   │   └── Splash
-│   │       ├── index.js
-│   │       └── SplashScreen.js
-│   ├── stores
-│   │   ├── auth
-│   │   │   ├── index.js
-│   │   │   └── useAuthStore.js
-│   │   ├── box
-│   │   │   ├── index.js
-│   │   │   └── useInspectionStore.js
-│   │   ├── currency
-│   │   │   ├── index.js
-│   │   │   └── useCurrencyStore.js
-│   │   └── product
-│   │       ├── index.js
-│   │       └── productStore.js
-│   └── utils
-│       ├── common
-│       │   ├── date
-│       │   │   ├── formatDate.js
-│       │   │   ├── formatDateTime.js
-│       │   │   └── index.js
-│       │   ├── index.js
-│       │   ├── StringUtils.js
-│       │   └── toastUtils.js
-│       ├── config
-│       │   ├── getConfig.js
-│       │   └── index.js
-│       ├── formatters
-│       │   ├── formatData.js
-│       │   └── index.js
-│       └── validation
-│           ├── index.js
-│           ├── validationFunction.js
-│           ├── validation.js
-│           └── validationRules.js
-├── tailwind.config.js
-└── yarn.lock
+### 2.2 Explanation of Folder and File Organization
 
-110 directories, 378 files
+- **`App.js`**: The entry point of the React Native app.
 
-```
-
-### 1. **App.js**:
-   The entry point of the React Native app.
-
-### 2. **app.json**:
+-  **`app.json`**:
    Configuration file for the Expo application.
 
-### 3. **assets**:
+- **`assets`**:
    This directory contains the application's static assets like icons, images, fonts, and animations.
    - **android/**: Icons for Android devices.
    - **animations/**: Lottie JSON files for app animations.
@@ -527,7 +92,7 @@ The following is the structure of the project that provides an organized overvie
    - **icons/**: Various categories for bottom tabs, modals, etc.
    - **images/**: General app imagery like empty states, headers, banners, logos, etc.
 
-### 4. **src**:
+- **`src`**:
    This is the main source directory that contains all the logic and components.
    
    - **api/**:
@@ -552,35 +117,27 @@ The following is the structure of the project that provides an organized overvie
         - **`TextInput/`**: Components for text input fields, including variations like password fields and search inputs.
         - **`empty/`**: Components for empty listing & fill the empty space.
 
- - **CRM/**: Components handling CRM functionalities like `FollowUpList`, `Meetingslist`, and `VisitList`.
- - **Header/**: Components for headers including `NavigationHeader` and `BottomSheetHeader`.
-- **Loader/**: Loading animations and overlays like `AnimatedLoader` and `OverlayLoader`.
-- **Modal/**: Various modals like `ActionModal`,  `AddUpdateModal`, `ConfirmationModal`, `CustomListModal`, `LogoutModal` and more.
-- **Options/**: Components for handling different options or list items.
-- **Product/**: Components for displaying product-related data.
-- **Scanner/**: Barcode and other scanner-related components.
-- **containers/**: Containers for managing layouts like `RoundedScrollContainer`, `SafeAreaView`, and more.
+      - **CRM/**: Components handling CRM functionalities like `FollowUpList`, `Meetingslist`, and `VisitList`.
+       - **Header/**: Components for headers including `NavigationHeader` and `BottomSheetHeader`.
+      - **Loader/**: Loading animations and overlays like `AnimatedLoader` and `OverlayLoader`.
+      - **Modal/**: Various modals like `ActionModal`,  `AddUpdateModal`, `ConfirmationModal`, `CustomListModal`, `LogoutModal` and more.
+      - **Options/**: Components for handling different options or list items.
+      - **Product/**: Components for displaying product-related data.
+      - **Scanner/**: Barcode and other scanner-related components.
+      - **containers/**: Containers for managing layouts like `RoundedScrollContainer`, `SafeAreaView`, and more.
+  - **`constants/`**: Constants used throughout the app.
+  - **`hooks/`**: Custom React hooks.
+  - **`navigation/`**: Navigation setup and configurations.
+  - **`screens/`**: Feature-specific screens.
+  - **`store/`**: Redux or Zustand state management.
+  - **`utils/`**: Utility functions and helpers.
 
----
+## 3. Components Documentation
 
-## Directory Overview
-
-### **assets/**
-Includes images, icons, fonts, and animations used throughout the app.
-
-### **src/api**
-Here, we define all the API-related files that handle network requests. This includes configurations for handling responses, API endpoints, and services.
-
-### **src/components/**
-This is where all the building blocks of the UI live. It contains several subfolders that house reusable components.
-
-
----
-
-## Components
-
+### 3.1 Overview
 Each component in this project is reusable and designed for flexibility this can be easily integrated into any React Native project. Below is a detailed breakdown of each component, including prop descriptions and default values. 
 
+### 3.2 Component Index
 1. [CalendarScreen](#1-calendarscreen)
 2. [VerticalScrollableCalendar](#2-verticalscrollablecalendar)
 3. [DropdownSheet](#3-dropdownsheet)
@@ -590,17 +147,18 @@ Each component in this project is reusable and designed for flexibility this can
 7. [LoadingButton](#7-loadingbutton)
 8. [PressableInput](#8-pressableinput)
 9. [CheckBox](#9-checkbox)
-10. [SafeAreaView](#10-safeareaview)
-11. [SearchContainer](#11-searchcontainer)
-12. [RoundedContainer](#12-roundedcontainer)
-13. [RoundedScrollContainer](#13-roundedscrollcontainer)
-14. [BottomSheetHeader](#14-bottomsheetheader)
-15. [NavigationHeader](#15-navigationheader)
-16. [AnimatedLoader](#16-animatedloader)
-17. [OverlayLoader](#17-overlayloader)
-18. [CustomTabBar](#18-customtabbar)
-19. [DetailField](#19-detailfield)
-20. [TextInput](#20-textinput)
+10. [DetailCheckBox](#10-detailcheckbox)
+11. [SafeAreaView](#11-safeareaview)
+12. [SearchContainer](#12-searchcontainer)
+13. [RoundedContainer](#13-roundedcontainer)
+14. [RoundedScrollContainer](#14-roundedscrollcontainer)
+15. [BottomSheetHeader](#15-bottomsheetheader)
+16. [NavigationHeader](#16-navigationheader)
+17. [AnimatedLoader](#17-animatedloader)
+18. [OverlayLoader](#18-overlayloader)
+19. [CustomTabBar](#19-customtabbar)
+20. [DetailField](#20-detailfield)
+21. [TextInput](#21-textinput)
 
 
 ## 1. CalendarScreen
@@ -608,12 +166,9 @@ Each component in this project is reusable and designed for flexibility this can
 A scrollable calendar interface.
 
 ### Usage
-Import the CalendarScreen component in your React Native file:
 ```jsx
 import { CalendarScreen } from '@components/Calendar';
-```
-Use the CalendarScreen component in your JSX code:
-```jsx
+
 <CalendarScreen 
   markedDates={{ '2024-09-05': { marked: true } }} 
   onDayPress={(day) => console.log(day)}
@@ -638,13 +193,9 @@ A vertical scrollable calendar interface.
 
 ### Usage
 
-Import the VerticalScrollableCalendar component in your React Native file:
-
 ```jsx
 import { VerticalScrollableCalendar } from '@components/Calendar';
-```
-Use the VerticalScrollableCalendar component in your JSX code:
-```jsx
+
 <VerticalScrollableCalendar 
   date={new Date()} 
   onChange={(day) => console.log(day)} 
@@ -665,8 +216,10 @@ Use the VerticalScrollableCalendar component in your JSX code:
 A bottom sheet dropdown for selecting options.
 
 ### Usage
+
+
 ```jsx
-import DropdownSheet from '@components/DropdownSheet';
+import { DropdownSheet } from '@components/common/BottomSheets';
 
 <DropdownSheet 
   isVisible={true} 
@@ -695,7 +248,7 @@ A bottom sheet dropdown for selecting multiple options.
 
 ### Usage
 ```jsx
-import MultiSelectDropdownSheet from '@components/MultiSelectDropdownSheet';
+import { MultiSelectDropdownSheet } from '@components/common/BottomSheets';
 
 <MultiSelectDropdownSheet 
   isVisible={true} 
@@ -718,204 +271,447 @@ import MultiSelectDropdownSheet from '@components/MultiSelectDropdownSheet';
 | `previousSelections`| Array     | List of items selected previously                             | `[]`            |
 | `onClose`           | Function  | Function called when the sheet is closed                      | `() => {}`      |
 
----
-
 ## 5. Button
 
-A reusable button component.
+A customizable button with loading state and disabled state handling.
 
 ### Usage
+
 ```jsx
-import Button from '@components/common/Button';
+import { Button } from '@components/common/Button';
 
 <Button 
-  title="Click me" 
-  onPress={() => console.log('Button clicked')} 
-  disabled={false} 
+  title="Submit" 
+  onPress={() => console.log('Button Pressed')} 
+  backgroundColor="#3498db" 
+  color="white"
+  loading={false} 
+  disabled={false}
 />
 ```
 
 ### Props
 
-| Prop       | Type      | Description                       | Default Value |
-| ---------- | --------- | --------------------------------- | ------------- |
-| `title`    | String    | Button text                       | `''`          |
-| `onPress`  | Function  | Function to call on button press   | `() => {}`    |
-| `disabled` | Boolean   | Whether the button is disabled     | `false`       |
+| Prop            | Type     | Description                                     | Default            |
+| --------------- | -------- | ----------------------------------------------- | ------------------ |
+| `title`         | string   | The text to display inside the button            | `Submit`           |
+| `onPress`       | function | Function to call when the button is pressed      | `() => {}`         |
+| `color`         | string   | Text color of the button                        | `white`            |
+| `backgroundColor`| string   | Background color of the button                  | `COLORS.button`    |
+| `disabled`      | boolean  | Disable the button interaction                  | `false`            |
+| `loading`       | boolean  | Display a loading spinner instead of text       | `false`            |
 
 ---
 
 ## 6. FABButton
 
-A floating action button component.
+A Floating Action Button (FAB) to trigger an action, commonly used for adding items.
 
 ### Usage
-```jsx
-import FABButton from '@components/common/FABButton';
 
-<FABButton 
-  onPress={() => console.log('FAB clicked')} 
-  icon="plus" 
-/>
+```jsx
+import { FABButton } from '@components/common/Button';
+
+<FABButton onPress={() => console.log('FAB Pressed')} />
 ```
 
 ### Props
 
-| Prop       | Type      | Description                        | Default Value |
-| ---------- | --------- | ---------------------------------- | ------------- |
-| `onPress`  | Function  | Function to call on button press    | `() => {}`    |
-| `icon`     | String    | Icon to display inside the FAB      | `''`          |
+| Prop      | Type     | Description                       | Default |
+| --------- | -------- | ---------------------------------- | ------- |
+| `onPress` | function | Function to call when FAB is pressed | `() => {}` |
 
 ---
 
 ## 7. LoadingButton
 
-A button that shows a loading indicator when pressed.
+A button with a loading spinner to indicate a process in progress.
 
 ### Usage
+
 ```jsx
-import LoadingButton from '@components/common/LoadingButton';
+import { LoadingButton } from '@components/common/Button';
 
 <LoadingButton 
-  title="Submit" 
+  title="Loading..." 
+  onPress={() => console.log('Loading Button Pressed')} 
+  backgroundColor="#27ae60" 
   loading={true} 
-  onPress={() => console.log('Loading button clicked')} 
 />
 ```
 
 ### Props
 
-| Prop       | Type      | Description                         | Default Value |
-| ---------- | --------- | ----------------------------------- | ------------- |
-| `title`    | String    | Button text                         | `''`          |
-| `loading`  | Boolean   | Whether to show the loading spinner | `false`       |
-| `onPress`  | Function  | Function to call on button press     | `() => {}`    |
+| Prop            | Type     | Description                                     | Default            |
+| --------------- | -------- | ----------------------------------------------- | ------------------ |
+| `title`         | string   | The text to display inside the button            | `Submit`           |
+| `onPress`       | function | Function to call when the button is pressed      | `() => {}`         |
+| `color`         | string   | Text color of the button                        | `white`            |
+| `backgroundColor`| string   | Background color of the button                  | `COLORS.button`    |
+| `loading`       | boolean  | Display a loading spinner instead of text       | `false`            |
 
 ---
 
-## Other Components
+## 8. PressableInput
 
-Please refer to the respective code files for usage examples and prop details for the following components:
+An input field that can be pressed to trigger an action, with optional icon support.
 
-- `PressableInput`
-- `CheckBox`
-- `SafeAreaView`
-- `SearchContainer`
-- `RoundedContainer`
-- `RoundedScrollContainer`
-- `BottomSheetHeader`
-- `NavigationHeader`
-- `AnimatedLoader`
-- `OverlayLoader`
-- `CustomTabBar`
-- `DetailField`
-- `TextInput`
+### Usage
 
----
+```jsx
+import { PressableInput } from '@components/common/Button';
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/yourproject.git
+<PressableInput 
+  placeholder="Press here" 
+  handlePress={() => console.log('Input pressed')} 
+  dropIcon="chevron-down" 
+/>
 ```
 
-2. Install dependencies:
-```bash
-npm install
+### Props
+
+| Prop         | Type     | Description                                          | Default      |
+| ------------ | -------- | ---------------------------------------------------- | ------------ |
+| `placeholder`| string   | Placeholder text for the input                       | `''`         |
+| `dropIcon`   | string   | Name of the icon to display on the right             | `''`         |
+| `handlePress`| function | Function to call when the input is pressed           | `() => {}`   |
+
+---
+## 9. CheckBox
+
+A checkbox with a label, customizable to handle checked and unchecked states.
+
+### Usage
+
+```jsx
+import { CheckBox } from '@components/common/CheckBox';
+
+<CheckBox 
+  label="Accept Terms" 
+  checked={true} 
+  onPress={(newValue) => console.log(newValue)} 
+/>
 ```
 
-3. Run the app:
-```bash
-npm start
+### Props
+
+| Prop      | Type     | Description                               | Default   |
+| --------- | -------- | ----------------------------------------- | --------- |
+| `label`   | string   | The label text displayed next to the checkbox | `''`    |
+| `checked` | boolean  | Whether the checkbox is checked            | `false`   |
+| `onPress` | function | Function called when the checkbox is pressed | `() => {}` |
+
+---
+
+## 10. DetailCheckBox
+
+A read-only checkbox used specifically for displaying the checked or unchecked state in detailed views. For interactive checkboxes, consider using the [CheckBox](#9-checkbox) component instead.
+
+### Usage
+
+```jsx
+import { DetailCheckBox } from '@components/common/Detail';
+
+<DetailCheckBox 
+  label="Is Active" 
+  checked={true} 
+/>
 ```
 
----
+### Props
 
-## License
-
-This project is licensed under the MIT License.
-
----
-
-This `README.md` provides clear, professional, and reusable component documentation along with prop descriptions and default values. Each component has a dedicated section explaining its usage and customization options. You can further expand the details for each component as needed.
+| Prop      | Type     | Description                         | Default   |
+| --------- | -------- | ----------------------------------- | --------- |
+| `label`   | string   | The label text displayed next to the checkbox | `''` |
+| `checked` | boolean  | Whether the checkbox is checked     | `false`  |
 
 ---
 
-## API Integration
 
-The project integrates APIs via the `src/api` folder, where different services are modularized to handle various operations:
-- **detailApi.js**: Manages fetching detailed data from the server.
-- **dropdownApi.js**: Fetches dropdown options dynamically.
-- **generalApi.js**: Contains general service APIs for interacting with external data.
+## 11. SafeAreaView
+A view that takes care of safe area constraints, ensuring content does not overlap system UI like the status bar.
 
----
+### Usage
 
-## Assets
+```jsx
+import { SafeAreaView } from '@components/containers';
 
-The assets folder contains all static resources:
-- **Animations**: JSON files for animated elements.
-- **Fonts**: Font files, mainly the Urbanist font family.
-- **Icons**: Various icons for bottom tabs, modals, and common elements.
-- **Images**: Images categorized into sections like `EmptyData`, `Home`, `Profile`, etc.
-
----
-
-## Scripts and Configurations
-
-### 1. **babel.config.js**:
-   Babel configuration file for compiling the app.
-
-### 2. **package.json**:
-   Contains all the dependencies and scripts needed to run the app.
-
-### 3. **eas.json**:
-   Configuration for Expo Application Services (EAS).
-
----
-
-## Usage
-
-### Importing Components
-Each component can be imported from the `src/components` folder and reused across the application:
-
-```js
-import CalendarScreen from './components/Calendar/CalendarScreen';
-import DropdownSheet from './components/common/BottomSheets/DropdownSheet';
+<SafeAreaView backgroundColor="blue">
+  <Text>Content within safe area</Text>
+</SafeAreaView>
 ```
 
-### API Integration Example
-To make an API call from a component, import the necessary function from `src/api`:
+### Props
 
-```js
-import { getDetailData } from '../api/details/detailApi';
+| Prop             | Type      | Description                                                | Default Value             |
+| ---------------- | --------- | ---------------------------------------------------------- | ------------------------- |
+| `children`       | Node      | The content to display inside the safe area                | `null`                    |
+| `backgroundColor`| String    | Background color of the SafeAreaView                       | `COLORS.primaryThemeColor`|
+
+---
+
+
+## 12. SearchContainer
+A search input component with a magnifying glass icon.
+
+### Usage
+
+```jsx
+import { SearchContainer } from '@components/containers';
+
+<SearchContainer placeholder="Search" onChangeText={(text) => console.log(text)} />
 ```
 
----
+### Props
 
-## Running the Application
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/369ai.git
-   cd 369ai
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the Expo server:
-   ```bash
-   npx expo start
-   ```
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `placeholder`    | String    | Placeholder text for the search input                      | `''`             |
+| `onChangeText`   | Function  | Function to call when the input text changes               | `() => {}`       |
 
 ---
 
-This is an overview of the structure and workflow for your React Native project. For more detailed explanations of specific components, check their individual documentation or component files.
+## 13. RoundedContainer
+A container with rounded top corners.
+
+### Usage
+
+```jsx
+import { RoundedContainer } from '@components/containers';
+
+<RoundedContainer backgroundColor="lightgrey">
+  <Text>Content goes here</Text>
+</RoundedContainer>
+```
+
+### Props
+
+| Prop             | Type     | Description                                                | Default Value    |
+| ---------------- | -------- | ---------------------------------------------------------- | ---------------- |
+| `children`       | Node     | The content to display inside the container                 | `null`           |
+| `backgroundColor`| String   | Background color of the container                          | `COLORS.white`   |
 
 ---
 
-This README will provide clarity on your project's architecture and serve as a professional guide for onboarding new developers. Let me know if you'd like to expand on any specific sections or add more detailed descriptions for components!
-]([url]([url]([url]([url](url)))))
+## 14. RoundedScrollContainer
+A scrollable container with rounded top corners, useful for wrapping content that may require scrolling.
+
+### Usage
+
+```jsx
+import { RoundedScrollContainer } from '@components/containers';
+
+<RoundedScrollContainer backgroundColor="lightgrey">
+  <Text>Scrollable content goes here</Text>
+</RoundedScrollContainer>
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `children`       | Node      | The content to display inside the container                 | `null`           |
+| `backgroundColor`| String    | Background color of the container                          | `COLORS.white`   |
+| `borderRadius`   | Boolean   | Whether to apply rounded corners to the container          | `true`           |
+| `scrollEnabled`  | Boolean   | Whether scrolling is enabled                               | `true`           |
+
+---
+
+
+## 15. BottomSheetHeader
+A header component for bottom sheets with an optional "plus" icon for additional actions.
+
+### Usage
+
+```jsx
+import { BottomSheetHeader } from '@components/Header';
+
+<BottomSheetHeader title="Title" plusIcon onPress={() => console.log('Plus icon pressed')} />
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `title`          | String    | The text to display in the header                          | `''`             |
+| `plusIcon`       | Boolean   | Whether to show the plus icon                              | `false`          |
+| `onPress`        | Function  | Function to call when the plus icon is pressed             | `() => {}`       |
+
+---
+
+## 16. NavigationHeader
+A customizable header with a back button, optional icons, and a logo.
+
+### Usage
+
+```jsx
+import { NavigationHeader } from '@components/Header';
+
+<NavigationHeader
+  title="Page Title"
+  onBackPress={() => console.log('Back pressed')}
+  iconOneName="home"
+  iconOnePress={() => console.log('Home icon pressed')}
+/>
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value             |
+| ---------------- | --------- | ---------------------------------------------------------- | ------------------------- |
+| `title`          | String    | Title to display in the header                             | `''`                      |
+| `onBackPress`    | Function  | Function to call when the back button is pressed           | `() => {}`                |
+| `iconOneName`    | String    | Name of the first icon to display on the right side        | `''`                      |
+| `iconOnePress`   | Function  | Function to call when the first icon is pressed            | `() => {}`                |
+| `iconTwoName`    | String    | Name of the second icon to display                         | `''`                      |
+| `iconTwoPress`   | Function  | Function to call when the second icon is pressed           | `() => {}`                |
+| `iconThreeName`  | String    | Name of the third icon to display                          | `''`                      |
+| `iconThreePress` | Function  | Function to call when the third icon is pressed            | `() => {}`                |
+
+---
+
+## 17. AnimatedLoader
+A component that displays an animated loader, useful for showing loading states.
+
+### Usage
+
+```jsx
+import { AnimatedLoader } from '@components/Loader';
+
+<AnimatedLoader visible={true} animationSource={require('path-to-animation.json')} />
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `visible`        | Boolean   | Controls the visibility of the loader                      | `false`          |
+| `animationSource`| Object    | Path to the Lottie animation JSON                          | `null`           |
+
+---
+
+## 18. OverlayLoader
+An overlay loader that covers the entire screen with a loading indicator.
+
+### Usage
+
+```jsx
+import { OverlayLoader } from '@components/Loader';
+
+<OverlayLoader visible={true} backgroundColor="rgba(0, 0, 0, 0.5)" />
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `visible`        | Boolean   | Controls the visibility of the overlay loader              | `false`          |
+| `backgroundColor`| String    | Background color of the overlay                            | `transparent`    |
+
+---
+
+## 19. CustomTabBar
+A custom tab bar for React Native Top tab navigation.
+
+### Usage
+
+```jsx
+import { CustomTabBar } from '@components/TabBar';
+
+<CustomTabBar scrollEnabled={true} />
+```
+
+### Props
+
+| Prop             | Type      | Description                                                | Default Value    |
+| ---------------- | --------- | ---------------------------------------------------------- | ---------------- |
+| `scrollEnabled`  | Boolean   | Enables or disables scrolling on the tab bar               | `true`           |
+
+---
+
+## 20. DetailField
+
+A detail view field for displaying non-editable information with optional icons.
+
+### Usage
+
+```jsx
+import { DetailField } from '@components/common/Detail';
+
+<DetailField 
+  label="Username" 
+  value="John Doe" 
+  iconName="account" 
+/>
+```
+
+### Props
+
+| Prop      | Type     | Description                          | Default   |
+| --------- | -------- | ------------------------------------ | --------- |
+| `label`   | string   | The label text displayed above the input | `''`    |
+| `value`   | string   | The value displayed inside the input | `''`     |
+| `iconName`| string   | Name of the icon to display on the right | `''`    |
+
+---
+
+## 21. TextInput
+A customizable `TextInput` component that includes features like error handling, password hiding, icons, and label with optional asterisk for required fields.
+
+#### Usage
+
+```jsx
+import { TextInput } from '@components/common/TextInput';
+
+<TextInput
+  label="Username"
+  placeholder="Enter your username"
+  iconName="account"
+  required={true}
+  error="This field is required"
+  onChangeText={(text) => console.log(text)}
+  onFocus={() => console.log('Focused')}
+/>
+```
+
+### Props
+
+| Prop         | Type     | Description                                                                 | Default Value  |
+| ------------ | -------- | --------------------------------------------------------------------------- | -------------- |
+| `label`      | String   | The label text for the input field                                           | `''`           |
+| `labelColor` | String   | Color of the label text                                                      | `COLORS.black` |
+| `iconName`   | String   | The name of the icon to display next to the input field                      | `null`         |
+| `error`      | String   | Error message to display when validation fails                               | `''`           |
+| `onPress`    | Function | Function to call when the input field is pressed                             | `null`         |
+| `password`   | Boolean  | If true, enables password hiding functionality                               | `false`        |
+| `dropIcon`   | String   | The name of the drop-down icon to display                                    | `null`         |
+| `login`      | Boolean  | If true, applies a specific login style                                      | `false`        |
+| `validate`   | Boolean  | If true, enables validation state (displays error icon)                      | `false`        |
+| `column`     | Boolean  | If true, aligns the label and input vertically; if false, aligns them horizontally | `true`      |
+| `required`   | Boolean  | If true, displays a red asterisk next to the label for required fields        | `false`        |
+| `onFocus`    | Function | Callback function when the input is focused                                  | `() => {}`     |
+| `...props`   | Various  | Passes additional props to the underlying `RNTextInput`                      | `null`         |
+
+---
+
+#### Features
+
+- **Label with Asterisk**: Displays an optional asterisk next to the label for required fields.
+- **Password Toggle**: Allows the user to show or hide the password in the input field using an eye icon.
+- **Error Handling**: Displays error messages and highlights the input border in red if validation fails.
+- **Icons**: Supports icons on the right side of the input field, including a password toggle and error icon.
+
+---
+
+#### Component Breakdown
+
+- **Label**: Displays a text label above or beside the input field.
+- **TextInput**: A styled `TextInput` from React Native, which handles the input behavior.
+- **Error Handling**: Shows an error message if the `error` prop is passed.
+- **Password Visibility**: A toggle button (eye icon) for showing or hiding passwords when `password` prop is true.
+- **Validation Icon**: An alert icon if `validate` is true and validation fails.
+
+---
+
+
+## 4. Store Documentation
