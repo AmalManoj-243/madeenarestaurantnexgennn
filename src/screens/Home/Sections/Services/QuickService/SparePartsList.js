@@ -18,7 +18,7 @@ const SparePartsList = ({ item }) => {
         <Text style={styles.contentRight}>{item?.unit_price || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>{item?.tax || '-'}</Text>
+        <Text style={styles.content}>{item?.tax_type_name || '-'}</Text>
         <Text style={styles.contentRight}>{item?.total || '-'}</Text>
       </View>
     </TouchableOpacity>

@@ -8,8 +8,10 @@ import { DetailField } from '@components/common/Detail';
 import { formatDateTime } from '@utils/common/date';
 import { showToastMessage } from '@components/Toast';
 import { fetchSparePartsDetails } from '@api/details/detailApi';
+import SparePartsIssueList from './SparePartsIssueList';
 import { OverlayLoader } from '@components/Loader';
 import { LoadingButton } from '@components/common/Button';
+import { FlatList } from 'react-native-gesture-handler';
 import { COLORS } from '@constants/theme';
 import { post } from '@api/services/utils';
 import { ConfirmationModal } from '@components/Modal';
@@ -19,6 +21,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sparePartsItems, setSparePartsItems] = useState([]);
     const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
     const [actionToPerform, setActionToPerform] = useState(null);
 
@@ -27,6 +30,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
         try {
             const updatedDetails = await fetchSparePartsDetails(spareId);
             setDetails(updatedDetails[0] || {});
+            setSparePartsItems(updatedDetails[0]?.sparePartsItems || []);
         } catch (error) {
             console.error('Error fetching spare parts details:', error);
             showToastMessage('Failed to fetch spare parts details. Please try again.');
@@ -45,8 +49,12 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
 
     const handleDeleteJob = async () => {
         setIsSubmitting(true);
+        const deleteJobData = {
+            spare_id: spareId,
+            action: 'delete',
+        };
         try {
-            const response = await post('/viewSparePartsRequest', deleteJobData);
+            const response = await post('/deleteSparePartsRequest', deleteJobData);
             if (response.success === "true") {
                 showToastMessage('Job successfully deleted!');
             } else {
@@ -110,6 +118,7 @@ const SparePartsRequestDetails = ({ navigation, route }) => {
                     )}
                     keyExtractor={(item, index) => index.toString()}
                 />
+                {sparePartsItems.length > 0 && <></>}
                 <View style={{ flexDirection: 'row', marginVertical: 20 }}>
                     <LoadingButton
                         width={'50%'}

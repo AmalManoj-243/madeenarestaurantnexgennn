@@ -9,17 +9,14 @@ const SparePartsIssueList = ({ item }) => {
       <View style={styles.leftColumn}>
         <Text style={styles.head}>{item?.product_name?.trim() || '-'}</Text>
         <View style={styles.rightColumn}>
-          <Text style={styles.content}>{item?.description || '-'}</Text>
           <Text style={[styles.contentRight]}>{item?.quantity}</Text>
         </View>
       </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>{item?.uom || '-'}</Text>
-        <Text style={styles.contentRight}>{item?.unit_price || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>{item?.tax || '-'}</Text>
-        <Text style={styles.contentRight}>{item?.total || '-'}</Text>
+        <Text style={styles.contentRight}>{item?.status || '-'}</Text>
       </View>
     </TouchableOpacity>
   );
