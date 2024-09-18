@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Image, TouchableOpacity } from 'react-native';
-import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
+import { RoundedScrollContainer, SafeAreaView, UploadsContainer } from '@components/containers';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationHeader } from '@components/Header';
 import { DetailField } from '@components/common/Detail';
@@ -52,8 +52,8 @@ const VisitDetails = ({ navigation, route }) => {
       <NavigationHeader
         title="Customer Visits Details"
         onBackPress={() => navigation.goBack()}
-        iconOneName="edit"
-        iconOnePress={() => navigation.navigate('EditVisit', { details })}
+        // iconOneName="edit"
+        // iconOnePress={() => navigation.navigate('EditVisit', { details })}
         logo={false}
       />
       <RoundedScrollContainer>
@@ -64,12 +64,19 @@ const VisitDetails = ({ navigation, route }) => {
           />
         </TouchableOpacity>
         <DetailField label="Date & Time" value={formatDateTime(details.date_time)} />
+        <DetailField label="Employee Name" value={details?.employee?.name?.trim()} multiline />
         <DetailField label="Customer Name" value={details?.customer?.name?.trim()} multiline />
         <DetailField label="Site / Location" value={details?.site_location?.site_location_name} />
         <DetailField label="Contact Person" value={contactNames || '-'} />
         <DetailField label="Contact No" value={contactNo || '-'} />
+        <DetailField label="Next Customer Visit" value={formatDateTime(details.next_customer_visit_date)} />
         <DetailField label="Visit Purpose" value={visitPurposes || '-'} />
+        <DetailField label="Time In" value={formatDateTime(details.time_in)} />
+        <DetailField label="Time Out" value={formatDateTime(details.time_out)} />
         <DetailField label="Remarks" value={details?.remarks || '-'} multiline numberOfLines={5} textAlignVertical={'top'} />
+        {details.images?.length > 0 && (
+          <UploadsContainer imageUrls={details.images} title='Attached Images' deleteIcon={false} />
+        )}
       </RoundedScrollContainer>
     </SafeAreaView>
   );

@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Text from '@components/Text';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 
-const UploadsContainer = ({ imageUrls, onDelete }) => {
+const UploadsContainer = ({ imageUrls, onDelete, title = 'Uploads', deleteIcon = true, }) => {
     // State to manage image loading status
     const [loadingImages, setLoadingImages] = useState({});
 
@@ -31,15 +31,15 @@ const UploadsContainer = ({ imageUrls, onDelete }) => {
                 onLoadEnd={() => handleLoadEnd(index)}
                 onError={() => handleLoadEnd(index)} // Also handle errors
             />
-            <TouchableOpacity style={styles.deleteIcon} onPress={() => onDelete(index)}>
+            {deleteIcon && <TouchableOpacity style={styles.deleteIcon} onPress={() => onDelete(index)}>
                 <AntDesign name="delete" size={24} color="white" />
-            </TouchableOpacity>
+            </TouchableOpacity>}
         </View>
     );
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Uploads</Text>
+            <Text style={styles.label}>{title}</Text>
             <FlatList
                 data={imageUrls}
                 numColumns={4}

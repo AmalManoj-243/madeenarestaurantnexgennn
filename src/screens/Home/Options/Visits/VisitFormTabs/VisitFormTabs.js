@@ -32,7 +32,6 @@ const VisitFormTabs = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
-    console.log("🚀 ~ file: VisitFormTabs.js:33 ~ VisitFormTabs ~ errors:", errors)
     const currentUser = useAuthStore(state => state.user)
     const [formData, setFormData] = useState({
         customer: '',
@@ -49,8 +48,6 @@ const VisitFormTabs = ({ navigation, route }) => {
         timeOut: null,
         imageUrls: [],
     })
-
-    console.log('FormDAta', JSON.stringify(formData, null, 2))
 
     // fetch visit plan details visit plan id is available ie. means navigating through visit plan 
     const fetchVisitPlan = async () => {
@@ -155,7 +152,7 @@ const VisitFormTabs = ({ navigation, route }) => {
             case 'second':
                 return <VisitDetails handleFieldChange={handleFieldChange} formData={formData} errors={errors} onNextPress={() => handleTabChange(2)} />;
             case 'third':
-                return <InAndOut handleFieldChange={handleFieldChange} formData={formData} errors={errors} submit={submit} />;
+                return <InAndOut handleFieldChange={handleFieldChange} formData={formData} errors={errors} submit={submit} loading={isSubmitting} />;
             default:
                 return null;
         }
@@ -170,7 +167,6 @@ const VisitFormTabs = ({ navigation, route }) => {
     };
 
     const submit = async () => {
-        console.log('hiiiii')
         const fieldsToValidate = ['customer', 'dateAndTime', 'remarks', 'visitPurpose', 'timeIn', 'timeOut'];
         if (validateForm(fieldsToValidate)) {
             setIsSubmitting(true);
@@ -192,7 +188,7 @@ const VisitFormTabs = ({ navigation, route }) => {
                 time_in: formData.timeIn || null,
                 time_out: formData.timeOut || null
             };
-            console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
+            // console.log("🚀 ~ submit ~ visitData:", JSON.stringify(visitData, null, 2))
             try {
                 const response = await post("/createCustomerVisitList", visitData);
                 if (response.success) {
@@ -233,7 +229,7 @@ const VisitFormTabs = ({ navigation, route }) => {
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}
-                renderTabBar={props => <CustomTabBar {...props} />}
+                renderTabBar={props => <CustomTabBar {...props} scrollEnabled={false}/>}
                 onIndexChange={setIndex}
                 initialLayout={{ width: layout.width }}
             />

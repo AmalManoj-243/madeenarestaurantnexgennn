@@ -5,7 +5,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { formatDateTime } from '@utils/common/date';
 import { Button } from '@components/common/Button';
 
-const InAndOut = ({ formData, errors, handleFieldChange, submit }) => {
+const InAndOut = ({ formData, errors, handleFieldChange, submit, loading }) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedField, setSelectedField] = useState(null);
 
@@ -47,7 +47,7 @@ const InAndOut = ({ formData, errors, handleFieldChange, submit }) => {
                 onCancel={() => setDatePickerVisibility(false)}
             />
             {/* Button to submit */}
-            <Button alignSelf={'center'} width={'50%'} height={40} title={'SUBMIT'} onPress={submit}/>
+            <Button alignSelf={'center'} width={'50%'} height={40} title={'SUBMIT'} onPress={submit} loading={loading} />
         </RoundedScrollContainer>
     );
 };
