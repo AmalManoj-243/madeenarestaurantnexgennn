@@ -79,7 +79,7 @@ const QuickServiceDetails = ({ navigation, route }) => {
             };
             const response = await post('/createJobApproveQuote', updateJobData);
             if (response.success === "true") {
-                navigation.navigate('UpdateDetail', {
+                navigation.navigate('QuickServiceUpdateDetails', {
                     id: serviceId,
                     details: {
                         customerName: details.customer_name,

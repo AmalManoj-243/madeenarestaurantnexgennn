@@ -15,5 +15,4 @@ const API_BASE_URL = 'https://uaetest.369ai.biz:3027'
 {/* ----Oman live ----- */ }
 // const API_BASE_URL = 'https://danatoman.369ai.biz:3029' //oman live
 
-
 export default API_BASE_URL;
