@@ -20,6 +20,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { fetchPickupDetails } from '@api/details/detailApi';
 import { useFocusEffect } from '@react-navigation/native';
 import { OverlayLoader } from '@components/Loader';
+import PickupScreen from './PickupScreen';
 
 const EditPickup = ({ navigation, route }) => {
   const { id: pickupId } = route?.params || {};
@@ -54,7 +55,7 @@ const EditPickup = ({ navigation, route }) => {
         device: { id: detail?.device_id || '', label: detail?.device_name || '' },
         brand: { id: detail?.brand_id || '', label: detail?.brand_name || '' },
         consumerModel: { id: detail?.consumer_model_id || '', label: detail?.consumer_model_name || '' },
-        serialNumber: detail?.serial_Number || '',
+        serialNumber: detail?.serial_no || '',
         warehouse: { id: detail?.warehouse_id || '', label: detail?.warehouse_name || '' },
         pickupScheduleTime: detail?.pickup_schedule_time || null,
         remarks: detail?.remarks || '',
@@ -290,7 +291,7 @@ const EditPickup = ({ navigation, route }) => {
             type: "success", title: "Success",
             message: response.message || "Pickup Updated Successfully",
           });
-          navigation.goBack();
+          navigation.navigate('PickupScreen');
         } else {
           showToast({
             type: "error", title: "Error",
