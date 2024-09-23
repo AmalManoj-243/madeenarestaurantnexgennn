@@ -61,6 +61,7 @@ const EditPickup = ({ navigation, route }) => {
         isShowCoordinatorSignaturePad: detail?.customer_signature && detail?.driver_signature,
         customerSignatureUrl: detail?.customer_signature || null,
         driverSignatureUrl: detail?.driver_signature || null,
+        detailCoordinatorSignatureUrl: detail?.service_coordinator_signature || null,
         coordinatorSignatureUrl: detail?.service_coordinator_signature || null,
         imageUrls: detail?.attachment_details || [],
         // below two are not shown in web so commanded
@@ -443,7 +444,7 @@ const EditPickup = ({ navigation, route }) => {
             setScrollEnabled={setScrollEnabled}
             setUrl={(url) => handleFieldChange('coordinatorSignatureUrl', url)}
             title={'Co-Ordinator Signature'}
-            previousSignature={formData.coordinatorSignatureUrl}
+            previousSignature={formData.detailCoordinatorSignatureUrl}
           />}
         <FormInput
           label={"Remarks"}
