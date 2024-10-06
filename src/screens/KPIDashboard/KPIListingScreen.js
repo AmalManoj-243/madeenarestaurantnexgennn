@@ -27,11 +27,11 @@ const KPIListingScreen = ({ navigation }) => {
         inProgressKpi: [],
         completedKpi: [],
     });
-
+    
     const fetchKPIDetails = async () => {
         try {
-
             const data = await fetchKPIDashboard({ userId: currentUserId });
+            console.log("🚀 ~ Full API Response:", JSON.stringify(data, null, 2));
             setDashBoardDetails({
                 assignedKpiData: data.assigned_kpi_data || [],
                 importantKpiData: data.important_kpi_data || [],
@@ -45,7 +45,8 @@ const KPIListingScreen = ({ navigation }) => {
             console.error('Error fetching KPI details:', error);
             showToastMessage('Failed to fetch KPI details');
         }
-    }
+    };    
+    
     useEffect(() => {
         if (isFocused) {
             fetchKPIDetails();
@@ -53,25 +54,35 @@ const KPIListingScreen = ({ navigation }) => {
     }, [isFocused]);
 
     const getDataForCategory = () => {
+        let data = [];
         switch (kpiCategory) {
-            case 'Complete':
-                return dashBoardDetails.completedKpi;
-            case 'In Progress':
-                return dashBoardDetails.inProgressKpi;
             case 'Assigned':
-                return dashBoardDetails.assignedKpiData;
+                data = dashBoardDetails.assignedKpiData;
+                break;
             case 'Urgent':
-                return dashBoardDetails.urgentKpiData;
+                data = dashBoardDetails.urgentKpiData;
+                break;
             case 'Important':
-                return dashBoardDetails.importantKpiData;
+                data = dashBoardDetails.importantKpiData;
+                break;
             case 'Regular Task':
-                return dashBoardDetails.serviceKpiData;
+                data = dashBoardDetails.serviceKpiData;
+                break;
+            case 'In Progress':
+                data = dashBoardDetails.inProgressKpi;
+                break;
+            case 'Complete':
+                data = dashBoardDetails.completedKpi;
+                break;
             default:
-                return [];
+                data = [];
+                break;
         }
-    }
-    const kpiData = getDataForCategory();
+        console.log("🚀 ~ KPI Data for Category:", JSON.stringify(kpiCategory, null, 2));
+        return data;
+    };    
 
+    const kpiData = getDataForCategory();
     const renderItem = ({ item }) => {
         if (item.empty) {
             return <EmptyItem />

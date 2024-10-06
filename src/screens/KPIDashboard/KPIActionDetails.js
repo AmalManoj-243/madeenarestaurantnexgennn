@@ -58,7 +58,6 @@ const KPIActionDetails = ({ navigation, route }) => {
     const handleStartTask = async () => {
         setIsSubmitting(true);
         try {
-            // console.log("Start Data Here", updateStartData)
             const updateStartData = {
                 _id: details._id || id,
                 status: 'In progress',
@@ -67,10 +66,13 @@ const KPIActionDetails = ({ navigation, route }) => {
                 progress_status: 'Ongoing',
                 isDeveloper: false,
                 estimatedTime: details.totalEstimation?.[0]?.estimated_time || 0,
+                time: formatDateTime(new Date(), "Pp"),
             };
+    
+            console.log("Start Data Here", updateStartData);
             const response = await put('/updateKpiTasks', updateStartData);
-            console.log("Start Response",response)
-            if (response.success === "true") {
+            console.log("Start Response", response);
+            if (response.status === true) {
                 showToastMessage('Action Started Successfully');
                 setStartList(prevStartList => [
                     ...prevStartList, 
@@ -91,18 +93,19 @@ const KPIActionDetails = ({ navigation, route }) => {
     
     const handlePauseTask = async () => {
         setIsSubmitting(true);
+        console.log("haiiiii")
         try {
-            // console.log("Pause Data Here", updatePauseData)
             const updatePauseData = {
                 _id: details._id || id,
                 assignee_id: currentUser._id,
                 assignee_name: currentUser?.related_profile?.name,
                 progress_status: 'Pause',
-                pause_reason: pause?.pause_reason, //
+                // pause_reason: pause?.pause_reason, //
                 isDeveloper: false,
             };
+            console.log("Pause Data Here", updatePauseData)
             const response = await put('/updateKpiTasks', updatePauseData);
-            console.log("Pause Response",response)
+            console.log("Pause Response : ",response)
             if (response.success === "true") {
                 showToastMessage('Action paused Successfully');
             } else {
@@ -127,11 +130,10 @@ const KPIActionDetails = ({ navigation, route }) => {
                 assignee_name: currentUser?.related_profile?.name,
                 estimatedTime: details.totalEstimation?.[0]?.estimated_time || 0,
                 isDeveloper: false,
-                // reassign_reason: currentUser?.related_profile?.name, reassigned the task to ${this.re_assign.assignee_name} due to ${this.re_assign.reassign_reason},
-                // assignedToId: re_assign?.assignee_id,
-                // assignedToName: re_assign?.assignee_name,
             };
+            console.log("ReAssign Data Here", updateReAssignData)
             const response = await put('/updateKpiTasks', updateReAssignData);
+            console.log("ReAssign Response : ",response)
             if (response.success === "true") {
                 showToastMessage('Re Assigned Successfully');
             } else {
@@ -150,21 +152,21 @@ const KPIActionDetails = ({ navigation, route }) => {
     const handleCompleteTask = async () => {
         setIsSubmitting(true);
         try {
-            const updateReAssignData = {
+            const updateCompleteData = {
                 _id: details._id || id,
                 assignee_id: currentUser._id,
                 assignee_name: currentUser?.related_profile?.name,
-                estimatedTime: details.totalEstimation?.[0]?.estimated_time || 0,
                 isDeveloper: false,
-                // reassign_reason: currentUser?.related_profile?.name, reassigned the task to ${this.re_assign.assignee_name} due to ${this.re_assign.reassign_reason},
-                // assignedToId: re_assign?.assignee_id,
-                // assignedToName: re_assign?.assignee_name,
+                progress_status: "Completed",
+                status: "Completed",
             };
-            const response = await put('/updateKpiTasks', updateReAssignData);
+            console.log("Complete Data Here", updateCompleteData)
+            const response = await put('/updateKpiTasks', updateCompleteData);
+            console.log("Complete Response : ",response)
             if (response.success === "true") {
-                showToastMessage('Re Assigned Successfully');
+                showToastMessage('Task Completed Successfully');
             } else {
-                showToastMessage('Failed to Re-Assign task. Please try again.');
+                showToastMessage('Failed to Complete task. Please try again.');
             }
         } catch (error) {
             console.error('API error:', error);
@@ -180,12 +182,12 @@ const KPIActionDetails = ({ navigation, route }) => {
         const updateHistoryData = {
             kpiStatusUpdates: [
                 {
-                    isDeveloper: false,
+                    _id: details._id || id,
                     assignee_id: currentUser._id,
                     assignee_name: currentUser?.related_profile?.name,
                     time: formatDateTime(new Date(), "Pp"),
+                    isDeveloper: false,
                     updateText: updateText || null,
-                    _id: Date.now().toString(),
                 }
             ],
         };
@@ -350,6 +352,7 @@ const KPIActionDetails = ({ navigation, route }) => {
                         backgroundColor={COLORS.green}
                         onPress={() => {
                             setActionToPerform('complete');
+                            handleCompleteTask();
                         }}
                         title={(
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

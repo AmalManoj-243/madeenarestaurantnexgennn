@@ -7,7 +7,7 @@ const StartList = ({ item }) => {
     return (
         <TouchableOpacity activeOpacity={0.8} style={styles.itemContainer}>
             <View style={styles.leftColumn}>
-                <Text style={styles.head}>Ongoing</Text>
+                <Text style={styles.head}>{item?.progress_status || '-'}</Text>
                 <View style={styles.rightColumn}>
                     <Text style={styles.content}>{item?.assignee_name || '-'}</Text>
                     <Text style={styles.contentRight}>{item?.time || '-'}</Text>

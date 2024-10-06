@@ -20,7 +20,7 @@ const PauseModal = ({ isVisible, onClose, onSubmit, title, header = ''}) => {
         let hasError = false;
 
         if (!updateText) {
-            setErrorText('Updates Required');
+            setErrorText('Reason Required');
             hasError = true;
         } else {
             setErrorText('');
