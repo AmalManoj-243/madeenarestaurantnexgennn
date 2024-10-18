@@ -27,7 +27,6 @@ const QuickServiceDetails = ({ navigation, route }) => {
         setIsLoading(true);
         try {
             const updatedDetails = await fetchServiceDetails(serviceId);
-            console.log("QuickServiceDetails : ", updatedDetails)
             setDetails(updatedDetails[0] || {});
         } catch (error) {
             console.error('Error fetching service details:', error);
@@ -135,7 +134,7 @@ const QuickServiceDetails = ({ navigation, route }) => {
                     label="Remarks"
                     value={details?.service_register_complaint_lists?.[0]?.remarks || '-'}
                     multiline={true}
-                    textAlignVertical={'top'} /> 
+                    textAlignVertical={'top'} />
 
                 <View style={{ flexDirection: 'row', marginVertical: 20 }}>
                     <Button

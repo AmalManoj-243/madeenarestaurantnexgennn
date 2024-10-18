@@ -93,22 +93,23 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         setDetails(updatedDetails || {});
         const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
           diagnosis.job_diagnosis_parts?.map(part => {
-            const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
-            return cleanPart;
-          }) || []
-        ) || [];
-        setSparePartsItems(prevItems => {
-          const existingPartIds = new Set(prevItems.map(item => item._id));
-          const newItems = jobDiagnosisParts.filter(item => !existingPartIds.has(item._id));
-          return [...prevItems, ...newItems];
-        });
+          const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
+          return cleanPart;
+        }) || []
+      ) || [];
+
+      setSparePartsItems(prevItems => {
+        const existingPartIds = new Set(prevItems.map(item => item._id));
+        const newItems = jobDiagnosisParts.filter(item => !existingPartIds.has(item._id));
+        return [...prevItems, ...newItems];
+      });
     } catch (error) {
       console.error('Error fetching service details:', error);
       showToastMessage('Failed to fetch service details. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };   
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -184,14 +185,13 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           parts: sparePartsItems.map((items) => ({
             product_id: items?.product_id,
             product_name: items?.product_name,
-            description: items?.description,
+            description: items?.description || null,
             quantity: items?.quantity,
             uom_id: items?.uom_id,
             uom: items?.uom,
             unit_price: items?.unit_price,
-            sub_total: items?.unit_price,
-            unit_cost: items?.unit_price,
-            total: items?.total,
+            sub_total: items?.unit_price * items?.quantity || 0, //
+            total: items?.total, //
             tax_type_id: items?.tax_type_id,
             tax_type_name: items?.tax_type_name,
           }))
@@ -282,7 +282,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Total : </Text>
-            <Text style={styles.totalValue}>{total.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>{total.toFixed(2) || total_amount}</Text>
           </View>
         </>
         }

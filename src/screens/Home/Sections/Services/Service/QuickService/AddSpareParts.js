@@ -29,8 +29,7 @@ const AddSpareParts = ({ navigation, route }) => {
         uom: '',
         unitPrice: '',
         isInclusive: false,
-        tax: '',       // VAT 5% id and its label
-        subTotal: '',
+        tax: '',     
         taxType: ''
     });
 
@@ -208,7 +207,6 @@ const AddSpareParts = ({ navigation, route }) => {
                 }));
 
                 const defaultTax = taxItems.find(tax => tax.label === "vat 5%");
-                console.log("🚀 ~ file: AddSpareParts.js:210 ~ fetchTax ~ defaultTax:", defaultTax)
                 // setDropdown(prevDropdown => ({
                 //     ...prevDropdown,
                 //     taxes: taxItems,
@@ -250,7 +248,6 @@ const AddSpareParts = ({ navigation, route }) => {
                 uom: formData.uom || '',
                 unitPrice: formData.unitPrice || '',
                 tax: formData.tax || '',
-                subTotal: formData.subTotal || '',
                 spareTotalPrice: formData.spareTotalPrice || '',
                 total: formData.total || '',
                 taxType: formData.taxType || '',
