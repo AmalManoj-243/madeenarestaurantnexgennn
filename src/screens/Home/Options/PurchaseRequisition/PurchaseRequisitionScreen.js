@@ -9,4 +9,4 @@ const PurchaseRequisitionScreen = () => {
   )
 }
 
-export default PurchaseRequisitionScreen
+export default PurchaseRequisitionScreen;

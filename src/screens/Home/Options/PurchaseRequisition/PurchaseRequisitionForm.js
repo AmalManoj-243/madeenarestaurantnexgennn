@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
 import { NavigationHeader } from "@components/Header";
-import { fetchEmployeesDropdown } from "@api/dropdowns/dropdownApi";
+import { fetchEmployeesDropdown, fetchWarehouseDropdown } from "@api/dropdowns/dropdownApi";
 import { DropdownSheet } from "@components/common/BottomSheets";
 import { TextInput as FormInput } from "@components/common/TextInput";
 import { LoadingButton } from "@components/common/Button";
@@ -10,7 +10,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { COLORS, FONT_FAMILY } from "@constants/theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-const PurchaseRequisitionForm = ({ navigation }) => {
+const PurchaseRequisitionForm = ({ navigation, onFieldChange }) => {
   const [dropdown, setDropdown] = useState({
     requestedByName: [],
     warehouse: [],

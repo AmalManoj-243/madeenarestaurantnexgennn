@@ -252,6 +252,7 @@ const AddSpareParts = ({ navigation, route }) => {
                 total: formData.total || '',
                 taxType: formData.taxType || '',
             };
+            console.log("Added Spares :", spareItem)
             addSpareParts(spareItem);
             navigation.navigate('QuickServiceUpdateDetails', { id });
         }

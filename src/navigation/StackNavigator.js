@@ -36,7 +36,7 @@ import { SpareManagementsScreen } from "@screens/Home/Sections/Services/SpareMan
 import { QuickServiceFormTabs } from "@screens/Home/Sections/Services/Service/QuickService/QuickServiceFormTabs";
 import { EditPickup, PickupDetails, PickupScreen } from "@screens/Home/Sections/Services/Service/Pickup";
 import { VisitFormTabs } from "@screens/Home/Options/Visits/VisitFormTabs";
-import { AddProductLines, PurchaseRequisitionForm } from "@screens/Home/Options/PurchaseRequisition";
+import { AddProductLines, PurchaseRequisitionForm, PurchaseRequisitionScreen } from "@screens/Home/Options/PurchaseRequisition";
 
 const Stack = createNativeStackNavigator();
 
@@ -376,7 +376,7 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      {/* KPI               KPI               KPI */}
+      {/* KPI */}
       <Stack.Screen
         name="KPIListingScreen"
         component={KPIListingScreen}
@@ -399,15 +399,17 @@ const StackNavigator = () => {
       component={PurchaseRequisitionForm}
       options={{headerShown: false}}
       />
-
+      <Stack.Screen 
+      name="PurchaseRequisitionScreen"
+      component={PurchaseRequisitionScreen}
+      options={{headerShown: false}}
+      />
       <Stack.Screen 
       name="AddProductLines"
       component={AddProductLines}
       options={{headerShown: false}}/>
 
     </Stack.Navigator>
-  
-    
   );
 };
 

@@ -30,11 +30,13 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
   const [calculatedTax, setCalculatedTax] = useState(0);
 
   const [formData, setFormData] = useState({
+    // accumulatedSparePartsTax: accumulatedSparePartsTax,
     serviceCharge: 100,
     spareTotalPrice: null,
     subTotal: subTotal,
     total: total,
-  });
+  })
+  console.log("Form Datas :",formData)
 
   const addSpareParts = (addedItems) => {
     const structureSpareItems = {
@@ -45,9 +47,9 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       uom_id: addedItems?.uom?.id,
       uom: addedItems?.uom.label,
       unit_price: addedItems.unitPrice,
-      unit_cost: addedItems.unitPrice, 
-      tax_type_id: addedItems?.taxType?.id,  
-      tax_type_name: addedItems?.taxType?.label,
+      unit_cost: addedItems.unitPrice,
+      tax_type_id: addedItems?.tax?.id,
+      tax_type_name: addedItems?.tax?.label,
       tax: addedItems?.tax,
       spareTotalPrice: addedItems?.spareTotalPrice,
       total: addedItems?.total,
@@ -57,58 +59,63 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
 
   const calculateTotals = () => {
     let calculatedSparePartsTotal = sparePartsItems.reduce(
-      (sum, item) => sum + parseFloat(item.spareTotalPrice || 0), 0);
+    (sum, item) => sum + (parseFloat(item.unit_price || 0) * (item.quantity || 1)), 0);
+    setSubTotal(calculatedSparePartsTotal);
 
     let accumulatedSparePartsTax = sparePartsItems.reduce(
-    (sum, item) => sum + parseFloat(item.tax || 0), 0);
-
+      (sum, item) => sum + parseFloat(item.tax || 0), 0
+    );
+  
     const serviceCharge = parseFloat(formData.serviceCharge) || 0;
     const serviceChargeTax = serviceCharge * 0.05;
-
+  
     const totalTax = accumulatedSparePartsTax + serviceChargeTax;
     setCalculatedTax(totalTax);
-    
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      spareTotalPrice: calculatedSparePartsTotal,
-      subTotal: calculatedSubTotal, 
-      total: total
-    }))
 
-    const calculatedSubTotal = calculatedSparePartsTotal + serviceCharge;
-    setSubTotal(calculatedSubTotal);
-
-    const total = calculatedSubTotal + totalTax;
+    // const calculatedSubTotal = calculatedSparePartsTotal + serviceCharge;
+    // setSubTotal(calculatedSubTotal);
+  
+    const total = calculatedSparePartsTotal + serviceCharge + totalTax;
     setTotal(total);
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      serviceChargeTax,
+      spareTotalPrice: calculatedSparePartsTotal,
+      subTotal: calculatedSparePartsTotal,
+      total,
+      totalTax: accumulatedSparePartsTax,
+    }));
   };
   
-    useEffect(() => {
-      calculateTotals();
-    }, [sparePartsItems, formData.serviceCharge]);
-    
-    const fetchDetails = async () => {
-      setIsLoading(true);
-      try {
-        const [updatedDetails] = await fetchServiceDetails(id);
-        setDetails(updatedDetails || {});
-        const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
-          diagnosis.job_diagnosis_parts?.map(part => {
-            const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
-            return cleanPart;
-          }) || []
-        ) || [];
-        setSparePartsItems(prevItems => {
-          const existingPartIds = new Set(prevItems.map(item => item._id));
-          const newItems = jobDiagnosisParts.filter(item => !existingPartIds.has(item._id));
-          return [...prevItems, ...newItems];
-        });
+  useEffect(() => {
+    calculateTotals();
+  }, [sparePartsItems]);
+  
+  const fetchDetails = async () => {
+    setIsLoading(true);
+    try {
+      const [updatedDetails] = await fetchServiceDetails(id);
+      setDetails(updatedDetails || {});
+      const jobDiagnosisParts = updatedDetails?.job_diagnoses?.flatMap(diagnosis =>
+        diagnosis.job_diagnosis_parts?.map(part => {
+          // Destructure the part object to exclude spare_parts_line_lists and product_lists
+          const { spare_parts_line_lists, product_lists, ...cleanPart } = part;
+          return cleanPart;
+        }) || []
+      ) || [];
+      setSparePartsItems(prevItems => {
+        const existingPartIds = new Set(prevItems.map(item => item._id));
+        const newItems = jobDiagnosisParts.filter(item => !existingPartIds.has(item._id));
+        return [...prevItems, ...newItems];
+      });
     } catch (error) {
       console.error('Error fetching service details:', error);
       showToastMessage('Failed to fetch service details. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };   
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -136,8 +143,10 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       sales_person_id: currentUser?.related_profile?._id,
       sales_person_name: currentUser?.related_profile?.name,
     }
+    console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuote ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
     try {
       const response = await post("/createJobApproveQuote", requestPayload);
+      console.log("🚀 ~ submit ~ response:", JSON.stringify(response, null, 2));
       if (response.success === 'true') {
         showToast({
           type: "success",
@@ -153,7 +162,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         });
       }
     } catch (error) {
-      console.error("Error Job Approving is failed:", error);
+      console.error("Error job approvilng is failed:", error);
       showToast({
         type: "error",
         title: "ERROR",
@@ -174,7 +183,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           job_registration_id: id,
           proposed_action_id: null,
           proposed_action_name: null,
-          done_by_id: currentUser?.related_profile?._id || null, 
+          done_by_id: currentUser?.related_profile?._id || null,
           done_by_name: currentUser?.related_profile?.name || '',
           untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),
           parts_or_service_required: null,
@@ -188,8 +197,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
             quantity: items?.quantity,
             uom_id: items?.uom_id,
             uom: items?.uom,
-            unit_price: items?.unit_price,
-            sub_total: items?.unit_price,
+            unit_price: items.unit_price,
             unit_cost: items?.unit_price,
             total: items?.total,
             tax_type_id: items?.tax_type_id,
@@ -200,7 +208,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     }
     try {
       const response = await put("/updateJobRegistration", requestPayload);
-      console.log("Submitting Spares : ", requestPayload)
       if (response.success === 'true') {
         handleJobApproveQuote(response);
         showToast({
@@ -243,7 +250,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           numberOfLines={3}
           textAlignVertical={'top'}
         />
-        <DetailField label="Mobile Number" value={details?.customer_lists?.[0]?.customer_mobile || '-'} />
+        <DetailField label="Mobile Number" value={details?.customer_mobile || '-'} />
         <DetailField label="Email" value={details?.customer_email || '-'} />
         <DetailField label="Warehouse Name" value={details?.warehouse_name || '-'} />
         <DetailField label="Created On" value={formatDateTime(details.date)} />
@@ -251,7 +258,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         <DetailField label="Brand Name" value={details?.brand_name || '-'} />
         <DetailField label="Device Name" value={details?.device_name || '-'} />
         <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
-        <DetailField label="Serial Number" value={details?.serial_no || '-'} />
         <FormInput
           label="Service Charge"
           placeholder="Enter Service Charge"
@@ -272,7 +278,8 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
-        {sparePartsItems.length > 0 && <><View style={styles.totalSection}>
+        {sparePartsItems.length > 0 && <>
+        <View style={styles.totalSection}>
           <Text style={styles.totalLabel}>Sub Total : </Text>
           <Text style={styles.totalValue}>{subTotal.toFixed(2)}</Text>
         </View>
@@ -299,6 +306,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   label: {

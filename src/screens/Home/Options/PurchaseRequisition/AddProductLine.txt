@@ -1,10 +1,11 @@
+import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
 import { NavigationHeader } from "@components/Header";
 import { TextInput as FormInput } from "@components/common/TextInput";
-import { Button } from "@components/common/Button";
+import { Button, LoadingButton } from "@components/common/Button";
 import { DropdownSheet } from "@components/common/BottomSheets";
-import { COLORS } from "@constants/theme";
+import { COLORS, FONT_FAMILY } from "@constants/theme";
 import { fetchProductsDropdown } from "@api/dropdowns/dropdownApi";
 
 const AddProductLines = ({ navigation, route }) => {
@@ -26,7 +27,7 @@ const AddProductLines = ({ navigation, route }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const ProductsData = await fetchProductsDropdown(searchText); 
+        const ProductsData = await fetchProductsDropdown(searchText);
         setDropdown((prevDropdown) => ({
           ...prevDropdown,
           products: ProductsData?.map((data) => ({
@@ -39,19 +40,11 @@ const AddProductLines = ({ navigation, route }) => {
       }
     };
     fetchProducts();
-  }, [searchText]);
+  }, []);
 
   const toggleBottomSheet = (type) => {
     setSelectedType(type);
     setIsVisible(!isVisible);
-  };
-
-  const handleProductSelection = (selectedProduct) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      productId: selectedProduct.id,
-      productName: selectedProduct.label,
-    }));
   };
 
   const renderBottomSheet = () => {
@@ -59,29 +52,30 @@ const AddProductLines = ({ navigation, route }) => {
     let fieldName = "";
 
     switch (selectedType) {
-      case "Product":
+      case "Product Name":
         items = dropdown.products;
         fieldName = "products";
         break;
       default:
         return null;
     }
-
     return (
       <DropdownSheet
-        isVisible={isVisible}
-        items={items}
-        title={selectedType}
-        onClose={() => setIsVisible(false)}
-        search
-        onSearchText={(value) => setSearchText(value)} 
-        onValueChange={(value) => {
-          setSearchText(''); 
-          if (selectedType === 'Product') {
-            handleProductSelection(value);
-          }
-        }}
-      />
+                isVisible={isVisible}
+                items={items}
+                title={selectedType}
+                onClose={() => setIsVisible(false)}
+                search
+                onSearchText={(value) => setSearchText(value)}
+                onValueChange={(value) => {
+                    setSearchText('')
+                    if (selectedType === 'Product Name') {
+                        handleProductSelection(value);
+                    } else {
+                        handleFieldChange(fieldName, value);
+                    }
+                }}
+            />
     );
   };
 
@@ -98,8 +92,7 @@ const AddProductLines = ({ navigation, route }) => {
           dropIcon={"menu-down"}
           editable={false}
           required
-          value={formData.productName}
-          onPress={() => toggleBottomSheet("Product")}
+          onPress={()=> toggleBottomSheet("Product Name")}
         />
         <FormInput
           label={"Quantity"}
