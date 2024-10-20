@@ -6,7 +6,6 @@ import { FONT_FAMILY } from '@constants/theme';
 import { NavigationHeader } from '@components/Header';
 import { SearchContainer } from '@components/containers';
 
-
 const DropdownSheet = ({
     isVisible,
     items,
@@ -38,8 +37,6 @@ const DropdownSheet = ({
         bottomSheetModalRef.current?.dismiss();
     };
 
-
-
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles.item} onPress={() => handleSelectItem(item)} >
             <Text style={styles.text}>{item.label?.trim()}</Text>
@@ -56,7 +53,7 @@ const DropdownSheet = ({
         >
             {/* <BottomSheetHeader title={title} /> */}
             <NavigationHeader title={title} onBackPress={() => bottomSheetModalRef.current?.dismiss()} />
-            {search && <SearchContainer placeholder={placeholder} onSearchText={onSearchText} />}
+            {search && <SearchContainer placeholder={placeholder} onChangeText={onSearchText} />}
             <BottomSheetFlatList
                 data={items}
                 numColumns={1}

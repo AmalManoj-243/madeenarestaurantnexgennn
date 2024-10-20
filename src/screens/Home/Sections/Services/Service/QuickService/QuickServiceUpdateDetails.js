@@ -30,12 +30,11 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
   const [calculatedTax, setCalculatedTax] = useState(0);
 
   const [formData, setFormData] = useState({
-    // accumulatedSparePartsTax: accumulatedSparePartsTax,
     serviceCharge: 100,
     spareTotalPrice: null,
     subTotal: subTotal,
     total: total,
-  })
+  });
   console.log("Form Datas :",formData)
 
   const addSpareParts = (addedItems) => {
@@ -48,8 +47,8 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       uom: addedItems?.uom.label,
       unit_price: addedItems.unitPrice,
       unit_cost: addedItems.unitPrice,
-      tax_type_id: addedItems?.tax?.id,
-      tax_type_name: addedItems?.tax?.label,
+      tax_type_id: addedItems?.taxType?.id,
+      tax_type_name: addedItems?.taxType?.label,
       tax: addedItems?.tax,
       spareTotalPrice: addedItems?.spareTotalPrice,
       total: addedItems?.total,
@@ -64,16 +63,13 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
 
     let accumulatedSparePartsTax = sparePartsItems.reduce(
       (sum, item) => sum + parseFloat(item.tax || 0), 0
-    );
+    ); // spare parts items not returning tax value so it is not fetching
   
     const serviceCharge = parseFloat(formData.serviceCharge) || 0;
     const serviceChargeTax = serviceCharge * 0.05;
   
     const totalTax = accumulatedSparePartsTax + serviceChargeTax;
     setCalculatedTax(totalTax);
-
-    // const calculatedSubTotal = calculatedSparePartsTotal + serviceCharge;
-    // setSubTotal(calculatedSubTotal);
   
     const total = calculatedSparePartsTotal + serviceCharge + totalTax;
     setTotal(total);
@@ -162,7 +158,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         });
       }
     } catch (error) {
-      console.error("Error job approvilng is failed:", error);
+      console.error("Error Job Approving failed:", error);
       showToast({
         type: "error",
         title: "ERROR",
@@ -194,12 +190,13 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
             product_id: items?.product_id,
             product_name: items?.product_name,
             description: items?.description,
-            quantity: items?.quantity,
             uom_id: items?.uom_id,
             uom: items?.uom,
+            quantity: items?.quantity,
             unit_price: items.unit_price,
+            sub_total: items.unit_price,
             unit_cost: items?.unit_price,
-            total: items?.total,
+            // total: items?.total,
             tax_type_id: items?.tax_type_id,
             tax_type_name: items?.tax_type_name,
           }))
@@ -208,6 +205,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     }
     try {
       const response = await put("/updateJobRegistration", requestPayload);
+      console.log("Submitting Spares : ", requestPayload)
       if (response.success === 'true') {
         handleJobApproveQuote(response);
         showToast({
@@ -250,7 +248,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           numberOfLines={3}
           textAlignVertical={'top'}
         />
-        <DetailField label="Mobile Number" value={details?.customer_mobile || '-'} />
+        <DetailField label="Mobile Number" value={details?.customer_lists?.[0]?.customer_mobile || '-'} />
         <DetailField label="Email" value={details?.customer_email || '-'} />
         <DetailField label="Warehouse Name" value={details?.warehouse_name || '-'} />
         <DetailField label="Created On" value={formatDateTime(details.date)} />
@@ -258,6 +256,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         <DetailField label="Brand Name" value={details?.brand_name || '-'} />
         <DetailField label="Device Name" value={details?.device_name || '-'} />
         <DetailField label="Consumer Model" value={details?.consumer_model_name || '-'} />
+        <DetailField label="Serial Number" value={details?.serial_no || '-'} />
         <FormInput
           label="Service Charge"
           placeholder="Enter Service Charge"
@@ -306,7 +305,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     </SafeAreaView>
   );
 };
-
 
 const styles = StyleSheet.create({
   label: {

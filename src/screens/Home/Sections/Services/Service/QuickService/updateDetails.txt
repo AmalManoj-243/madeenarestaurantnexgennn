@@ -35,6 +35,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     subTotal: subTotal,
     total: total,
   });
+  console.log("Form Datas :",formData)
 
   const addSpareParts = (addedItems) => {
     const structureSpareItems = {
