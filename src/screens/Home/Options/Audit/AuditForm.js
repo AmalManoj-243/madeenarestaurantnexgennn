@@ -291,9 +291,11 @@ const AuditForm = ({ navigation }) => {
       if (scannedBillDetails?.warehouse || scannedBillDetails?.from_warehouse_id) {
         const warehouses_id = scannedBillDetails?.warehouse?.warehouses_id || null;
         const from_warehouse_id = scannedBillDetails?.from_warehouse_id || null;
+        const to_warehouse_id = scannedBillDetails?.to_warehouse_id || null;
+        console.log("Warehouse ID:", warehouses_id)
         // Debugging logs to inspect the variables before the condition
         // Enhanced condition to handle potential undefined/null values
-        if (warehouseId !== warehouses_id && warehouseId !== from_warehouse_id) {
+        if (warehouseId !== warehouses_id && warehouseId !== to_warehouse_id && warehouseId !== from_warehouse_id) {
           console.log("Condition triggered: Warehouse ID doesn't match either the warehouse or from_warehouse_id.");
           showToast({
             type: 'error',
