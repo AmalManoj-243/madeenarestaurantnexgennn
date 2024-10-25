@@ -202,7 +202,7 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="Purchase Requisition Creation"
+        title="Add Purchase Requisition"
         onBackPress={() => navigation.goBack()}
         logo={false}
       />

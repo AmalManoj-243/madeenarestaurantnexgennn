@@ -12,7 +12,7 @@ import PurchaseDetailList from './PurchaseDetailList';
 import { OverlayLoader } from '@components/Loader';
 import { Button } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
-import { put, post } from '@api/services/utils';
+import { put, post, deleteRequest } from '@api/services/utils';
 import { ConfirmationModal } from '@components/Modal';
 
 const PurchaseRequisitionDetails = ({ navigation, route }) => {
@@ -49,31 +49,26 @@ const PurchaseRequisitionDetails = ({ navigation, route }) => {
 
     const handleSendPurchase = async () => {
         try {
-            const response = await put('/updatePurchaseRequest/push_to_price_enquiry');
-            if (response.success === 'true' || response.success === true) {
-                showToastMessage('Purchase Sent Successfully');
-                navigation.navigate('PurchaseRequisitionScreen');
+            const data = { _id: details._id };  
+            const response = await post('/updatePurchaseRequest/push_to_price_enquiry', data);
+            if (response.success === true || response.success === 'true') {
+                showToastMessage('Purchase Succesfully added to Price Enquiry');
+                fetchDetails();
+                navigation.navigate('OptionsScreen');
             } else {
                 showToastMessage('Failed. Please try again.');
             }
         } catch (error) {
             showToastMessage('An error occurred. Please try again.');
-        } finally {
-            fetchDetails();
         }
     };
     
-
-    const handleDetetePurchase = async () => {
+    const handleDeletePurchase = async () => {
         setIsSubmitting(true);
         try {
-            const deletePurchaseData = {
-                _id: details._id,
-                job_stage: "Closed",
-            };
-            console.log("Closing Reason", deletePurchaseData)
-            const response = await put('/updateJobRegistration', deletePurchaseData);
-            if (response.success === "true") {
+            const { _id } = details;
+            const response = await deleteRequest(`/viewPurchaseRequest/${_id}`);
+            if (response.success === true || response.success === 'true') {
                 showToastMessage('Purchase Deleted Successfully');
                 navigation.navigate('PurchaseRequisitionScreen');
             } else {
@@ -86,7 +81,7 @@ const PurchaseRequisitionDetails = ({ navigation, route }) => {
             setIsSubmitting(false);
         }
     };
-
+         
     const handleEditPurchase = () => {
         navigation.navigate('EditPurchaseRequisitionDetails', { id: purchaseId });
     };
@@ -140,7 +135,7 @@ const PurchaseRequisitionDetails = ({ navigation, route }) => {
                     onCancel={() => setIsConfirmationModalVisible(false)}
                     headerMessage='Are you sure you want to Delete this?'
                     onConfirm={() => {
-                        handleDetetePurchase();
+                        handleDeletePurchase();
                         setIsConfirmationModalVisible(false);
                     }}
                 />

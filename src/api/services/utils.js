@@ -37,3 +37,16 @@ export const put = async (endpoint, data = {}, config ={}) => {
     handleApiError(error)
   }
 };
+
+
+export const deleteRequest = async (endpoint, data = {}, config = {}) => {
+  try {
+    const url = `${API_BASE_URL}${endpoint}`;
+    // For DELETE requests with data in the body, axios requires { data: data } in the config
+    const response = await axios.delete(url, { data, ...config });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
