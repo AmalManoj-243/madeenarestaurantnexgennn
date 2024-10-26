@@ -46,6 +46,17 @@ const fetchAuditDetails = async (endpoint, sequenceNo) => {
   }
 };
 
+// fetch stock transfer details
+const fetchAuditDetailss = async (endpoint, sequenceNo) => {
+  try {
+    const response = await get(`${endpoint}?qr_sequence_no=${sequenceNo}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
 // Fetches details for a given endpoint and detail ID.
 const fetchDetails = async (endpoint, detailId) => {
   try {
@@ -109,7 +120,7 @@ export const fetchBills = {
   purchaseReturnDetails: async (sequenceNo) => fetchAuditDetails(GET_PURCHASE_RETURN_DETAILS, sequenceNo),
   capitalPaymentDetails: async (sequenceNo) => fetchAuditDetails(GET_CAPITAL_PAYMENT_DETAILS, sequenceNo),
   jobInvoiceDetails: async (sequenceNo) => fetchAuditDetails(GET_JOB_INVOICE_DETAILS, sequenceNo),
-  stockTransferDetails: async (sequenceNo) => fetchAuditDetails(GET_STOCK_TRANSFER_DETAILS, sequenceNo),
+  stockTransferDetails: async (sequenceNo) => fetchAuditDetailss(GET_STOCK_TRANSFER_DETAILS, sequenceNo),
   fundTransferDetails: async (sequenceNo) => fetchAuditDetails(GET_FUND_TRANSFER_DETAILS, sequenceNo),
   sparePartsIssueDetails: async (sequenceNo) => fetchAuditDetails(GET_SPARE_PARTS_ISSUE_DETAILS, sequenceNo),
   sparePartsIssueAuditDetails: async (issueId) => fetchDetails(GET_SPARE_PARTS_ISSUE_AUDIT_DETAILS, issueId),

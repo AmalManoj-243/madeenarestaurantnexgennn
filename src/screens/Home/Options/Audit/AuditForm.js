@@ -33,7 +33,8 @@ const AuditForm = ({ navigation }) => {
   const [splittedBillName, setSplittedBillName] = useState('')
   const loginUser = useAuthStore(state => state.user)
   const warehouseId = loginUser?.warehouse?.warehouse_id
-
+  
+  
   useEffect(() => {
     resetFormState();
   }, [splittedBillName]);
@@ -289,12 +290,17 @@ const AuditForm = ({ navigation }) => {
       }
 
       if (scannedBillDetails?.warehouse || scannedBillDetails?.from_warehouse_id) {
-        const warehouses_id = scannedBillDetails?.warehouse?.warehouses_id || null;
+        const warehouses_id = scannedBillDetails?.warehouse?.warehouses_id || scannedBillDetails?.to_warehouse_id;
         const from_warehouse_id = scannedBillDetails?.from_warehouse_id || null;
         const to_warehouse_id = scannedBillDetails?.to_warehouse_id || null;
         console.log("Warehouse ID:", warehouses_id)
+        console.log("Scanned details:",scannedBillDetails)
         // Debugging logs to inspect the variables before the condition
         // Enhanced condition to handle potential undefined/null values
+        console.log("LOG ID:", warehouseId)
+        console.log("LOG 1:", warehouses_id)
+        console.log("LOG TO:", to_warehouse_id)
+        console.log("LOG FROM:", from_warehouse_id)
         if (warehouseId !== warehouses_id && warehouseId !== to_warehouse_id && warehouseId !== from_warehouse_id) {
           console.log("Condition triggered: Warehouse ID doesn't match either the warehouse or from_warehouse_id.");
           showToast({
