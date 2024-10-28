@@ -37,7 +37,7 @@ import { QuickServiceFormTabs } from "@screens/Home/Sections/Services/Service/Qu
 import { EditPickup, PickupDetails, PickupScreen } from "@screens/Home/Sections/Services/Service/Pickup";
 import { VisitFormTabs } from "@screens/Home/Options/Visits/VisitFormTabs";
 import { PurchasesScreen } from "@screens/Home/Options/Purchases";
-import { AddPriceLines, PriceEnquiryDetails, PriceEnquiryForm, PriceEnquiryScreen } from "@screens/Home/Options/Purchases/PriceEnquiry";
+import { AddPriceLines, EditPriceEnquiryDetails, PriceEnquiryDetails, PriceEnquiryForm, PriceEnquiryScreen } from "@screens/Home/Options/Purchases/PriceEnquiry";
 import { AddProductLines, EditPurchaseRequisitionDetails, PurchaseRequisitionDetails, PurchaseRequisitionForm, PurchaseRequisitionScreen } from "@screens/Home/Options/Purchases/PurchaseRequisition";
 
 const Stack = createNativeStackNavigator();
@@ -401,55 +401,60 @@ const StackNavigator = () => {
       />
 
       {/* Purchases */}
-      <Stack.Screen 
-      name="PurchasesScreen"
-      component={PurchasesScreen}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PurchasesScreen"
+        component={PurchasesScreen}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PriceEnquiryForm"
-      component={PriceEnquiryForm}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PriceEnquiryForm"
+        component={PriceEnquiryForm}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PriceEnquiryScreen"
-      component={PriceEnquiryScreen}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PriceEnquiryScreen"
+        component={PriceEnquiryScreen}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PriceEnquiryDetails"
-      component={PriceEnquiryDetails}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PriceEnquiryDetails"
+        component={PriceEnquiryDetails}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="AddPriceLines"
-      component={AddPriceLines}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="EditPriceEnquiryDetails"
+        component={EditPriceEnquiryDetails}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PurchaseRequisitionForm"
-      component={PurchaseRequisitionForm}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="AddPriceLines"
+        component={AddPriceLines}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PurchaseRequisitionScreen"
-      component={PurchaseRequisitionScreen}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PurchaseRequisitionForm"
+        component={PurchaseRequisitionForm}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="PurchaseRequisitionDetails"
-      component={PurchaseRequisitionDetails}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PurchaseRequisitionScreen"
+        component={PurchaseRequisitionScreen}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="EditPurchaseRequisitionDetails"
-      component={EditPurchaseRequisitionDetails}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="PurchaseRequisitionDetails"
+        component={PurchaseRequisitionDetails}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="AddProductLines"
-      component={AddProductLines}
-      options={{headerShown: false}}
+      <Stack.Screen
+        name="EditPurchaseRequisitionDetails"
+        component={EditPurchaseRequisitionDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddProductLines"
+        component={AddProductLines}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

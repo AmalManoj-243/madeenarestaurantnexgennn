@@ -12,7 +12,7 @@ import PriceDetailList from './PriceDetailList';
 import { OverlayLoader } from '@components/Loader';
 import { Button } from '@components/common/Button';
 import { COLORS } from '@constants/theme';
-import { put, post, deleteRequest } from '@api/services/utils';
+import { post, deleteRequest } from '@api/services/utils';
 import { ConfirmationModal } from '@components/Modal';
 
 const PriceEnquiryDetails = ({ navigation, route }) => {
@@ -20,7 +20,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
     const [details, setDetails] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [productLines, setProductLines] = useState([]);
+    const [priceLines, setPriceLines] = useState([]);
     const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
     const [actionToPerform, setActionToPerform] = useState(null);
 
@@ -30,7 +30,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
             const updatedDetails = await fetchPriceEnquiryDetails(priceId);
             const requestDetails = updatedDetails[0]?.request_details?.[0];
             setDetails(updatedDetails[0] || {});
-            setProductLines(requestDetails?.supplier_prices || []);
+            setPriceLines(requestDetails?.supplier_prices || []);
         } catch (error) {
             console.error('Error fetching price enquiry details:', error);
             showToastMessage('Failed to fetch price enquiry details. Please try again.');
@@ -47,23 +47,25 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
         }, [priceId])
     );
 
-    const handleSendPurchase = async () => {
+    const handlePurchaseOrder = async () => {
         try {
-            const data = { _id: details._id };
-            const response = await post('/updatePurchaseRequest/push_to_price_enquiry', data);
+            const { _id } = details;
+            const response = await post('/createPriceEnquiryPurchaseOrder');
             if (response.success === true || response.success === 'true') {
-                showToastMessage('Purchase Succesfully added to Price Enquiry');
-                fetchDetails();
-                navigation.navigate('OptionsScreen');
+                showToastMessage('Purchase Order Created Successfully');
+                navigation.navigate('OptionScreen');
             } else {
-                showToastMessage('Failed. Please try again.');
+                showToastMessage('Failed to Create Purchase Order. Please try again.');
             }
         } catch (error) {
             showToastMessage('An error occurred. Please try again.');
+        } finally {
+            fetchDetails();
+            setIsSubmitting(false);
         }
-    };
+    }
 
-    const handleDeletePurchase = async () => {
+    const handleDeletePurchase = async () => {  //
         setIsSubmitting(true);
         try {
             const { _id } = details;
@@ -82,11 +84,11 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
         }
     };
 
-    const handleEditPurchase = () => {
-        navigation.navigate('EditPurchaseRequisitionDetails', { id: priceId });
+    const handleEditPrice = () => {
+        navigation.navigate('EditPriceEnquiryDetails', { id: priceId });
     };
 
-    const isPurchaseOrderDisabled = productLines.some(item => item.status === 'Approved');
+    const isPurchaseOrderDisabled = priceLines.some(item => item.status === 'Approved');
 
     return (
         <SafeAreaView>
@@ -101,7 +103,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
                 <DetailField label="Warehouse" value={details?.request_details?.[0]?.warehouse?.warehouse_name || '-'} />
                 <DetailField label="Require By" value={formatDate(details?.request_details?.[0]?.require_by)} />
                 <FlatList
-                    data={productLines}
+                    data={priceLines}
                     renderItem={({ item }) => <PriceDetailList item={item} />}
                     keyExtractor={(item) => item._id}
                 />
@@ -121,7 +123,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
                         width={'40%'}
                         backgroundColor={COLORS.tabIndicator}
                         title="Purchase Order"
-                        onPress={handleSendPurchase}
+                        onPress={handlePurchaseOrder}
                         disabled={isPurchaseOrderDisabled}
                     />
                     <View style={{ width: 5 }} />
@@ -129,7 +131,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
                         width={'30%'}
                         backgroundColor={COLORS.green}
                         title="EDIT"
-                        onPress={handleEditPurchase}
+                        onPress={handleEditPrice}
                     />
                 </View>
 
