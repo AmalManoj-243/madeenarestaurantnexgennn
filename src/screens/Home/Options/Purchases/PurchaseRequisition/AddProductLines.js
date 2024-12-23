@@ -109,7 +109,6 @@ const AddProductLines = ({ navigation, route }) => {
           name: supplier.label,
         })),
       };
-      console.log('Product Lines Data:', productLines);
       navigation.navigate("PurchaseRequisitionForm", { newProductLine: productLines });
     }
   };

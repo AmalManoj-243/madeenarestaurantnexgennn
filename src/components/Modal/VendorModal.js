@@ -5,8 +5,8 @@ import Text from '@components/Text';
 import { NavigationHeader } from '@components/Header';
 import { FONT_FAMILY, COLORS } from '@constants/theme';
 
-const MenuModal = ({ isVisible, onCancel, onOptionSelect, headerMessage = 'Select an Option' }) => {
-    const options = ['Shipment', 'Delivery Note', 'PO Cancel', 'Send PO'];
+const VendorModal = ({ isVisible, onCancel, onOptionSelect, headerMessage = 'Select an Option' }) => {
+    const options = ['Record Payment', 'Purchase Return', 'PDF Download', 'Preview'];
 
     return (
         <Modal
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MenuModal;
+export default VendorModal;

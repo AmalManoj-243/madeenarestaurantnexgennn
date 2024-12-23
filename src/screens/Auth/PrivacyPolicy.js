@@ -17,7 +17,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
             <RoundedScrollContainer>
                 <Text style={{ fontFamily: FONT_FAMILY.urbanistBold }}>
                     <Text style={styles.heading}>GENERAL INSTRUCTIONS</Text> {'\n'}
-                    1	  SALES IN CHARGE{'\n'}
+1                    1	  SALES IN CHARGE{'\n'}
                     2 	CREDIT COLLECTION{'\n'}
                     3 	SHIPMENT FOR CUSTOMER{'\n'}
                     4 	CREDIT PAYMENT RECEIPT{'\n'}

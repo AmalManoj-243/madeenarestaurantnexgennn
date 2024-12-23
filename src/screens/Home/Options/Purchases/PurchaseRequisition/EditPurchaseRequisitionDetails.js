@@ -54,7 +54,7 @@ const EditPurchaseRequisitionDetails = ({ navigation, route }) => {
                 supplier_id: selectedSuppliers.map(supplier => supplier.id),
                 product_lines: productLines,
             };
-            console.log("Haii hello : ", updateData)
+            console.log("Updated Suppliers : ", updateData)
             const response = await put('/updatePurchaseRequest', updateData);
             if (response.success === "true") {
                 showToastMessage('Successfully Added Suppliers');

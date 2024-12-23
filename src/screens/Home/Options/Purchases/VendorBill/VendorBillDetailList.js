@@ -25,7 +25,7 @@ const VendorBillDetailList = ({ item, onPress }) => {
         <View style={styles.rightColumn}> 
           <Text style={styles.content}>{scheduled_date}</Text>
           <Text style={styles.contentRight}>{quantity}</Text>
-          <Text style={styles.content}>Sub : {sub_total || '-'}</Text>
+          <Text style={styles.content}>Tot : {sub_total || '-'}</Text>
         </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>Des : {product.product_description || '-'}</Text>

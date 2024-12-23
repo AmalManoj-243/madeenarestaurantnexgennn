@@ -119,7 +119,7 @@ const ProductDetail = ({ navigation, route }) => {
       <View style={{ marginTop: 10, marginLeft: 10 }}>
         {inventory_ledgers.length > 0 ? (
           inventory_ledgers.map((ledger, index) => (
-            <View key={index} style={{ flexDirection: 'row', flexWrap: 'wrap', backgroundColor: COLORS.lightGrey, padding: 5, borderRadius: 5, marginBottom: 5 }}>
+            <View key={index} style={{ flexDirection: 'row', flexWrap: 'wrap', backgroundColor: COLORS.lightGray, padding: 5, borderRadius: 5, marginBottom: 5 }}>
               <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{ledger?.warehouse_name}:</Text>
               <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{ledger?.total_warehouse_quantity}</Text>
             </View>
@@ -127,7 +127,7 @@ const ProductDetail = ({ navigation, route }) => {
         ) : (
           <Text style={{ color: 'red', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Out of Stock</Text>
         )}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 5, backgroundColor: COLORS.lightGrey, padding: 10, borderRadius: 5 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 5, backgroundColor: COLORS.lightGray, padding: 10, borderRadius: 5 }}>
           <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>Stocks On Hand:</Text>
           <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold }}>{total_product_quantity}</Text>
         </View>
@@ -148,7 +148,7 @@ const ProductDetail = ({ navigation, route }) => {
                 <TouchableOpacity
                   activeOpacity={0.6}
                   key={`${index}-${idx}`}
-                  style={{ marginTop: 8, borderColor: COLORS.primaryThemeColor, padding: 8, flex: 2, width: '40%', alignItems: 'center', borderRadius: 6, backgroundColor: COLORS.lightGrey }}
+                  style={{ marginTop: 8, borderColor: COLORS.primaryThemeColor, padding: 8, flex: 2, width: '40%', alignItems: 'center', borderRadius: 6, backgroundColor: COLORS.lightGray }}
                   onPress={() => handleBoxNamePress(boxName, boxDetail?.warehouse_id ? boxDetail?.warehouse_id : '')}
                 >
                   <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, color: COLORS.orange, fontSize: 15 }}>Box Name: {boxName}</Text>

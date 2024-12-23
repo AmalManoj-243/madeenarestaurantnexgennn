@@ -35,7 +35,7 @@ const InventoryRequestItem = ({ item, onPress, onChoose, onQuantityChange }) => 
                     <Text style={styles.label}>{item?.uom_name}</Text>
                 </View>
                 {/* <View style={{alignSelf:'flex-end'}}> */}
-                <Button backgroundColor={item?.chosen ? COLORS.lightGrey: COLORS.white} title={item?.chosen ? 'Unchoose' : 'Choose'} color={item?.chosen ? COLORS.black : COLORS.black} paddingHorizontal={20} onPress={() => onChoose(item)} />
+                <Button backgroundColor={item?.chosen ? COLORS.lightGray : COLORS.white} title={item?.chosen ? 'Unchoose' : 'Choose'} color={item?.chosen ? COLORS.black : COLORS.black} paddingHorizontal={20} onPress={() => onChoose(item)} />
                 {/* </View> */}
             </View>
         </TouchableOpacity>

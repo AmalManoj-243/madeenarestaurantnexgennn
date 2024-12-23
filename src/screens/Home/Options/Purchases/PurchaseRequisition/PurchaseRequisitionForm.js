@@ -148,10 +148,10 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
         requested_by: formData?.requestedByName?.id ?? null,
         require_by: formData?.requireBy ?? null,
         ware: formData?.warehouse?.label ?? '',
-        _id: null,
-        supplier_id: null,
-        supplier_name: null,
-        employee_name: null,
+        _id: '',
+        supplier_id: '',
+        supplier_name: '',
+        employee_name: '',
         request_details: [0],
         alternate_products: [],
         product_lines: productLines.map((item, index) => ({
@@ -167,8 +167,8 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
           })) || [],
         })),
       };
-      console.log("Purchase Data :", purchaseData)
- 
+      // console.log('Purchase Data :', JSON.stringify(purchaseData, null, 2));
+      
       try {
         const response = await post("/createPurchaseRequest", purchaseData);
         if (response.success === 'true' || response.success === true) {
@@ -243,7 +243,7 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
           onPress={() => setIsDatePickerVisible(true)}
         />
         <TitleWithButton
-          label={'Add an Item'}
+          label={'Add Product'}
           onPress={() => { navigation.navigate('AddProductLines'); }}
         />
         <FlatList
