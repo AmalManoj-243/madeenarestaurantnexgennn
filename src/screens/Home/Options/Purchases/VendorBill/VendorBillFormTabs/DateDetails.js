@@ -3,7 +3,7 @@ import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
 import { fetchWarehouseDropdown, fetchSalesPersonDropdown } from '@api/dropdowns/dropdownApi';
-import { formatDateTime } from '@utils/common/date';
+import { formatDateandTime } from '@utils/common/date';
 
 const DateDetails = ({ formData, onFieldChange, errors }) => {
 
@@ -69,7 +69,7 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
       case 'Warehouse':
         items = dropdown.warehouse;
         fieldName = 'warehouse';
-        break;  
+        break;
       default:
         return null;
     }
@@ -89,7 +89,7 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
       <FormInput
         label="Date"
         editable={false}
-        value={formatDateTime(formData.date)}
+        value={formatDateandTime(formData.date)}
       />
       <FormInput
         label={"TRN Number"}
@@ -101,12 +101,12 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
       <FormInput
         label="Order Date"
         editable={false}
-        value={formatDateTime(formData.orderDate)}
+        value={formatDateandTime(formData.orderDate)}
       />
       <FormInput
         label="Bill Date"
         editable={false}
-        value={formatDateTime(formData.billDate)}
+        value={formatDateandTime(formData.billDate)}
       />
       <FormInput
         label={"Sales Person"}

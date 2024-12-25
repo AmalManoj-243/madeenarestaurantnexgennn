@@ -173,7 +173,7 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
         onPress={() => toggleBottomSheet("Payment Mode")}
       />
       <TitleWithButton
-        label="Add an item"
+        label="Add Products"
         onPress={() => navigation.navigate('AddVendorProducts')}
       />
       <FlatList

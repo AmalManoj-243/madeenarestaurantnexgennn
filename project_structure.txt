@@ -221,14 +221,22 @@
 │   │   │   ├── ActionModal.js
 │   │   │   ├── AddUpdateModal.js
 │   │   │   ├── backupEmployeeListModal.txt
+│   │   │   ├── CloseModal.txt
 │   │   │   ├── ConfirmationModal.js
 │   │   │   ├── CustomListModal.js
+│   │   │   ├── DocumentModal.js
 │   │   │   ├── EmployeeLIstModal.js
 │   │   │   ├── index.js
 │   │   │   ├── InputModal.js
 │   │   │   ├── LogoutModal.js
 │   │   │   ├── MeetingsScheduleModal.js
-│   │   │   └── RulesModal.js
+│   │   │   ├── MenuModal.js
+│   │   │   ├── PauseModal.js
+│   │   │   ├── ReAssignModal.js
+│   │   │   ├── RulesModal.js
+│   │   │   ├── StartModal.js
+│   │   │   ├── UpdatesModal.js
+│   │   │   └── VendorModal.js
 │   │   ├── Options
 │   │   │   ├── index.js
 │   │   │   └── ListItem.js

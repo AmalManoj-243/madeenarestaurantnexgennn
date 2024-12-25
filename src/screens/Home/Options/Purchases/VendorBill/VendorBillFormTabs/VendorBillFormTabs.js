@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { TabView } from 'react-native-tab-view';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useAuthStore } from "@stores/auth";
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { LoadingButton } from '@components/common/Button';
 import { showToast } from '@utils/common';
+import { fetchPurchaseOrderDetails } from '@api/details/detailApi';
 import { post } from '@api/services/utils';
 import { validateFields } from '@utils/validation';
 import { CustomTabBar } from '@components/TabBar';
@@ -13,16 +16,45 @@ import VendorDetails from './VendorDetails';
 import DateDetails from './DateDetails';
 import OtherDetails from './OtherDetails';
 
-const VendorBillFormTabs = ({ navigation }) => {
+const VendorBillFormTabs = ({ navigation, route }) => {
 
   const layout = useWindowDimensions();
+  const { id: vendorBillId } = route?.params || {};
+  const [details, setDetails] = useState({});
+  console.log(details)
+  const currentUser = useAuthStore((state) => state.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'Vendor Details' },
     { key: 'second', title: 'Date & Details' },
     { key: 'third', title: 'Other Details' },
   ]);
+
+    const fetchDetails = async () => {
+      setIsLoading(true);
+      try {
+        const updatedDetails = await fetchPurchaseOrderDetails(vendorBillId);
+        if (updatedDetails && updatedDetails[0]) {
+          setDetails(updatedDetails[0]);
+          setDeliveryNotes(updatedDetails[0]?.products_lines || []);
+        }
+      } catch (error) {
+        console.error('Error fetching purchase order details:', error);
+        showToastMessage('Failed to fetch purchase order details. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    useFocusEffect(
+      useCallback(() => {
+        if (vendorBillId) {
+          fetchDetails();
+        }
+      }, [vendorBillId])
+    );
 
   const [formData, setFormData] = useState({
     vendorName: "",
@@ -31,16 +63,15 @@ const VendorBillFormTabs = ({ navigation }) => {
     currency: "",
     amountPaid: "",
     paymentMode: "",
-    date: "",
+    date: new Date(), 
     trnnumber: "",
-    orderDate: "",
-    billDate: "",
+    orderDate: new Date(),
+    billDate: new Date(),
     salesPerson: "",
-    warehouse: "",
+    warehouse: { id: currentUser?.warehouse?.warehouse_id || '', label: currentUser?.warehouse?.warehouse_name },
     reference: "",
   });
-
-  const [errors, setErrors] = useState({});
+  // console.log("🚀 ~ VendorBillFormTabs ~ formData:", JSON.stringify(formData, null, 2));
 
   const handleFieldChange = (field, value) => {
     setFormData(prevFormData => ({
@@ -54,8 +85,6 @@ const VendorBillFormTabs = ({ navigation }) => {
       }));
     }
   };
-
-  // console.log("🚀 ~ VendorBillFormTabs ~ formData:", JSON.stringify(formData, null, 2));
 
   const renderScene = ({ route }) => {
     switch (route.key) {

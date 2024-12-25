@@ -15,6 +15,7 @@ import { OverlayLoader } from "@components/Loader";
 import ProductLineList from "./ProductLineList";
 import { validateFields } from '@utils/validation';
 import { showToast } from '@utils/common';
+import { showToastMessage } from '@components/Toast';
 import { COLORS, FONT_FAMILY } from "@constants/theme";
 
 const PurchaseOrderForm = ({ route, navigation }) => {
@@ -218,6 +219,10 @@ const PurchaseOrderForm = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     const fieldsToValidate = ['vendorName', 'trnNumber', 'currency', 'purchaseType', 'countryOfOrigin', 'billDate', 'warehouse'];
+    if (productLines.length === 0) {
+      showToastMessage('Please Add Products');
+      return; 
+    }
     if (validateForm(fieldsToValidate)) {
       Keyboard.dismiss();
       setIsSubmitting(true);

@@ -48,25 +48,26 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
         }, [purchaseOrderId])
     );
 
+    
+    const { taxTotal } = useMemo(() => {
+        let taxes = 0;
+        purchaseOrderLines.forEach((item) => {
+            taxes += item.tax_value || 0;
+        });
+        return {
+            taxTotal: taxes.toFixed(2),
+        };
+    }, [purchaseOrderLines]);
+    
     const handleVendorBill = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await post('/createPriceEnquiryPurchaseOrder', { _id: details._id });
-            if (response.success) {
-                showToastMessage('Purchase Order Created Successfully');
-                navigation.navigate('OptionScreen');
-            } else {
-                showToastMessage('Failed to Create Purchase Order. Please try again.');
-            }
-        } catch (error) {
-            showToastMessage('An error occurred. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-            fetchDetails();
-        }
+        navigation.navigate('VendorBillFormTabs', { id: purchaseOrderId });
     };
-
-    const handleDeletePrice = async () => {
+    
+    const handleDeliveryNote = () => {
+        navigation.navigate('DeliveryNoteCreation', { id: purchaseOrderId });
+    };
+    
+    const handleDeletePurchaseOrder = async () => {
         setIsSubmitting(true);
         try {
             const response = await deleteRequest(`/viewPurchaseOrder/${details._id}`);
@@ -74,7 +75,7 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
                 showToastMessage('Purchase Order Deleted Successfully');
                 navigation.navigate('PurchaseOrderScreen');
             } else {
-                showToastMessage('Failed to Delete Price Enquiry. Please try again.');
+                showToastMessage('Failed to Delete Purchase Order. Please try again.');
             }
         } catch (error) {
             showToastMessage('An error occurred. Please try again.');
@@ -84,19 +85,6 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
         }
     };
 
-    const { taxTotal } = useMemo(() => {
-        let taxes = 0;
-        purchaseOrderLines.forEach((item) => {
-          taxes += item.tax_value || 0;
-        });
-        return {
-          taxTotal: taxes.toFixed(2),
-        };
-      }, [purchaseOrderLines]);
-
-    const handleDeliveryNote = () => {
-        navigation.navigate('DeliveryNoteCreation', { id: purchaseOrderId });
-    };
 
     const handleCancelPurchaseOrder = async () => {
         setIsSubmitting(true);
@@ -187,7 +175,7 @@ const PurchaseOrderDetails = ({ navigation, route }) => {
                 onCancel={() => setIsConfirmationModalVisible(false)}
                 headerMessage="Are you sure you want to delete this?"
                 onConfirm={() => {
-                    handleDeletePrice();
+                    handleDeletePurchaseOrder();
                     setIsConfirmationModalVisible(false);
                 }}
             />

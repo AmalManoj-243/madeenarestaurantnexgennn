@@ -15,6 +15,7 @@ import { OverlayLoader } from "@components/Loader";
 import ProductLineList from "./ProductLineList";
 import { validateFields } from '@utils/validation';
 import { showToast } from '@utils/common';
+import { showToastMessage } from "@components/Toast";
 
 const PurchaseRequisitionForm = ({ route, navigation }) => {
   const { id } = route.params || {};
@@ -141,6 +142,10 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     const fieldsToValidate = ['requestedByName', 'warehouse', 'requireBy'];
+    if (productLines.length === 0) {
+      showToastMessage('Please Add Products');
+      return; 
+    }
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const purchaseData = {
@@ -202,7 +207,7 @@ const PurchaseRequisitionForm = ({ route, navigation }) => {
   return (
     <SafeAreaView>
       <NavigationHeader
-        title="Add Purchase Requisition"
+        title="Purchase Requisition Creation"
         onBackPress={() => navigation.goBack()}
         logo={false}
       />

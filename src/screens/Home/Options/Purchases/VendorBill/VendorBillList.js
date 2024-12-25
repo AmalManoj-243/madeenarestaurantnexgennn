@@ -11,18 +11,20 @@ const VendorBillList = ({ item, onPress }) => {
         <Text style={styles.head}>{item?.sequence_no || '-'}</Text>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{formatDate(item?.date) || '-'}</Text>
-          <Text style={styles.content}>{item?.sales_preson?.sales_person_name || '-'}</Text>
+          <Text style={styles.content}>{item?.total_amount || '-'}</Text>
         </View>
         <View style={styles.rightColumn}> 
-          <Text style={styles.content}>{item?.supplier?.supplier_name || '-'}</Text>
-          <Text style={styles.content}>{item?.total_amount || '-'}</Text>
           <Text style={styles.content}>{item?.due_amount || '-'}</Text>
+          <Text style={styles.content}>{item?.sales_preson?.sales_person_name || '-'}</Text>
         </View>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{item?.payment_method_name || '-'}</Text>
           <Text style={styles.content}>{item?.warehouse?.warehouses_name || '-'}</Text>
           <Text style={[styles.content, {color: 'red'}]}>{item?.payment_status || '-'}</Text>
-        </View> 
+        </View>
+        <View style={styles.rightColumn}>
+          <Text style={styles.content}>{item?.supplier?.supplier_name || '-'}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
