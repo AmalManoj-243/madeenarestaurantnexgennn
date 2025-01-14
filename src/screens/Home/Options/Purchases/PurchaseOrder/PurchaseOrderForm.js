@@ -356,7 +356,8 @@ const PurchaseOrderForm = ({ route, navigation }) => {
           editable={false}
           required
           validate={errors.billDate}
-          value={formatDate(formData.billDate)}
+          value={formatDate(formData.billDate, 'dd-MM-yyyy')}
+          // value={formatDate(formData.billDate, 'dd-MM-yyyy')}
           onPress={() => setIsDatePickerVisible(true)}
         />
         <FormInput

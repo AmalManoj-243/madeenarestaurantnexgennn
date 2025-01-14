@@ -288,8 +288,8 @@ const AddPurchaseLines = ({ navigation }) => {
           dropIcon="menu-down"
           editable={false}
           value={formData.uom?.label || ''}
-          onPress={() => toggleBottomSheet('')}
-        // onPress={() => toggleBottomSheet('UOM')}
+          // onPress={() => toggleBottomSheet('')}
+        onPress={() => toggleBottomSheet('UOM')}
         />
         <FormInput
           label="Unit Price"

@@ -41,7 +41,6 @@ const AddEditPurchaseLines = ({ navigation }) => {
     subTotal: '',
     totalAmount: ''
   });
-  console.log("🚀 ~ AddEditPurchaseLines ~ formData:", JSON.stringify(formData, null, 2));
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -311,8 +310,7 @@ const AddEditPurchaseLines = ({ navigation }) => {
           dropIcon="menu-down"
           editable={false}
           value={formData.uom?.label || ''}
-          onPress={() => toggleBottomSheet('')}
-        // onPress={() => toggleBottomSheet('UOM')}
+          onPress={() => toggleBottomSheet('UOM')}
         />
         <FormInput
           label="Unit Price"
