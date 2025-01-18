@@ -54,8 +54,7 @@ const UpdatesModal = ({ isVisible, onClose, onSubmit, title, header = ''}) => {
                             setUpdateText(text);
                             setErrorText('');
                         }}
-                        multiline
-                        numberOfLines={3}
+                        multiline={true}
                         style={[styles.textInput, errorText && styles.textInputError]}
                     />
                     {errorText ? (

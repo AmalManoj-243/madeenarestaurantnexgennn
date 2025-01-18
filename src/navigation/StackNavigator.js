@@ -27,7 +27,7 @@ import { PipelineDetailTabs } from "@screens/Home/Options/CRM/Pipeline/PipelineD
 import { BoxInspectionForm, BoxInspectionScreen } from "@screens/Home/Options/BoxInspection";
 import { AttendanceScreen } from "@screens/Home/Options/Attendance";
 import { MarkAttendance, PunchingScreen } from "@screens/Home/Options/Attendance/Punching";
-import { AddParticipants, KPIActionDetails, KPIListingScreen } from "@screens/KPIDashboard";
+import { AddParticipants, KPIActionDetails, KPIDashboardScreen, KPIListingScreen } from "@screens/KPIDashboard";
 import { ServicesScreen } from "@screens/Home/Sections/Services";
 import { ServiceScreens } from "@screens/Home/Sections/Services/Service";
 import { SparePartsIssueCreation, SparePartsRequestDetails, SparePartsRequestScreen } from "@screens/Home/Sections/Services/SpareManagements/SparePartsRequest";
@@ -396,6 +396,11 @@ const StackNavigator = () => {
       <Stack.Screen
         name="KPIListingScreen"
         component={KPIListingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="KPIDashboardScreen"
+        component={KPIDashboardScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

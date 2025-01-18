@@ -93,7 +93,7 @@ const KPIActionDetails = ({ navigation, route }) => {
       const response = await put('/updateKpiTasks/reassign', actionData);
       if (response.message === 'Successfully Updated') {
         showToastMessage(successMessage);
-        navigation.navigate('KPIListingScreen');
+        navigation.navigate('KPIDashboardScreen');
       } else {
         showToastMessage('Failed to perform action. Please try again.');
       }
