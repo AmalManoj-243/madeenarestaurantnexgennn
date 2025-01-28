@@ -9,14 +9,13 @@ const VendorBillDetailList = ({ item, onPress }) => {
     product = { product_name: '-', product_description: '-' },
     scheduled_date = '-',
     quantity = '-',
-    recieved_quantity = 0,
+    recieved_quantity = item?.recieved_quantity || '-',
+    billed_quantity = item?.billed_quantity || '-',
     product_unit_of_measure = '-',
     unit_price = '-',
     taxes = { taxes_name: '-' },
     sub_total = '-'
   } = item || {};
-
-  const pendingQuantity = quantity - recieved_quantity;
 
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
@@ -28,11 +27,11 @@ const VendorBillDetailList = ({ item, onPress }) => {
           <Text style={styles.content}>Tot : {sub_total || '-'}</Text>
         </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>Des : {product.product_description || '-'}</Text>
-        <Text style={styles.content}>RQ : {recieved_quantity || '0'}</Text>
+        <Text style={styles.content}>Des : {product.product_description || 'Nill'}</Text>
+        <Text style={styles.content}>RQ : {recieved_quantity || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>PQ : {pendingQuantity || '-'}</Text>
+        <Text style={styles.content}>BQ : {billed_quantity || '-'}</Text>
         <Text style={styles.contentRight}>UOM : {product_unit_of_measure || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>

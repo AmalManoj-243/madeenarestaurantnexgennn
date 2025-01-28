@@ -87,8 +87,12 @@ const QuickServiceDetails = ({ navigation, route }) => {
                 title={details?.sequence_no || 'Quick Service Details'}
                 onBackPress={() => navigation.goBack()}
                 logo={false}
-                iconTwoName="plus"
-                iconTwoPress={() => { navigation.navigate('QuickServiceFormTabs', { serviceId: serviceId }) }}
+                iconOneName="close"
+                iconOnePress={() => {
+                    setActionToPerform('close');
+                    setIsCloseModalVisible(true);
+                }}
+                disabled={isJobClosedOrCompleted}
             />
             <RoundedScrollContainer>
                 <DetailField label="Job Stage" value={details?.job_stage || '-'} />
@@ -132,26 +136,12 @@ const QuickServiceDetails = ({ navigation, route }) => {
                     multiline={true}
                     textAlignVertical={'top'} />
 
-                <View style={{ flexDirection: 'row', marginVertical: 20 }}>
-                    <Button
-                        width={'50%'}
-                        backgroundColor={COLORS.lightRed}
-                        title="CLOSE JOB"
-                        onPress={() => {
-                            setActionToPerform('close');
-                            setIsCloseModalVisible(true);
-                        }}
-                        disabled={isJobClosedOrCompleted}
-                    />
-                    <View style={{ width: 5 }} />
-                    <Button
-                        width={'50%'}
-                        backgroundColor={COLORS.green}
-                        title="UPDATE"
-                        onPress={handleUpdateJob}
-                        disabled={isJobClosedOrCompleted}
-                    />
-                </View>
+                <Button
+                    title="UPDATE"
+                    backgroundColor={COLORS.primaryThemeColor}
+                    onPress={handleUpdateJob}
+                    disabled={isJobClosedOrCompleted}
+                />
 
                 <CloseModal
                     isVisible={isCloseModalVisible}

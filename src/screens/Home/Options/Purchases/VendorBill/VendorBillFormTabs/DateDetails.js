@@ -10,28 +10,8 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [dropdown, setDropdown] = useState({
-    salesPerson: [],
     warehouse: [],
   });
-
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const salesPersonData = await fetchSalesPersonDropdown();
-        setDropdown(prevDropdown => ({
-          ...prevDropdown,
-          salesPerson: salesPersonData.map(data => ({
-            id: data._id,
-            label: data.name,
-          })),
-        }));
-      } catch (error) {
-        console.error('Error fetching Sales Person dropdown data:', error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -62,10 +42,6 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
     let fieldName = '';
 
     switch (selectedType) {
-      case 'Sales Person':
-        items = dropdown.salesPerson;
-        fieldName = 'salesPerson';
-        break;
       case 'Warehouse':
         items = dropdown.warehouse;
         fieldName = 'warehouse';
@@ -111,12 +87,10 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
       <FormInput
         label={"Sales Person"}
         placeholder={"Select Sales Person"}
-        dropIcon={"menu-down"}
         editable={false}
         required
         validate={errors.salesPerson}
         value={formData.salesPerson?.label}
-        onPress={() => toggleBottomSheet('Sales Person')}
       />
       <FormInput
         label={"Warehouse"}

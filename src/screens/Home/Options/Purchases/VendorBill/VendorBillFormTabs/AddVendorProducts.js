@@ -33,12 +33,13 @@ const AddVendorProducts = ({ navigation }) => {
     quantity: "1",
     uom: "",
     unitPrice: "",
-    taxes: "",
+    taxes: "vat 5%",
     isInclusive: false,
     subTotal: "",
     totalAmount: "",
     tax: "",
   });
+  // console.log("🚀 ~ AddVendorProducts ~ formData", formData);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -93,21 +94,26 @@ const AddVendorProducts = ({ navigation }) => {
     const fetchTax = async () => {
       try {
         const TaxData = await fetchTaxDropdown();
-        const taxItems = TaxData.map((data) => ({
+        const taxItems = TaxData.map(data => ({
           id: data._id,
           label: data.tax_type_name,
         }));
 
-        const defaultTax = taxItems.find((tax) => tax.label === "vat 5%");
+        const defaultTax = taxItems.find(tax => tax.label === "vat 5%");
+        // console.log("Default Tax : ", defaultTax)
+        // setDropdown(prevDropdown => ({
+        //     ...prevDropdown,
+        //     taxes: taxItems,
+        // }));
 
         if (defaultTax) {
-          setFormData((prevFormData) => ({
+          setFormData(prevFormData => ({
             ...prevFormData,
-            taxes: defaultTax,
+            taxType: defaultTax,
           }));
         }
       } catch (error) {
-        console.error("Error fetching Tax dropdown data:", error);
+        console.error('Error fetching Tax dropdown data:', error);
       }
     };
 
@@ -193,7 +199,7 @@ const AddVendorProducts = ({ navigation }) => {
         tax: formData.tax || "",
         totalAmount: formData.totalAmount || "",
       };
-      console.log("🚀 ~ AddPurchaseLines ~ productLine:", JSON.stringify(productLine, null, 2));
+      // // // console.log("🚀 ~ AddPurchaseLines ~ productLine:", JSON.stringify(productLine, null, 2));
       navigation.navigate("VendorDetails", { newProductLine: productLine });
     }
   };
@@ -280,10 +286,10 @@ const AddVendorProducts = ({ navigation }) => {
         <FormInput
           label="Unit Of Measure"
           placeholder="Unit Of Measure"
-          dropIcon="menu-down"
+          // dropIcon="menu-down"
           editable={false}
           value={formData.uom?.label || ""}
-          onPress={() => toggleBottomSheet("UOM")}
+        // onPress={() => toggleBottomSheet("UOM")}
         />
         <FormInput
           label="Unit Price"
@@ -293,12 +299,11 @@ const AddVendorProducts = ({ navigation }) => {
           onChangeText={(value) => handleFieldChange("unitPrice", parseFloat(value))}
         />
         <FormInput
-          label="Tax" 
-          placeholder="Enter Tax"
-          dropIcon="menu-down"
-          required
+          label="Tax"
+          placeholder="Select Tax Type"
           editable={false}
-          value={formData.taxType?.label || 'Vat 5%'}
+          value={formData.taxes}
+        // onPress={() => toggleBottomSheet('Tax')}
         />
         <CheckBox
           checked={formData.isInclusive}

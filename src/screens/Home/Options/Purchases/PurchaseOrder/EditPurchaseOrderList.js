@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity, TextInput } from 'react-native';
 import Text from '@components/Text';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 
 const EditPurchaseOrderList = ({ item, onPress, onDeletePress }) => {
   const {

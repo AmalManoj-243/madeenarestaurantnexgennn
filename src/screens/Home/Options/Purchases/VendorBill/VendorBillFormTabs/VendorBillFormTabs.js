@@ -1,29 +1,26 @@
 import * as React from 'react';
-import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useWindowDimensions, KeyboardAvoidingView, Platform, Keyboard, View, FlatList } from 'react-native';
+import { useEffect, useState } from "react";
 import { TabView } from 'react-native-tab-view';
-import { useState, useCallback } from 'react';
 import { useAuthStore } from "@stores/auth";
 import { SafeAreaView } from '@components/containers';
-import { NavigationHeader } from '@components/Header';
-import { LoadingButton } from '@components/common/Button';
+import { NavigationHeader, TitleWithButton } from '@components/Header';
 import { showToast } from '@utils/common';
-import { fetchPurchaseOrderDetails } from '@api/details/detailApi';
+import { Button } from "@components/common/Button";
 import { post } from '@api/services/utils';
 import { validateFields } from '@utils/validation';
+import { COLORS, FONT_FAMILY } from "@constants/theme";
 import { CustomTabBar } from '@components/TabBar';
 import VendorDetails from './VendorDetails';
 import DateDetails from './DateDetails';
 import OtherDetails from './OtherDetails';
 
-const VendorBillFormTabs = ({ navigation, route }) => {
+const VendorBillFormTabs = ({ route, navigation }) => {
 
   const layout = useWindowDimensions();
-  const { id: vendorBillId } = route?.params || {};
-  const [details, setDetails] = useState({});
-  console.log(details)
   const currentUser = useAuthStore((state) => state.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [productLines, setProductLines] = useState([]);
   const [errors, setErrors] = useState({});
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -31,30 +28,6 @@ const VendorBillFormTabs = ({ navigation, route }) => {
     { key: 'second', title: 'Date & Details' },
     { key: 'third', title: 'Other Details' },
   ]);
-
-    const fetchDetails = async () => {
-      setIsLoading(true);
-      try {
-        const updatedDetails = await fetchPurchaseOrderDetails(vendorBillId);
-        if (updatedDetails && updatedDetails[0]) {
-          setDetails(updatedDetails[0]);
-          setDeliveryNotes(updatedDetails[0]?.products_lines || []);
-        }
-      } catch (error) {
-        console.error('Error fetching purchase order details:', error);
-        showToastMessage('Failed to fetch purchase order details. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    useFocusEffect(
-      useCallback(() => {
-        if (vendorBillId) {
-          fetchDetails();
-        }
-      }, [vendorBillId])
-    );
 
   const [formData, setFormData] = useState({
     vendorName: "",
@@ -67,11 +40,11 @@ const VendorBillFormTabs = ({ navigation, route }) => {
     trnnumber: "",
     orderDate: new Date(),
     billDate: new Date(),
-    salesPerson: "",
+    salesPerson: { id: currentUser?.related_profile?._id || '', label: currentUser?.related_profile?.name },
     warehouse: { id: currentUser?.warehouse?.warehouse_id || '', label: currentUser?.warehouse?.warehouse_name },
     reference: "",
   });
-  // console.log("🚀 ~ VendorBillFormTabs ~ formData:", JSON.stringify(formData, null, 2));
+  console.log("🚀 ~ VendorBillFormTabs ~ formData:", JSON.stringify(formData, null, 2));
 
   const handleFieldChange = (field, value) => {
     setFormData(prevFormData => ({
@@ -85,6 +58,51 @@ const VendorBillFormTabs = ({ navigation, route }) => {
       }));
     }
   };
+
+  const handleAddProductLine = (newProductLine) => {
+    const productLineData = {
+      product_id: newProductLine.product_id,
+      product_name: newProductLine.product_name,
+      description: newProductLine.description || '', 
+      scheduledDate: newProductLine.scheduledDate || '', 
+      quantity: newProductLine.quantity || 0,
+      uom: newProductLine.uom || { id: '', label: '' },
+      unitPrice: newProductLine.unitPrice || 0, 
+      taxes: newProductLine.taxes || { id: '', label: '' },
+      subTotal: newProductLine.subTotal || 0,
+      untaxedAmount: newProductLine.untaxedAmount || 0,
+      tax: newProductLine.tax || 0,
+      totalAmount: newProductLine.totalAmount || 0,
+    };
+    setProductLines((prevLines) => [...prevLines, productLineData]);
+  };
+  
+  useEffect(() => {
+    if (route.params?.newProductLine) {
+      handleAddProductLine(route.params.newProductLine);
+    }
+  }, [route.params?.newProductLine]);
+
+  const calculateTotals = () => {
+    let untaxed = 0;
+    let taxes = 0;
+    productLines.forEach((line) => {
+      untaxed += Number(line.subTotal || 0);
+      taxes += Number(line.tax || 0);
+    });
+    const total = untaxed + taxes;
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      untaxedAmount: untaxed.toFixed(2),
+      taxTotal: taxes.toFixed(2), 
+      totalAmount: total.toFixed(2),
+    }));
+  };
+    
+  useEffect(() => {
+    calculateTotals();
+  }, [productLines]);
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -107,24 +125,26 @@ const VendorBillFormTabs = ({ navigation, route }) => {
     return isValid;
   };
 
+  const isSubmitDisabled = productLines.length < 0;
+
   const handleSubmit = async () => {
     const fieldsToValidate = ['vendor', 'purchaseType', 'countryOfOrigin', 'currency', 'amountPaid', 'paymentMode', 'salesPerson', 'warehouse'];
     if (validateForm(fieldsToValidate)) {
       setIsSubmitting(true);
       const vendorData = {
-          supplier :  "670675464e15450d26ba8eb8",
-          supplier_name :  "MEC TECHNOLOGY",
-          Trn_number : "null",
-          vendor_reference :   "",
-          currency :  "6540b68c05fb79149c3eb7d8" ,
-          purchase_type :  "Local Purchase" ,
-          country :  "6540b68405fb79149c3eb5c2" ,
-          bill_date :  "2024-12-26T15:48" ,
-          ordered_date :  "2024-12-26T15:48" ,
-          warehouse :  "66307fc0ceb8eb834bb25509" ,
+          supplier : formData?.vendorName.id ?? null,
+          supplier_name : formData?.vendorName.label ?? null,
+          Trn_number : formData?.trnnumber || null,
+          vendor_reference : formData?.reference || null,
+          currency : formData?.currency?.id ?? null,
+          purchase_type : formData?.purchaseType?.label ?? null,
+          country : formData?.countryOfOrigin?.id ?? null,
+          bill_date : formData?.billDate || null,
+          ordered_date : formData?.orderDate || null,
+          warehouse : formData?.warehouse?.id ?? null,
           untaxed_total_amount : "200",
           total_amount : "210",
-          date :  "2024-12-26T15:48" ,
+          date : formData?.date || null,
           remarks :  "",
           due_date : "",
           due_amount : 210,
@@ -133,18 +153,18 @@ const VendorBillFormTabs = ({ navigation, route }) => {
           vendor_bill_status :  un_paid ,
           products_lines : [
             {
-              product :  "66c59e94607e1e2b7e3cbd41" ,
-              product_name :  "\t[31320691661271] LAPTOP HARD DISC DRIVE NEW SSD SAMSUNG 1TB" ,
+              product : "66c59e94607e1e2b7e3cbd41" ,
+              product_name : "\t[31320691661271] LAPTOP HARD DISC DRIVE NEW SSD SAMSUNG 1TB" ,
               description : null,
               quantity : 1,
               unit_price : 200,
               sub_total : 200,
               tax_value : 10,
-              scheduled_date :  2024-12-26 ,
+              scheduled_date : 2024-12-26 ,
               recieved_quantity : 0,
               billed_quantity : 0,
-              product_unit_of_measure :  Kilo ,
-              taxes :  "648d9b54ef9cd868dfbfa37b" ,
+              product_unit_of_measure : Kilo ,
+              taxes : "648d9b54ef9cd868dfbfa37b" ,
               return_quantity : 0,
               processed : false
             }
@@ -205,7 +225,6 @@ const VendorBillFormTabs = ({ navigation, route }) => {
             title: "Success",
             message: response.message || "Vendor Bill created successfully",
           });
-
           navigation.navigate("VendorBillScreen");
         } else {
           console.error("Vendor Bill Failed:", response.message);
@@ -243,7 +262,25 @@ const VendorBillFormTabs = ({ navigation, route }) => {
         />
       </KeyboardAvoidingView>
       <View style={{ backgroundColor: 'white', paddingHorizontal: 50, paddingBottom: 12 }}>
-        <LoadingButton onPress={handleSubmit} title={'Submit'} loading={isSubmitting} />
+      <TitleWithButton
+        label="Add Products"
+        onPress={() => navigation.navigate('AddVendorProducts')}
+      />
+      <FlatList
+        data={productLines}
+        renderItem={({ item }) => (
+          <ProductLineList item={item} />
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      <Button
+          title="SUBMIT"
+          onPress={handleSubmit}
+          marginTop={10}
+          loading={isSubmitting}
+          backgroundColor={COLORS.tabIndicator}
+          disabled={isSubmitDisabled}
+        />
       </View>
     </SafeAreaView>
   );

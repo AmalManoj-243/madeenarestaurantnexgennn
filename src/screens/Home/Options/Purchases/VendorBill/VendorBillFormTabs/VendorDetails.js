@@ -159,6 +159,7 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
         label={"Amount Paid"}
         placeholder={"Enter Amount Paid"}
         editable={true}
+        keyboardType="numeric"
         value={formData.amountPaid}
         onChangeText={(value) => onFieldChange('amountPaid', value)}
       />
@@ -171,17 +172,6 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
         value={formData.paymentMode?.label}
         required
         onPress={() => toggleBottomSheet("Payment Mode")}
-      />
-      <TitleWithButton
-        label="Add Products"
-        onPress={() => navigation.navigate('AddVendorProducts')}
-      />
-      <FlatList
-        data={productLines}
-        renderItem={({ item }) => (
-          <ProductLineList item={item} />
-        )}
-        keyExtractor={(item, index) => index.toString()}
       />
       {renderBottomSheet()}
     </RoundedScrollContainer>

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, FlatList, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, View, Text } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from '@components/containers';
 import NavigationHeader from '@components/Header/NavigationHeader';
@@ -12,7 +12,6 @@ import { formatDateTime } from '@utils/common/date';
 import { showToastMessage } from '@components/Toast';
 import { fetchServiceDetails } from '@api/details/detailApi';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { post, put } from '@api/services/utils';
 import { useAuthStore } from '@stores/auth';
 import { showToast } from '@utils/common';
@@ -23,9 +22,11 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
   const { id } = route.params || {};
   const currentUser = useAuthStore((state) => state.user);
   const [details, setDetails] = useState({});
+  console.log("🚀 ~ file: ~ Details :", JSON.stringify(details, null, 2))
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sparePartsItems, setSparePartsItems] = useState([]);
+  console.log("🚀 ~ file: ~ Spare Parts Items :", JSON.stringify(sparePartsItems, null, 2))
   const [subTotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [calculatedTax, setCalculatedTax] = useState(0);
@@ -36,7 +37,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     subTotal: subTotal,
     total: total,
   });
-  console.log("Form Datas :",formData)
 
   const addSpareParts = (addedItems) => {
     const structureSpareItems = {
@@ -62,9 +62,12 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     (sum, item) => sum + (parseFloat(item.unit_price || 0) * (item.quantity || 1)), 0);
     setSubTotal(calculatedSparePartsTotal);
 
-    let accumulatedSparePartsTax = sparePartsItems.reduce(
-      (sum, item) => sum + parseFloat(item.tax || 0), 0
-    ); // spare parts items not returning tax value so it is not fetching
+    let accumulatedSparePartsTax = sparePartsItems.reduce((sum, item) => {
+      if (item.tax_type_name === "vat 5%") {
+        return sum + (parseFloat(item.unit_price || 0) * 0.05 * (item.quantity || 1));
+      }
+      return sum;
+    }, 0);
   
     const serviceCharge = parseFloat(formData.serviceCharge) || 0;
     const serviceChargeTax = serviceCharge * 0.05;
@@ -140,10 +143,9 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       sales_person_id: currentUser?.related_profile?._id,
       sales_person_name: currentUser?.related_profile?.name,
     }
-    console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuote ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
+    // console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuote ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
     try {
       const response = await post("/createJobApproveQuote", requestPayload);
-      console.log("🚀 ~ submit ~ response:", JSON.stringify(response, null, 2));
       if (response.success === 'true') {
         showToast({
           type: "success",
@@ -206,7 +208,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
     }
     try {
       const response = await put("/updateJobRegistration", requestPayload);
-      console.log("Submitting Spares : ", requestPayload)
       if (response.success === 'true') {
         handleJobApproveQuote(response);
         showToast({
@@ -240,6 +241,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       <NavigationHeader
         title="Update Service Details"
         onBackPress={() => navigation.goBack()}
+        logo={false}
       />
       <RoundedScrollContainer>
         <DetailField
@@ -249,7 +251,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           numberOfLines={3}
           textAlignVertical={'top'}
         />
-        <DetailField label="Mobile Number" value={details?.customer_lists?.[0]?.customer_mobile || '-'} />
+        <DetailField label="Mobile Number" value={details?.customer_mobile || '-'} />
         <DetailField label="Email" value={details?.customer_email || '-'} />
         <DetailField label="Warehouse Name" value={details?.warehouse_name || '-'} />
         <DetailField label="Created On" value={formatDateTime(details.date)} />
@@ -265,16 +267,10 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
           value={formData.serviceCharge.toString()}
           onChangeText={(value) => setFormData({ ...formData, serviceCharge: value })}
         />
-        {/* <TitleWithButton
+        <TitleWithButton
           label="Add an item"
           onPress={() => navigation.navigate('AddSpareParts', { id, addSpareParts })}
-        /> */}
-        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 10 }}>
-          <Text style={styles.label}>Add an Item</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('AddSpareParts', { id, addSpareParts })}>
-            <AntDesign name="pluscircle" size={26} color={COLORS.orange} />
-          </TouchableOpacity>
-        </View>
+        />
         <FlatList
           data={sparePartsItems}
           renderItem={({ item }) => (
@@ -299,7 +295,6 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
         }
         <Button
           title={'SUBMIT'}
-          width={'50%'}
           alignSelf={'center'}
           backgroundColor={COLORS.orange}
           onPress={handleSubmit}

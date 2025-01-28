@@ -10,16 +10,16 @@ const SparePartsList = ({ item }) => {
         <Text style={styles.head}>{item?.product_name?.trim() || '-'}</Text>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{item?.description || '-'}</Text>
-          <Text style={[styles.contentRight]}>{item?.quantity}</Text>
+          <Text style={[styles.contentRight]}>Quantity : {item?.quantity}</Text>
         </View>
       </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>{item?.uom || '-'}</Text>
-        <Text style={styles.contentRight}>{item?.unit_price || '-'}</Text>
+        <Text style={styles.contentRight}>Unit Price : {item?.unit_price || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>{item?.tax_type_name || '-'}</Text>
-        <Text style={styles.contentRight}>{item?.total || '-'}</Text>
+        <Text style={styles.contentRight}>Sub Total : {( item?.unit_price ) * ( item?.quantity ) || '-'}</Text>
       </View>
     </TouchableOpacity>
   );

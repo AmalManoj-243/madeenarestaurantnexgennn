@@ -9,6 +9,7 @@ import { COLORS } from '@constants/theme';
 import { Keyboard } from 'react-native';
 import { validateFields } from '@utils/validation';
 import { CheckBox } from '@components/common/CheckBox';
+import { showToastMessage } from '@components/Toast';
 
 const AddSpareParts = ({ navigation, route }) => {
     const { id, addSpareParts } = route?.params || {};
@@ -166,7 +167,7 @@ const AddSpareParts = ({ navigation, route }) => {
         };
 
         fetchProducts();
-    }, []);
+    }, [searchText]);
 
     useEffect(() => {
         const fetchUnitOfMeasure = async () => {
@@ -241,6 +242,14 @@ const AddSpareParts = ({ navigation, route }) => {
 
     const handleAddItems = async () => {
         const fieldsToValidate = ['product', 'tax'];
+        if (formData.quantity === '' || formData.quantity === undefined || formData.quantity === null) {
+          showToastMessage('Quantity is required');
+          return;
+        }
+        if (Number(formData.quantity) <= 0) {
+          showToastMessage('Quantity should be greater than 0');
+          return;
+        }    
         if (validateForm(fieldsToValidate)) {
             const spareItem = {
                 product: formData.product || '',
@@ -282,20 +291,20 @@ const AddSpareParts = ({ navigation, route }) => {
         }
         return (
             <DropdownSheet
-                isVisible={isVisible}
-                items={items}
-                title={selectedType}
-                onClose={() => setIsVisible(false)}
-                search={true}
-                onSearchText={(value) => setSearchText(value)}
-                onValueChange={(value) => {
-                    setSearchText('')
-                    if (selectedType === 'Spare Name') {
-                        handleProductSelection(value);
-                    } else {
-                        handleFieldChange(fieldName, value);
-                    }
-                }}
+              isVisible={isVisible}
+              items={items}
+              title={selectedType}
+              onClose={() => setIsVisible(false)}
+              search={selectedType === "Spare Name"}
+              onSearchText={(value) => setSearchText(value)}
+              onValueChange={(value) => {
+                setSearchText('')
+                if (selectedType === 'Spare Name') {
+                  handleProductSelection(value);
+                } else {
+                  handleFieldChange(fieldName, value);
+                }
+              }}
             />
         );
     };
@@ -327,6 +336,7 @@ const AddSpareParts = ({ navigation, route }) => {
                 <FormInput
                     label="Quantity"
                     placeholder="Enter Quantity"
+                    required
                     keyboardType="numeric"
                     value={formData.quantity}
                     onChangeText={(value) => handleQuantityChange(value)}
@@ -348,7 +358,7 @@ const AddSpareParts = ({ navigation, route }) => {
                 <FormInput
                     label="Tax"
                     placeholder="Enter Tax"
-                    dropIcon="menu-down"
+                    // dropIcon="menu-down"
                     required
                     editable={false}
                     value={formData.taxType?.label || 'VAT 5%'}
@@ -375,7 +385,6 @@ const AddSpareParts = ({ navigation, route }) => {
                 />
                 <Button
                     title={'Add Item'}
-                    width={'50%'}
                     alignSelf={'center'}
                     backgroundColor={COLORS.primaryThemeColor}
                     onPress={handleAddItems}

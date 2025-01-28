@@ -149,7 +149,6 @@ const QuickServiceFormTabs = ({ navigation }) => {
             title: "Success",
             message: response.message || "Quick Service created successfully",
           });
-
           navigation.navigate("QuickServiceScreen");
         } else {
           console.error("Quick Service Failed:", response.message);
@@ -177,6 +176,7 @@ const QuickServiceFormTabs = ({ navigation }) => {
       <NavigationHeader
         title="Quick Job Registration "
         onBackPress={() => navigation.goBack()}
+        logo={false}
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={{ flex: 1 }}>
         <TabView

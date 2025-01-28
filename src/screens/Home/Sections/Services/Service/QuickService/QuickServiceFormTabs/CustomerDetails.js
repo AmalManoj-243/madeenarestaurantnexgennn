@@ -79,21 +79,28 @@ const CustomerDetails = ({ formData, onFieldChange, errors }) => {
     }
     return (
       <DropdownSheet
-        isVisible={isVisible}
-        items={items}
-        title={selectedType}
-        onClose={() => setIsVisible(false)}
-        onValueChange={(selectedCustomer) => {
-          onFieldChange('customerName', selectedCustomer);
-          if (fieldName === 'customerName') {
-            // Auto-fill related fields when a customer is selected
-            onFieldChange('phoneNumber', selectedCustomer.customer_mobile);
-            onFieldChange('emailAddress', selectedCustomer.customer_email);
-            onFieldChange('address', selectedCustomer.address);
-            onFieldChange('trn', selectedCustomer.trn_no);
-          }
-        }}
-      />
+      isVisible={isVisible}
+      items={items}
+      title={selectedType}
+      onClose={() => setIsVisible(false)}
+      onValueChange={(value) => onFieldChange(fieldName, value)}
+    />
+      // <DropdownSheet
+      //   isVisible={isVisible}
+      //   items={items}
+      //   title={selectedType}
+      //   onClose={() => setIsVisible(false)}
+      //   onValueChange={(selectedCustomer) => {
+      //     onFieldChange('customerName', selectedCustomer);
+      //     if (fieldName === 'customerName') {
+      //       // Auto-fill related fields when a customer is selected
+      //       onFieldChange('phoneNumber', selectedCustomer.customer_mobile);
+      //       onFieldChange('emailAddress', selectedCustomer.customer_email);
+      //       onFieldChange('address', selectedCustomer.address);
+      //       onFieldChange('trn', selectedCustomer.trn_no);
+      //     }
+      //   }}
+      // />
     );
   };
 
