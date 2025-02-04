@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
     VIEW_PURCHASE_ORDER: '/viewPurchaseOrder',
     VIEW_DELIVERY_NOTE: '/viewPurchaseOrderDeliveryNote',
     VIEW_VENDOR_BILL: '/viewVendorBill',
+    VIEW_PAYMENT_MADE: '/viewPaymentMade',
 };
 
 export const DROP_DOWN_API_ENDPOINTS = {
@@ -67,6 +68,7 @@ export const DROP_DOWN_API_ENDPOINTS = {
     SUB_COMPLAINTS: "/viewServiceRegisterSubProblem/service_register_sub_problem_list/service_register_sub_problem_dropdown",
     UNIT_OF_MEASURE: "/viewUnitOfMeasure/quality_list/quality_dropdown",
     TAXES: "/viewTaxType/tax_type_list/tax_type_dropdown",
+    PAYMENT_MODE: "/viewPaymentMethod/payment_method_list/payment_method_dropdown",
     SUPPLIERS: "/viewsupplier",
 };
 

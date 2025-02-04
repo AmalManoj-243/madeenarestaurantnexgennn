@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchWarehouseDropdown, fetchSalesPersonDropdown } from '@api/dropdowns/dropdownApi';
+import { fetchWarehouseDropdown } from '@api/dropdowns/dropdownApi';
 import { formatDateandTime } from '@utils/common/date';
 
 const DateDetails = ({ formData, onFieldChange, errors }) => {
@@ -25,7 +25,7 @@ const DateDetails = ({ formData, onFieldChange, errors }) => {
           })),
         }));
       } catch (error) {
-        console.error('Error fetching Assignee dropdown data:', error);
+        console.error('Error fetching Warehouse dropdown data:', error);
       }
     };
 

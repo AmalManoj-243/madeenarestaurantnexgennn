@@ -43,6 +43,7 @@ import { AddEditPurchaseLines, AddPurchaseLines, EditPurchaseLines, EditPurchase
 import { DeliveryNoteCreation, DeliveryNoteDetails, DeliveryNoteScreen } from "@screens/Home/Options/Purchases/DeliveryNote";
 import { VendorBillDetails, VendorBillScreen } from "@screens/Home/Options/Purchases/VendorBill";
 import { AddVendorProducts, VendorBillFormTabs } from "@screens/Home/Options/Purchases/VendorBill/VendorBillFormTabs";
+import { SupplierPaymentCreation, SupplierPaymentScreen } from "@screens/Home/Options/Purchases/SupplierPayment";
 
 const Stack = createNativeStackNavigator();
 
@@ -533,6 +534,16 @@ const StackNavigator = () => {
       <Stack.Screen
         name="AddVendorProducts"
         component={AddVendorProducts}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SupplierPaymentScreen"
+        component={SupplierPaymentScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SupplierPaymentCreation"
+        component={SupplierPaymentCreation}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

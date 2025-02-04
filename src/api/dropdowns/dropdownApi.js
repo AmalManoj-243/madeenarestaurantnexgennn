@@ -175,6 +175,10 @@ export const fetchTaxDropdown = async () => {
   return fetchData(DROP_DOWN_API_ENDPOINTS.TAXES);
 }
 
+export const fetchPaymentModeDropdown = async () => {
+  return fetchData(DROP_DOWN_API_ENDPOINTS.PAYMENT_MODE);
+}
+
 export const fetchSupplierDropdown = async (searchText = '') => {
   return fetchData(`${DROP_DOWN_API_ENDPOINTS.SUPPLIERS}?name=${searchText}`);
 }

@@ -1,0 +1,357 @@
+{
+  "success": "true",
+  "message": "Vendor bills Detail",
+  "data": [
+    {
+      "_id": "6799feed302b090a0cfb2a7d",
+      "sequence_no": "VB/2025/5",
+      "Trn_number": null,
+      "vendor_reference": "",
+      "supplier": {
+        "supplier_id": "6785196e0976b5eff34ab89e",
+        "supplier_name": "JET MAGIC COMPUTER",
+        "supplier_trn_no": null,
+        "supplier_credit_ledger": []
+      },
+      "warehouse_id": "66307fc0ceb8eb834bb25509",
+      "warehouse_name": "Danat Hub",
+      "currency": {
+        "currency_id": "6540b68c05fb79149c3eb7d8",
+        "currency_name": "AED"
+      },
+      "purchase_type": "Local Purchase",
+      "country": {
+        "country_id": "6540b68405fb79149c3eb5c2",
+        "country_name": "UAE"
+      },
+      "bill_date": "2025-01-29T15:40:00.000Z",
+      "ordered_date": "2025-01-29T15:40:00.000Z",
+      "status": "paid",
+      "untaxed_total_amount": 850,
+      "total_amount": 892.5,
+      "date": "2025-01-29T10:11:57.195Z",
+      "remarks": "",
+      "due_date": null,
+      "due_amount": 892.5,
+      "paid_amount": 0,
+      "payment_status": "un_paid",
+      "vendor_bill_status": "un_paid",
+      "purchase_order_id": null,
+      "reference": null,
+      "bussiness_type_id": "64798e78ea90ff229748f18c",
+      "bussiness_type_name": "Local Purchase",
+      "is_estimation": false,
+      "sales_person_id": "6666eefcaaff742265d7592f",
+      "sales_person_name": "",
+      "payment_method_id": "643ea56a407e36e9962b9d28",
+      "payment_method_name": "cheque",
+      "products_lines": [
+        {
+          "_id": "6799feed302b090a0cfb2a80",
+          "product": {
+            "product_id": "6549fbbc170e1456c861c996",
+            "product_name": " IC CHIP 7692",
+            "product_description": "",
+            "product_cost": 8.12,
+            "product_minimal_sales_price": 15,
+            "product_sale_price": 20,
+            "product_barcode": "9566461030922"
+          },
+          "description": "gyftygyvy",
+          "scheduled_date": "2025-01-29",
+          "product_unit_of_measure": "Pcs",
+          "quantity": 3,
+          "billed_quantity": 0,
+          "recieved_quantity": 0,
+          "unit_price": 150,
+          "return_quantity": 0,
+          "taxes": {
+            "tax_type_id": "648d9b54ef9cd868dfbfa37b",
+            "taxes_name": "vat 5%"
+          },
+          "sub_total": 450,
+          "tax_value": 21.43
+        },
+        {
+          "_id": "6799feed302b090a0cfb2a92",
+          "product": {
+            "product_id": "665427dc330089a6f3b14a48",
+            "product_name": " IC CHIP Z09100B1",
+            "product_description": " IC CHIP Z09100B1",
+            "product_cost": 200,
+            "product_minimal_sales_price": 25,
+            "product_sale_price": 30,
+            "product_barcode": "6220730363862"
+          },
+          "description": " IC CHIP Z09100B1",
+          "scheduled_date": "2025-01-29",
+          "product_unit_of_measure": "Pcs",
+          "quantity": 2,
+          "billed_quantity": 0,
+          "recieved_quantity": 0,
+          "unit_price": 200,
+          "return_quantity": 0,
+          "taxes": {
+            "tax_type_id": "648d9b54ef9cd868dfbfa37b",
+            "taxes_name": "vat 5%"
+          },
+          "sub_total": 400,
+          "tax_value": 19.05
+        }
+      ],
+      "register_payments": [
+        {
+          "_id": "6799feed302b090a0cfb2aa8",
+          "sequence_no": "RP-5",
+          "payment_date": "2025-01-29T15:40:00.000Z",
+          "payment_status": "un_paid",
+          "amount": 892.5,
+          "remark": "",
+          "transaction_no": null,
+          "type": "expense",
+          "chq_no": "10",
+          "chq_date": "2025-01-31T00:00:00.000Z",
+          "chq_type": "Regular",
+          "status": "paid",
+          "payment_method_id": "643ea56a407e36e9962b9d28",
+          "journal_id": null,
+          "chart_of_accounts_id": null,
+          "chart_of_accounts_name": null,
+          "chq_bank_id": "670e2ba14e15450d26bc13d5",
+          "vendor_bill_id": [
+            {
+              "id": "6799feed302b090a0cfb2a7d",
+              "payment_status": "un_paid",
+              "paid_amount": 0,
+              "_id": "6799feed302b090a0cfb2aa9"
+            }
+          ],
+          "is_cheque_cleared": true,
+          "image_url": [],
+          "online_status": "Submitted",
+          "online_transaction_type": "done",
+          "ledger_type": "vendor",
+          "ledger_id": null,
+          "ledger_display_name": "",
+          "invoice_id": [],
+          "sales_preson": {
+            "sales_preson_id": "6666eefcaaff742265d7592f",
+            "sales_preson_name": "Sherin"
+          },
+          "filtered_vendor_bill_Array": [
+            {
+              "id": "6799feed302b090a0cfb2a7d",
+              "payment_status": "un_paid",
+              "paid_amount": 0,
+              "_id": "6799feed302b090a0cfb2aa9"
+            }
+          ],
+          "payment_method": {
+            "paymentmethod_id": "643ea56a407e36e9962b9d28",
+            "paymentmethod_name": "cheque"
+          },
+          "warehouse": {
+
+          },
+          "journal": {
+
+          },
+          "cheque": {
+            "chequebank_id": "670e2ba14e15450d26bc13d5",
+            "chequebank_name": "BANK OF BARODA "
+          }
+        }
+      ],
+      "company": {
+
+      },
+      "warehouse": {
+        "warehouses_id": "66307fc0ceb8eb834bb25509",
+        "warehouses_name": "Danat Hub"
+      },
+      "sales_preson": {
+        "sales_person_id": "6666eefcaaff742265d7592f",
+        "sales_person_name": "Sherin"
+      },
+      "batch_code": "20250005"
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Supplier Payment Creation
+
+{
+  "payment_date": "2025-01-31T10:28",
+  "amount": 105,
+  "payment_status": "fully_paid",
+  "vendor_sequence_no": "",
+  "remark": null,
+  "type": "expense",
+  "chq_no": null,
+  "chq_date": "",
+  "chq_type": null,
+  "status": "new",
+  "transaction_no": null,
+  "payment_method_id": "643ea55c407e36e9962b9d26",
+  "journal_id": null,
+  "chq_bank_id": null,
+  "vendor_bill_id": [
+    {
+      "id": "6799c115302b090a0cfb1e81",
+      "payment_status": "fully_paid",
+      "vendor_sequence_no": "VB/2025/4",
+      "due_amount": 0,
+      "paid_amount": 0
+    }
+  ],
+  "invoice_id": null,
+  "customer_id": null,
+  "supplier_id": "67851afb83253364ef38d57f",
+  "supplier_name": "BRITEK COMPUTERS",
+  "sales_person_id": "6666eefcaaff742265d7592f",
+  "is_cheque_cleared": true,
+  "date": "2025-01-31T10:28",
+  "payment_method_name": "cash",
+  "transaction": "VB/2025/4",
+  "in_amount": 0,
+  "out_amount": 105,
+  "due_balance": 0,
+  "outstanding": 105,
+  "credit_balance": null,
+  "image_url": [],
+  "warehouse_name": "Danat Hub",
+  "warehouse_id": "66307fc0ceb8eb834bb25509",
+  "vendor_balance_paid_amount": 105,
+  "reference": "",
+  "ledger_name": "",
+  "ledger_type": "",
+  "ledger_id": null,
+  "ledger_display_name": "",
+  "online_transaction_type": "done",
+  "card_transaction_type": "done",
+  "time_zone": "Asia/Dubai"
+}
+
+
+const handleSupplierPayment = async () => {
+  if (!amount || isNaN(amount) || amount <= 0) {
+    showToast({
+      type: "error",
+      title: "ERROR",
+      message: "Invalid payment amount. Please enter a valid amount.",
+    });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const totalAmountNum = parseFloat(details.total_amount);
+  const currentPaidAmount = parseFloat(details.paid_amount);
+  const currentAmountDue = parseFloat(details.due_amount);
+  const paidAmountNum = parseFloat(amount);
+  const newPaidAmount = currentPaidAmount + paidAmountNum;
+  const newAmountDue = currentAmountDue - paidAmountNum;
+  const paymentStatus = newPaidAmount < totalAmountNum ? "partially_paid" : "fully_paid";
+
+  const supplierPaymentData = {
+    payment_date: formatDateandTime(formData.paymentDate),
+    amount: paidAmountNum.toString(),
+    payment_status: paymentStatus,
+    vendor_sequence_no: details.sequence_no,
+    remark: formData.remark || "",
+    type: "expense",
+    chq_no: formData.chequeNo || "",
+    chq_date: formData.chequeDate ? formatDateandTime(formData.chequeDate) : "",
+    chq_type: formData.chequeType || "",
+    status: "new",
+    transaction_no: formData.transactionNo || "",
+    journal_id: null,
+    chq_bank_id: formData.chequeBankId || null,
+    vendor_bill_id: [
+      {
+        id: details._id,
+        payment_status: paymentStatus,
+        vendor_sequence_no: details.sequence_no,
+        due_amount: newAmountDue,
+        paid_amount: newPaidAmount,
+      },
+    ],
+    invoice_id: null,
+    customer_id: null,
+    supplier_id: details.supplier.supplier_id,
+    supplier_name: details.supplier.supplier_name,
+    sales_person_id: details.sales_person_id,
+    is_cheque_cleared: formData.paymentMode?.label === "cheque" ? "true" : "false",
+    date: formatDateandTime(formData.paymentDate),
+    payment_method_id: formData.paymentMode?.id,
+    payment_method_name: formData.paymentMode?.label,
+    transaction: details.sequence_no,
+    in_amount: 0,
+    out_amount: paidAmountNum.toString(),
+    due_balance: newAmountDue.toString(),
+    outstanding: "",
+    credit_balance: "",
+    image_url: [],
+    warehouse_id: details.warehouse_id,
+    warehouse_name: details.warehouse_name,
+    vendor_balance_paid_amount: paidAmountNum.toString(),
+    reference: formData.reference || "",
+    ledger_name: "",
+    ledger_type: "vendor",
+    ledger_id: null,
+    ledger_display_name: "",
+    online_transaction_type: formData.onlineTransactionType || "done",
+    card_transaction_type: formData.cardTransactionType || "done",
+    time_zone: "Asia/Dubai",
+  };
+
+  console.log("🚀 ~ submit ~ supplierPaymentData:", JSON.stringify(supplierPaymentData, null, 2));
+
+  try {
+    const response = await post("/createSupplierPayment", supplierPaymentData);
+    if (response.success) {
+      showToast({
+        type: "success",
+        title: "Success",
+        message: response.message || "Successfully Created Register Payment",
+      });
+      navigation.navigate("VendorBillDetails");
+    } else {
+      console.error("Supplier Payment Failed:", response.message);
+      showToast({
+        type: "error",
+        title: "ERROR",
+        message: response.message || "Supplier Payment creation failed",
+      });
+    }
+  } catch (error) {
+    console.error("Error Creating Supplier Payment:", error);
+    showToast({
+      type: "error",
+      title: "ERROR",
+      message: "An unexpected error occurred. Please try again later.",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};

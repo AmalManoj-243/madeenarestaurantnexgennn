@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { RoundedScrollContainer, SafeAreaView } from "@components/containers";
-import { NavigationHeader } from "@components/Header";
 import { TextInput as FormInput } from "@components/common/TextInput";
-import { Button } from "@components/common/Button";
-import { DropdownSheet } from "@components/common/BottomSheets";
-import { COLORS } from "@constants/theme";
 import { fetchProductsDropdown, fetchUnitOfMeasureDropdown, fetchTaxDropdown } from "@api/dropdowns/dropdownApi";
+import { DropdownSheet } from "@components/common/BottomSheets";
+import { NavigationHeader } from "@components/Header";
+import { Button } from "@components/common/Button";
+import { COLORS } from "@constants/theme";
 import { Keyboard } from "react-native";
 import { validateFields } from "@utils/validation";
-import { formatDate } from "@utils/common/date";
 import { CheckBox } from "@components/common/CheckBox";
+import { formatDate } from "@utils/common/date";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { showToastMessage } from "@components/Toast";
 
 const AddVendorProducts = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
@@ -26,11 +27,11 @@ const AddVendorProducts = ({ navigation }) => {
   });
 
   const [formData, setFormData] = useState({
-    productId: "",
+    product: "",
     productName: "",
     description: "",
     scheduledDate: new Date(),
-    quantity: "1",
+    quantity: "",
     uom: "",
     unitPrice: "",
     taxes: "vat 5%",
@@ -39,7 +40,6 @@ const AddVendorProducts = ({ navigation }) => {
     totalAmount: "",
     tax: "",
   });
-  // console.log("🚀 ~ AddVendorProducts ~ formData", formData);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -176,7 +176,7 @@ const AddVendorProducts = ({ navigation }) => {
   const handleProductSelection = (selectedProduct) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      productId: selectedProduct.id,
+      product: selectedProduct.id,
       productName: selectedProduct.label,
       description: selectedProduct.product_description || '',
     }));
@@ -184,23 +184,32 @@ const AddVendorProducts = ({ navigation }) => {
   };
 
   const handleAddProducts = () => {
-    const fieldsToValidate = ["productName"];
+    const fieldsToValidate = ["productName", "quantity", "unitPrice"];
+    if ((formData.quantity) <= 0) {
+      showToastMessage('Quantity should be greater than 0');
+      return;
+    }
+    if ((formData.unitPrice) <= 0) { 
+      showToastMessage('Unit Price should be greater than 0');        
+      return;
+    }
+
     if (validateForm(fieldsToValidate)) {
       const productLine = {
+        product_id: formData.product,
         product_name: formData.productName,
-        product_id: formData.productId,
         description: formData.description || "",
         scheduledDate: formatDate(formData.scheduledDate || ""),
         quantity: formData.quantity || "",
         uom: formData.uom || "",
         unitPrice: formData.unitPrice || "",
-        taxes: formData.taxes || "",
+        taxes: formData.taxType || "",
         subTotal: formData.subTotal || "",
         tax: formData.tax || "",
         totalAmount: formData.totalAmount || "",
       };
-      // // // console.log("🚀 ~ AddPurchaseLines ~ productLine:", JSON.stringify(productLine, null, 2));
-      navigation.navigate("VendorDetails", { newProductLine: productLine });
+      // // // console.log("🚀 ~ AddVendorProducts ~ productLine:", JSON.stringify(productLine, null, 2));
+      navigation.navigate("VendorBillFormTabs", { newProductLine: productLine });
     }
   };
 
@@ -249,6 +258,7 @@ const AddVendorProducts = ({ navigation }) => {
       <NavigationHeader
         title="Add Vendor Products"
         onBackPress={() => navigation.goBack()}
+        logo={false}
       />
       <RoundedScrollContainer>
         <FormInput
@@ -280,22 +290,26 @@ const AddVendorProducts = ({ navigation }) => {
           label="Quantity"
           placeholder="Enter Quantity"
           keyboardType="numeric"
+          required
           value={formData.quantity}
+          validate={errors.quantity}
           onChangeText={(value) => handleFieldChange("quantity", value)}
         />
         <FormInput
           label="Unit Of Measure"
           placeholder="Unit Of Measure"
-          // dropIcon="menu-down"
           editable={false}
           value={formData.uom?.label || ""}
-        // onPress={() => toggleBottomSheet("UOM")}
+          // dropIcon="menu-down"
+          // onPress={() => toggleBottomSheet("UOM")}
         />
         <FormInput
           label="Unit Price"
           placeholder="Unit Price"
           keyboardType="numeric"
+          required
           value={formData.unitPrice.toString()}
+          validate={errors.unitPrice}
           onChangeText={(value) => handleFieldChange("unitPrice", parseFloat(value))}
         />
         <FormInput

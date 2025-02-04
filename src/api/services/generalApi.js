@@ -261,6 +261,24 @@ export const fetchVendorBill = async ({ offset, limit,searchText}) => {
   }
 }
 
+export const fetchPaymentMade = async ({ offset, limit,searchText}) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+      ...(searchText !== undefined && { sequence_no: searchText }),
+    };
+    const response = await get(API_ENDPOINTS.VIEW_PAYMENT_MADE,queryParams);
+    return response.data;
+
+  } catch(error){
+    handleApiError(error);
+    throw error;
+  }
+}
+
+// viewPaymentMade
+
 export const fetchLead = async ({ offset, limit, loginEmployeeId }) => {
   try {
     const queryParams = {

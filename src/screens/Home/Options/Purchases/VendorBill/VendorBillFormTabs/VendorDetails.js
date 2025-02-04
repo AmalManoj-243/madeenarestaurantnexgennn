@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList } from "react-native";
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { fetchCurrencyDropdown, fetchCountryDropdown, fetchSupplierDropdown } from '@api/dropdowns/dropdownApi';
-import { paymentMode, purchaseType } from '@constants/dropdownConst';
-import { TitleWithButton } from '@components/Header';
-import ProductLineList from '../../PriceEnquiry/ProductLineList';
+import { fetchCurrencyDropdown, fetchCountryDropdown, fetchSupplierDropdown, fetchPaymentModeDropdown } from '@api/dropdowns/dropdownApi';
+import { purchaseType } from '@constants/dropdownConst';
 
-const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
+const VendorDetails = ({ formData, onFieldChange, errors }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
-  const [productLines, setProductLines] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [dropdown, setDropdown] = useState({
     vendorName: [],
@@ -31,6 +27,8 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
             vendorName: vendorData?.map((data) => ({
               id: data._id,
               label: data.name?.trim(),
+              partner: data.partner.partner_id,
+              partnerName: data.partner.partner_name,
             })),
           }));
         } catch (error) {
@@ -44,18 +42,28 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [currencyData, countryData] = await Promise.all([
-          fetchCurrencyDropdown(),
+        const [countryData, currencyData, paymentModeData] = await Promise.all([
           fetchCountryDropdown(),
+          fetchCurrencyDropdown(),
+          fetchPaymentModeDropdown(),
         ]);
+
+        const filteredPaymentModes = paymentModeData.filter(data => 
+          ["cheque", "credit", "cash"].includes(data.payment_method_name.toLowerCase())
+        );
+
         setDropdown({
+          countryOfOrigin: countryData.map(data => ({
+            id: data._id,
+            label: data.country_name,
+          })),
           currency: currencyData.map(data => ({
             id: data._id,
             label: data.currency_name,
           })),
-          countryOfOrigin: countryData.map(data => ({
+          paymentMode: filteredPaymentModes.map(data => ({
             id: data._id,
-            label: data.country_name,
+            label: data.payment_method_name,
           })),
         });
       } catch (error) {
@@ -93,7 +101,7 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
         fieldName = "currency";
         break;
       case 'Payment Mode':
-        items = paymentMode;
+        items = dropdown.paymentMode;
         fieldName = "paymentMode";
         break;
       default:
@@ -158,14 +166,14 @@ const VendorDetails = ({ formData, onFieldChange, errors, navigation }) => {
       <FormInput
         label={"Amount Paid"}
         placeholder={"Enter Amount Paid"}
-        editable={true}
+        editable={false}
         keyboardType="numeric"
         value={formData.amountPaid}
         onChangeText={(value) => onFieldChange('amountPaid', value)}
       />
       <FormInput
         label="Payment Mode"
-        placeholder="Select Purchase Type"
+        placeholder="Select Payment Mode"
         dropIcon="menu-down"
         editable={false}
         validate={errors.paymentMode}

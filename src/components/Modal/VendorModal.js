@@ -6,7 +6,7 @@ import { NavigationHeader } from '@components/Header';
 import { FONT_FAMILY, COLORS } from '@constants/theme';
 
 const VendorModal = ({ isVisible, onCancel, onOptionSelect, headerMessage = 'Select an Option' }) => {
-    const options = ['Record Payment', 'Purchase Return', 'PDF Download', 'Preview'];
+    const options = ['Record Payment', 'PDF Download'];
 
     return (
         <Modal

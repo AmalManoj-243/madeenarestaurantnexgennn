@@ -138,6 +138,10 @@ export const allValidationRules = {
         message: 'Please select Quantity',
         validate: validateRequired,
     },
+    unitPrice:{
+        message: 'Please select Unit Price',
+        validate: validateRequired, 
+    },
     supplier: {
         message: 'Please select Suppliers',
         validate: validateRequired,

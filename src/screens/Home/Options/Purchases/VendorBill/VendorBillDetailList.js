@@ -9,8 +9,8 @@ const VendorBillDetailList = ({ item, onPress }) => {
     product = { product_name: '-', product_description: '-' },
     scheduled_date = '-',
     quantity = '-',
-    recieved_quantity = item?.recieved_quantity || '-',
-    billed_quantity = item?.billed_quantity || '-',
+    recieved_quantity = '-',
+    billed_quantity = '-',
     product_unit_of_measure = '-',
     unit_price = '-',
     taxes = { taxes_name: '-' },
@@ -28,10 +28,10 @@ const VendorBillDetailList = ({ item, onPress }) => {
         </View>
       <View style={styles.rightColumn}>
         <Text style={styles.content}>Des : {product.product_description || 'Nill'}</Text>
-        <Text style={styles.content}>RQ : {recieved_quantity || '-'}</Text>
+        <Text style={styles.content}>RQ : {recieved_quantity || '0'}</Text>
       </View>
       <View style={styles.rightColumn}>
-        <Text style={styles.content}>BQ : {billed_quantity || '-'}</Text>
+        <Text style={styles.content}>BQ : {billed_quantity || '0'}</Text>
         <Text style={styles.contentRight}>UOM : {product_unit_of_measure || '-'}</Text>
       </View>
       <View style={styles.rightColumn}>

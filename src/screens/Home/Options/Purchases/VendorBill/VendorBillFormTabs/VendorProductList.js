@@ -4,22 +4,23 @@ import Text from '@components/Text';
 import { FONT_FAMILY } from '@constants/theme';
 import { formatDate } from '@utils/common/date';
 
-const VendorBillList = ({ item, onPress }) => {
+const VendorProductList = ({ item, onPress }) => {
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.itemContainer}>
       <View style={styles.leftColumn}>
-        <Text style={styles.head}>{item?.sequence_no || '-'}</Text>
+        <Text style={styles.head}>{item?.product_name || '-'}</Text>
         <View style={styles.rightColumn}>
           <Text style={styles.content}>{formatDate(item?.date) || '-'}</Text>
-          <Text style={styles.content}>{item?.total_amount || '-'}</Text>
-        </View>
-        <View style={styles.rightColumn}> 
-          <Text style={styles.content}>{item?.supplier?.supplier_name || '-'}</Text>
-          <Text style={styles.content}>{item?.due_amount || '0.00'}</Text>
+          <Text style={styles.content}>{item?.description || '-'}</Text>
         </View>
         <View style={styles.rightColumn}>
-          <Text style={styles.content}>{item?.payment_method_name || '-'}</Text>
-          <Text style={[styles.content, {color: 'red'}]}>{item?.payment_status || '-'}</Text>
+          <Text style={styles.content}>{item?.quantity || '-'}</Text>
+          <Text style={styles.content}>{item?.uom?.label || '-'}</Text>
+        </View>
+        <View style={styles.rightColumn}>
+          <Text style={styles.content}>{item?.unitPrice || '-'}</Text>
+          <Text style={styles.content}>{item?.taxes?.label || '-'}</Text>
+          <Text style={styles.content}>{item?.subTotal || '-'}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -71,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VendorBillList;
+export default VendorProductList;

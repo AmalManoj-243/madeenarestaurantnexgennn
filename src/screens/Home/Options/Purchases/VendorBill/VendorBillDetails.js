@@ -16,7 +16,7 @@ import { VendorModal } from '@components/Modal';
 const VendorBillDetails = ({ navigation, route }) => {
   const { id: vendorBillId } = route?.params || {};
   const [details, setDetails] = useState({});
-  console.log("🚀 ~ submit ~ vendorData:", JSON.stringify(details, null, 2));
+  // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // console.log("🚀 ~ submit ~ vendorData:", JSON.stringify(details, null, 2));
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [vendorBills, setVendorBills] = useState([]);
@@ -48,37 +48,12 @@ const VendorBillDetails = ({ navigation, route }) => {
   );
 
   const handleRecordPayment = () => {
-    navigation.navigate('DeliveryNoteCreation', { id: vendorBillId });
+    navigation.navigate('SupplierPaymentCreation', { id: vendorBillId });
   };
 
   const handlePdfDownload = () => {
     navigation.navigate('DeliveryNoteCreation', { id: vendorBillId });
   }
-
-  const handlePreview = () => {
-    navigation.navigate('DeliveryNoteCreation', { id: vendorBillId });
-  }
-
-  const handlePurchaseReturn = async () => {
-    setIsSubmitting(true);
-    try {
-      const response = await updatePurchaseOrder(details._id, {
-        _id: details._id,
-        status: "Cancelled",
-        payment_status: "Cancelled",
-      });
-      if (response.success || response === success) {
-        showToastMessage('Purchase Order Cancelled Successfully');
-        fetchDetails();
-      } else {
-        showToastMessage('Failed to Cancel Purchase Order. Please try again.');
-      }
-    } catch (error) {
-        showToastMessage('An error occurred. Please try again.');
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
 
   return (
     <SafeAreaView>
@@ -115,15 +90,15 @@ const VendorBillDetails = ({ navigation, route }) => {
         <View style={{ marginVertical: 2, marginBottom: 15 }}>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Sub Total : </Text>
-            <Text style={styles.totalValue}>{ }</Text>
+            <Text style={styles.totalValue}>{details.untaxed_total_amount}</Text>
           </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Taxes : </Text>
-            <Text style={styles.totalValue}>{ }</Text>
+            <Text style={styles.totalValue}>{((details.total_amount)-(details.untaxed_total_amount)).toFixed(2)}</Text>
           </View>
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Total : </Text>
-            <Text style={styles.totalValue}>{ }</Text>
+            <Text style={styles.totalValue}>{details.total_amount}</Text>
           </View>
         </View>
 
@@ -132,9 +107,7 @@ const VendorBillDetails = ({ navigation, route }) => {
           onCancel={() => setIsMenuModalVisible(false)}
           onOptionSelect={(option) => {
             if (option === 'Record Payment') handleRecordPayment();
-            else if (option === 'Purchase Return') handlePurchaseReturn();
             else if (option === 'PDF Download') handlePdfDownload();
-            else if (option === 'Preview') handlePreview();
           }}
         />
         <OverlayLoader visible={isLoading || isSubmitting} />
