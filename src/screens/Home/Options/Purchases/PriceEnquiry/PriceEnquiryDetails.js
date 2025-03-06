@@ -21,7 +21,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
     const currentUser = useAuthStore((state) => state.user);
     // console.log("🚀 ~ PriceEnquiryDetails ~ currentUser:", JSON.stringify(currentUser, null, 2));
     const [details, setDetails] = useState({});
-    console.log("🚀 ~ PriceEnquiryDetails ~ details:", JSON.stringify(details, null, 2));
+    // console.log("🚀 ~ PriceEnquiryDetails ~ details:", JSON.stringify(details, null, 2));
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [priceLines, setPriceLines] = useState(updatedPriceLines || []);

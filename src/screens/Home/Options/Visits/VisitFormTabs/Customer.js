@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { formatDate } from '@utils/common/date'
 import { RoundedScrollContainer } from '@components/containers'
 import { DropdownSheet } from '@components/common/BottomSheets'
-import { fetchCustomersDropdown, fetchPurposeofVisitDropdown, fetchSiteLocationDropdown } from '@api/dropdowns/dropdownApi'
+import { fetchEmployeesDropdown, fetchCustomersDropdown, fetchPurposeofVisitDropdown, fetchSiteLocationDropdown } from '@api/dropdowns/dropdownApi'
 import { fetchCustomerDetails } from '@api/details/detailApi'
 import { TextInput as FormInput } from '@components/common/TextInput'
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { showToastMessage } from '@components/Toast'
 import { Button } from '@components/common/Button'
-
 
 const Customer = ({ formData, errors, handleFieldChange, onNextPress }) => {
 
@@ -25,10 +24,15 @@ const Customer = ({ formData, errors, handleFieldChange, onNextPress }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const employeesDropdown = await fetchEmployeesDropdown();
                 const customersDropdown = await fetchCustomersDropdown();
                 const visitPurposeDropdown = await fetchPurposeofVisitDropdown();
                 setDropdowns(prevDropdown => ({
                     ...prevDropdown,
+                    employees: employeesDropdown.map((data) => ({
+                        id: data._id,
+                        label: data.name?.trim(),
+                    })),
                     customers: customersDropdown.map((data) => ({
                         id: data._id,
                         label: data.name?.trim(),
@@ -100,6 +104,10 @@ const Customer = ({ formData, errors, handleFieldChange, onNextPress }) => {
         let fieldName = '';
 
         switch (selectedType) {
+            case 'Employees':
+                items = dropdowns.employees;
+                fieldName = 'employee';
+                break;
             case 'Customers':
                 items = dropdowns.customers;
                 fieldName = 'customer';
@@ -146,6 +154,8 @@ const Customer = ({ formData, errors, handleFieldChange, onNextPress }) => {
                 multiline={true}
                 required
                 value={formData.employee?.label}
+                validate={errors.employee}
+                onPress={() => toggleBottomSheet('Employees')}
             />
             <FormInput
                 label={"Customer Name"}

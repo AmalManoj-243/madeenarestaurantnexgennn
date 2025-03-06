@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "369aiUAE",
-    "slug": "369aiuae",
-    "version": "1.0.0",
+    "name": "369aiOman",
+    "slug": "369aiOman",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/android/icon.png",
     "userInterfaceStyle": "light",
@@ -34,7 +34,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
       ],
-      "package": "com.danat.uae"
+      "package": "com.danat.oman"
     },
     "plugins": [
       [
@@ -69,7 +69,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "5649bb80-f5eb-4694-9096-e856471020cf"
+        "projectId": "7d835626-6753-40b7-bf78-b0a08d360109"
       }
     }
   }

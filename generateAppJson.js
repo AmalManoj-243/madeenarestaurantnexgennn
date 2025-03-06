@@ -22,7 +22,7 @@ const appJson = {
   expo: {
     name: config.appName,
     slug: config.appName.toLowerCase(),
-    version: '1.0.0',
+    version: '1.0.5',
     orientation: 'portrait',
     icon: './assets/android/icon.png',
     userInterfaceStyle: 'light',
