@@ -143,7 +143,7 @@ const QuickServiceUpdateDetails = ({ route, navigation }) => {
       sales_person_id: currentUser?.related_profile?._id,
       sales_person_name: currentUser?.related_profile?.name,
     }
-    // console.log("🚀 ~ file: UpdateDetail.js:78 ~ handleJobApproveQuote ~ requestPayload:", JSON.stringify(requestPayload, null, 2))
+    
     try {
       const response = await post("/createJobApproveQuote", requestPayload);
       if (response.success === 'true') {

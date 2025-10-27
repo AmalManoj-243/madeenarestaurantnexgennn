@@ -260,6 +260,201 @@ const InventoryForm = ({ navigation, route }) => {
     }
   };
 
+    const handleSubmit = async () => {
+      setIsSubmitting(true);
+      const requestPayload = {
+        _id: id,
+        job_stage: 'Waiting for spare',
+        create_job_diagnosis: [
+          {
+            job_registration_id: id,
+            proposed_action_id: null,
+            proposed_action_name: null,
+            done_by_id: currentUser?.related_profile?._id || null,
+            done_by_name: currentUser?.related_profile?.name || '',
+            untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),
+            parts_or_service_required: null,
+            service_type: null,
+            service_charge: parseInt(formData.serviceCharge, 0),
+            total_amount: parseInt(formData.total, 0),
+            parts: sparePartsItems.map((items) => ({
+              product_id: items?.product_id,
+              product_name: items?.product_name,
+              description: items?.description,
+              uom_id: items?.uom_id,
+              uom: items?.uom,
+              quantity: items?.quantity,
+              unit_price: items.unit_price,
+              sub_total: items.unit_price,
+              unit_cost: items?.unit_price,
+              // total: items?.total,
+              tax_type_id: items?.tax_type_id,
+              tax_type_name: items?.tax_type_name,
+            }))
+          }
+        ]
+      }
+      try {
+        const response = await put("/updateJobRegistration", requestPayload);
+        if (response.success === 'true') {
+          handleInventoryBoxRequest(response);
+          showToast({
+            type: "success",
+            title: "Success",
+            message: response.message || "Inventory Box Request created successfully",
+          });
+          navigation.navigate("InventoryScreen");
+        } else {
+          console.error("Inventory Box Request:", response.message);
+          showToast({
+            type: "error",
+            title: "ERROR",
+            message: response.message || "Inventory Box Request creation failed",
+          });
+        }
+      } catch (error) {
+        console.error("Error Submitting Request:", error);
+        showToast({
+          type: "error",
+          title: "ERROR",
+          message: "An unexpected error occurred. Please try again later.",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+//     const handleInventoryBoxRequest = async () => {
+//   if (!formData.reason) {
+//     showToastMessage("Please select a reason.");
+//     return;
+//   }
+
+//   if (!chosenItem) {
+//     showToastMessage("Please choose an item.");
+//     return;
+//   }
+
+//   setLoading(true);
+
+//   let itemsToSubmit = displayItems.length > 0 ? displayItems : [];
+//   itemsToSubmit = itemsToSubmit.map(({ chosen, ...rest }) => rest);
+
+//   const getReferenceId = () =>
+//     formData.sales?.id ||
+//     formData.service?.id ||
+//     formData.purchase?.id ||
+//     formData.stockTransfer?.id ||
+//     formData.purchaseReturn?.id ||
+//     formData.salesReturn?.id ||
+//     formData.serviceReturn?.id ||
+//     "";
+
+//   const getReferenceLabel = () =>
+//     formData.sales?.label ||
+//     formData.service?.label ||
+//     formData.purchase?.label ||
+//     formData.stockTransfer?.label ||
+//     formData.salesReturn?.label ||
+//     formData.purchaseReturn?.label ||
+//     formData.serviceReturn?.label ||
+//     "";
+
+//   const inventoryRequestData = {
+//     items: itemsToSubmit,
+//     quantity: itemsToSubmit.reduce((total, item) => total + item.quantity, 0),
+//     reason: formData.reason?.id || "",
+//     reference_id: getReferenceId(),
+//     reference: getReferenceLabel(),
+//     remarks: formData.remarks,
+//     box_id: inventoryDetails?._id,
+//     sales_person_id: currentUser?.related_profile?._id || null,
+//     box_status: "pending",
+//     request_status: "requested",
+//     approver_id: null,
+//     approver_name: "",
+//     warehouse_name: currentUser?.warehouse?.warehouse_name || "",
+//     warehouse_id: currentUser?.warehouse?.warehouse_id,
+//   };
+
+//   try {
+//     const response = await post("/createInventoryBoxRequest", inventoryRequestData);
+//     if (response.success === true) {
+//       Toast.show({
+//         type: "success",
+//         text1: "Success",
+//         text2: response.message || "Inventory Box Request created successfully",
+//         position: "bottom",
+//       });
+//       navigation.navigate("InventoryScreen");
+//     } else {
+//       Toast.show({
+//         type: "error",
+//         text1: "ERROR",
+//         text2: response.message || "Inventory Box Request creation failed",
+//         position: "bottom",
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error submitting request:", error);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+// const handleSubmit = async () => {
+//   setIsSubmitting(true);
+//   const requestPayload = {
+//     _id: id,
+//     job_stage: 'Waiting for spare',
+//     create_job_diagnosis: [
+//       {
+//         job_registration_id: id,
+//         done_by_id: currentUser?.related_profile?._id || null,
+//         done_by_name: currentUser?.related_profile?.name || '',
+//         untaxed_total_amount: parseInt(formData.spareTotalPrice, 0),
+//         service_charge: parseInt(formData.serviceCharge, 0),
+//         total_amount: parseInt(formData.total, 0),
+//         parts: sparePartsItems.map(item => ({
+//           product_id: item?.product_id,
+//           product_name: item?.product_name,
+//           description: item?.description,
+//           uom_id: item?.uom_id,
+//           uom: item?.uom,
+//           quantity: item?.quantity,
+//           unit_price: item?.unit_price,
+//           sub_total: item?.unit_price,
+//           unit_cost: item?.unit_price,
+//           tax_type_id: item?.tax_type_id,
+//           tax_type_name: item?.tax_type_name,
+//         })),
+//       },
+//     ],
+//   };
+
+//   try {
+//     const response = await put("/updateJobRegistration", requestPayload);
+//     if (response.success === true) {
+//       await handleInventoryBoxRequest();
+//     } else {
+//       showToast({
+//         type: "error",
+//         title: "ERROR",
+//         message: response.message || "Inventory Box Request creation failed",
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error Submitting Request:", error);
+//     showToast({
+//       type: "error",
+//       title: "ERROR",
+//       message: "An unexpected error occurred. Please try again later.",
+//     });
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+
   // Render dynamic form fields based on selected reason (e.g., Sales, Service)
   const toggleBottomSheet = (type) => {
     setSelectedType(type);
@@ -471,7 +666,7 @@ const InventoryForm = ({ navigation, route }) => {
           backgroundColor={loading ? COLORS.lightenBoxTheme : COLORS.boxTheme}
           title={"Submit"}
           disabled={loading}
-          onPress={handleInventoryBoxRequest}
+          onPress={handleSubmit}
           style={styles.submitButton}
         />
         {/* ) : null} */}
