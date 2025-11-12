@@ -11,7 +11,7 @@ import { LogBox } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button } from "@components/common/Button";
 import {  OverlayLoader } from "@components/Loader";
-import { post } from "@api/services/utils";
+import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Text from "@components/Text";
 import { TextInput } from "@components/common/TextInput";
@@ -23,7 +23,7 @@ import { Checkbox } from "react-native-paper";
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
 
-const LoginScreen = () => {
+const LoginScreenOdoo = () => {
 
   const navigation = useNavigation();
   const setUser = useAuthStore(state => state.login)
@@ -63,33 +63,44 @@ const LoginScreen = () => {
     }
   };
 
+LogBox.ignoreLogs(["new NativeEventEmitter"]);
+LogBox.ignoreAllLogs();
   const login = async () => {
     setLoading(true);
     try {
-      const response = await post("/viewuser/login", {
-        user_name: inputs.username,
-        password: inputs.password,
-      });
-      if (response.success === true) {
-        const userData = response.data[0];
-        // const userToken = response.token
-        if (
-          inputs.username === userData.username,
-          inputs.password === userData.password
-        ) {
-          // await AsyncStorage.setItem("userToken", userToken);
-          await AsyncStorage.setItem("userData", JSON.stringify(userData));
-          setUser(userData)
-          console.log("userData", userData);
-          navigation.navigate("AppNavigator");
-        } else {
-          showToastMessage("Invalid Details")
+      const response = await axios.post(
+        "http://192.168.1.121:8069/web/session/authenticate",
+        {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            db: "odooo19",
+            login: inputs.username,
+            password: inputs.password,
+          },
+        },
+        {
+          headers: { "Content-Type": "application/json" },
         }
+      );
+      console.log("🚀 ~ file: ~ Odoo response :", JSON.stringify(response.data))
+      if (response.data.result && response.data.result.uid) {
+        // Login successful
+        const userData = response.data.result;
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+        setUser(userData);
+        navigation.navigate("AppNavigator");
       } else {
-        showToastMessage("Error! User does not exist");
+        showToastMessage("Invalid credentials");
       }
+
+
+
+
+      
     } catch (error) {
-      showToastMessage(`error! occurred while logging in ${error.message}`);
+      console.log("Odoo error:", error.response ? error.response.data : error.message); // Debug log
+      showToastMessage(`Error! ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -121,8 +132,7 @@ const LoginScreen = () => {
                 onChangeText={(text) => handleOnchange(text, "username")}
                 onFocus={() => handleError(null, "username")}
                 iconName="account-outline"
-                label="ui need login screen odoo to work not login scren
-                sername or Email"
+                label="username orr Email"
                 placeholder="Enter Username or Email"
                 error={errors.username}
                 column={true}
@@ -133,7 +143,7 @@ const LoginScreen = () => {
                 onFocus={() => handleError(null, "password")}
                 error={errors.password}
                 iconName="lock-outline"
-                label="Password"
+                label="Pasword"
                 placeholder="Enter password"
                 password
                 column={true}
@@ -182,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default LoginScreenOdoo;

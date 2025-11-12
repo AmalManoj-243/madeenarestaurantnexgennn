@@ -169,6 +169,15 @@ const ProductDetail = ({ navigation, route }) => {
 
 
   const handleAddProduct = () => {
+    const { getCurrentCart, addProduct, setCurrentCustomer } = useProductStore.getState();
+    
+    // Ensure we have a current customer set
+    if (Object.keys(fromCustomerDetails).length > 0) {
+      const customerId = fromCustomerDetails.id || fromCustomerDetails._id;
+      setCurrentCustomer(customerId);
+    }
+    
+    const currentProducts = getCurrentCart();
     const newProduct = {
       id: detail._id,
       name: detail.product_name,
@@ -178,7 +187,7 @@ const ProductDetail = ({ navigation, route }) => {
       uom: detail?.uom?.[0]
     };
 
-    const exist = products.some(p => p.id === newProduct.id);
+    const exist = currentProducts.some(p => p.id === newProduct.id);
     if (exist) {
       showToastMessage('Product already added');
     } else {

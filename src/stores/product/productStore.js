@@ -1,22 +1,91 @@
 import { create } from 'zustand';
 
-const useProductStore = create((set) => ({
-  products: [],
+const useProductStore = create((set, get) => ({
+  currentCustomerId: null,
+  cartItems: {}, // Object: {customerId: [...items]}
+  
+  // Set current customer
+  setCurrentCustomer: (customerId) => set({ currentCustomerId: customerId }),
+  
+  // Get current customer's cart
+  getCurrentCart: () => {
+    const { currentCustomerId, cartItems } = get();
+    return cartItems[currentCustomerId] || [];
+  },
+  
+  // Backward compatibility - returns current customer's products
+  get products() {
+    return get().getCurrentCart();
+  },
+  
   addProduct: (product) => set((state) => {
-    const exists = state.products.some((p) => p.id === product.id);
+    const { currentCustomerId } = state;
+    if (!currentCustomerId) return state;
+    
+    const currentCart = state.cartItems[currentCustomerId] || [];
+    const exists = currentCart.some((p) => p.id === product.id);
+    
     if (!exists) {
-      return { products: [...state.products, product] };
+      return {
+        ...state,
+        cartItems: {
+          ...state.cartItems,
+          [currentCustomerId]: [...currentCart, product]
+        }
+      };
     } else {
-      const updatedProducts = state.products.map((p) =>
+      const updatedCart = currentCart.map((p) =>
         p.id === product.id ? { ...p, quantity: product.quantity, price: product.price } : p
       );
-      return { products: updatedProducts };
+      return {
+        ...state,
+        cartItems: {
+          ...state.cartItems,
+          [currentCustomerId]: updatedCart
+        }
+      };
     }
   }),
-  removeProduct: (productId) => set((state) => ({
-    products: state.products.filter((product) => product.id !== productId),
+  
+  removeProduct: (productId) => set((state) => {
+    const { currentCustomerId } = state;
+    if (!currentCustomerId) return state;
+    
+    const currentCart = state.cartItems[currentCustomerId] || [];
+    return {
+      ...state,
+      cartItems: {
+        ...state.cartItems,
+        [currentCustomerId]: currentCart.filter((product) => product.id !== productId)
+      }
+    };
+  }),
+  
+  clearProducts: () => set((state) => {
+    const { currentCustomerId } = state;
+    if (!currentCustomerId) return state;
+    
+    return {
+      ...state,
+      cartItems: {
+        ...state.cartItems,
+        [currentCustomerId]: []
+      }
+    };
+  }),
+  
+  // Load customer cart (from API or localStorage)
+  loadCustomerCart: (customerId, cartData) => set((state) => ({
+    ...state,
+    currentCustomerId: customerId,
+    cartItems: {
+      ...state.cartItems,
+      [customerId]: cartData || []
+    }
   })),
-  clearProducts: () => set({ products: [] }),
+  
+  // Clear all carts
+  clearAllCarts: () => set({ cartItems: {}, currentCustomerId: null }),
 }));
 
 export default useProductStore;

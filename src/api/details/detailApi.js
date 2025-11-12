@@ -124,6 +124,69 @@ const fetchLedgerDetail = async (ledgerId) => {
   }
 }
 
+export const fetchVehicles = async () => {
+  try {
+    const response = await get(GET_VEHICLES_DETAILS);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+export const fetchVehicleDetails = async (vehicleId) => {
+  return fetchDetails(GET_VEHICLES_DETAILS, vehicleId);
+};
+
+export const fetchDrivers = async () => {
+  try {
+    const response = await get(GET_DRIVERS_DETAILS);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+export const fetchLocations = async () => {
+  try {
+    const response = await get(GET_LOCATIONS_DETAILS);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+
+
+// Fetch list of vehicle tracking records
+export const fetchVehicleTrackingList = async () => {
+  try {
+    const response = await get(SUBMIT_VEHICLE_TRACKING); // Same endpoint for GET
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+// Fetch specific vehicle tracking record by ID
+export const fetchVehicleTrackingDetails = async (trackingId) => {
+  try {
+    const response = await get(`${SUBMIT_VEHICLE_TRACKING}/${trackingId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+
+
+
+
+
 // Object containing functions to fetch transaction auditing details
 export const fetchBills = {
   invoiceDetails: async (sequenceNo) => fetchAuditDetail(GET_INVOICE_DETAILS, sequenceNo),

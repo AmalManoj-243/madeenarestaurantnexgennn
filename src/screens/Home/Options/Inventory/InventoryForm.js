@@ -20,6 +20,7 @@ import { Button } from "@components/common/Button";
 import { COLORS } from "@constants/theme";
 import { showToastMessage } from "@components/Toast";
 import { post } from "@api/services/utils";
+import axios from 'axios';
 import { useAuthStore } from '@stores/auth';
 import Toast from "react-native-toast-message";
 import { OverlayLoader } from "@components/Loader";
@@ -183,78 +184,46 @@ const InventoryForm = ({ navigation, route }) => {
   };
   // Submit the inventory box request, validating required fields (reason, item)
   const handleInventoryBoxRequest = async () => {
-    if (!formData.reason) {
-      showToastMessage("Please select a reason.");
-      return;
-    }
-
-    if (!chosenItem) {
-      showToastMessage("Please choose an item.");
-      return;
-    }
     setLoading(true);
-
-    let itemsToSubmit = displayItems.length > 0 ? displayItems : [];
-    // Remove the 'chosen' key from the items
-    itemsToSubmit = itemsToSubmit.map(({ chosen, ...rest }) => rest);
-
-    const getReferenceId = () =>
-      formData.sales?.id ||
-      formData.service?.id ||
-      formData.purchase?.id ||
-      formData.stockTransfer?.id ||
-      formData.purchaseReturn?.id ||
-      formData.salesReturn?.id ||
-      formData.serviceReturn?.id ||
-      "";
-
-    const getReferenceLabel = () =>
-      formData.sales?.label ||
-      formData.service?.label ||
-      formData.purchase?.label ||
-      formData.stockTransfer?.label ||
-      formData.salesReturn?.label ||
-      formData.purchaseReturn?.label ||
-      formData.serviceReturn?.label ||
-      "";
-    const inventoryRequestData = {
-      items: itemsToSubmit,
-      quantity: itemsToSubmit.reduce((total, item) => total + item.quantity, 0),
-      reason: formData.reason?.id || "",
-      reference_id: getReferenceId(),
-      reference: getReferenceLabel(),
-      remarks: formData.remarks,
-      box_id: inventoryDetails?._id,
-      sales_person_id: currentUser?.related_profile?._id || null,
-      box_status: "pending",
-      request_status: "requested",
-      approver_id: null,
-      approver_name: "",
-      warehouse_name: currentUser?.warehouse?.warehouse_name || "",
-      warehouse_id: currentUser?.warehouse?.warehouse_id,
-    };
     try {
-      const response = await post("/createInventoryBoxRequest",inventoryRequestData);
-      if (response.success === true) {
+      const payload = {
+        box_name: inventoryDetails?.box_name || inventoryDetails?.name,
+        product_id: inventoryDetails?.product_id || inventoryDetails?.product?._id,
+        warehouse_id: inventoryDetails?.warehouse_id || inventoryDetails?.warehouse?._id,
+        quantity: chosenItem?.quantity || 1,
+        reason: formData.reason?.name || reason?.name,
+        remarks: formData.remarks || ""
+      };
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      console.log('Sending request to API:', {
+        url: "https://4d0c42359e62.ngrok-free.app/api/create_inventory_request",
+        payload,
+        headers
+      });
+      const response = await axios.post(
+        "https://4d0c42359e62.ngrok-free.app/api/create_inventory_request",
+        payload,
+        { headers }
+      );
+      console.log("Inventory request response:", response?.data || response);
+      if (response?.data?.status === 'success') {
         Toast.show({
-          type: "success",
-          text1: "Success",
-          text2:
-            response.message || "Inventory Box Request created successfully",
-          position: "bottom",
-        });
-        navigation.navigate("InventoryScreen");
-      } else {
-        console.error("Inventory Box Request:", response.message);
-        Toast.show({
-          type: "error",
-          text1: "ERROR",
-          text2: response.message || "Inventory Box Request creation failed",
-          position: "bottom",
+          type: 'success',
+          text1: 'Success',
+          text2: response.data.message || 'Inventory request created successfully',
+          position: 'bottom',
         });
       }
     } catch (error) {
-      console.error("Error submitting request:", error);
+      if (error.response) {
+        console.error("API error response:", error.response.data);
+        console.error("API error status:", error.response.status);
+        console.error("API error headers:", error.response.headers);
+      } else {
+        console.error("Error submitting request:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -666,7 +635,7 @@ const InventoryForm = ({ navigation, route }) => {
           backgroundColor={loading ? COLORS.lightenBoxTheme : COLORS.boxTheme}
           title={"Submit"}
           disabled={loading}
-          onPress={handleSubmit}
+          onPress={handleInventoryBoxRequest}
           style={styles.submitButton}
         />
         {/* ) : null} */}

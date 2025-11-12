@@ -56,6 +56,23 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
     const handlePurchaseOrder = async () => {
         setIsSubmitting(true);
         try {
+            // Check if suppliers have responded (price lines exist)
+            if (!priceLines || priceLines.length === 0) {
+                showToastMessage('No supplier responses available yet. Please wait for suppliers to respond with their prices.');
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Filter only approved items for purchase order
+            const approvedItems = priceLines.filter(item => item.status === 'Approved');
+            
+            // Check if any items are approved
+            if (approvedItems.length === 0) {
+                showToastMessage('Please approve at least one supplier price before creating purchase order.');
+                setIsSubmitting(false);
+                return;
+            }
+
             const purchaseOrderData = {
                 employee_id: currentUser?._id || "",
                 product_purchase_enquiry_id: details?._id,
@@ -64,7 +81,7 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
                 order_date: formatDate(new Date, 'yyyy/MM/dd'),
                 update_date: formatDate(new Date, 'yyyy/MM/dd'),
                 payment_status: "Submitted",
-                purchase_enquiry_lines: priceLines.map(item => ({
+                purchase_enquiry_lines: approvedItems.map(item => ({
                     product_id: item?.products?.product_id,
                     // uom: "", // uom name (units)
                     qty: item?.quantity,
@@ -120,7 +137,11 @@ const PriceEnquiryDetails = ({ navigation, route }) => {
         }
     };
 
-    const isPurchaseOrderDisabled = responseData?.purchase_order_models?.[0]?.status === "purchase_order";
+    const isPurchaseOrderDisabled = 
+        responseData?.purchase_order_models?.[0]?.status === "purchase_order" || // Already created
+        !priceLines || 
+        priceLines.length === 0 || // No supplier responses yet
+        priceLines.filter(item => item.status === 'Approved').length === 0; // No approved items
 
     const handleUpdateStatus = async (id, price, isSwitchOn) => {
         const reqBody = {

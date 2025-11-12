@@ -368,3 +368,18 @@ export const fetchKPIDashboard = async ({ userId }) => {
     throw error;
   }
 }
+
+export const fetchVehicles = async ({ offset, limit, searchText }) => {
+  try {
+    const queryParams = {
+      offset,
+      limit,
+      ...(searchText !== undefined && { name: searchText }),
+    };
+    const response = await get(API_ENDPOINTS.VIEW_VEHICLES, queryParams);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};

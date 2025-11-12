@@ -29,6 +29,7 @@ const COLORS = {
   lightGray: '#D3D3D3',
   pewterGray: '#848884',
   grey: '#F0F0F0',
+  gray: '#666666',
   green: '#008000',
   lightRed: '#FF0000',
   listText: '#FFFFFF',

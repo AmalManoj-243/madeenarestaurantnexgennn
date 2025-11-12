@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput, Image, StyleSheet, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearCartFromStorage } from '@api/customer/cartApi';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { DetailField } from '@components/common/Detail';
@@ -18,11 +20,60 @@ import { useCurrencyStore } from '@stores/currency';
 const CustomerDetails = ({ navigation, route }) => {
   const { details } = route?.params || {};
   const currentUser = useAuthStore(state => state.user);
-  const products = useProductStore(state => state.products);
-  const removeProduct = useProductStore(state => state.removeProduct);
-  const addProduct = useProductStore(state => state.addProduct);
-  const clearProducts = useProductStore(state => state.clearProducts);
+  const { 
+    getCurrentCart, 
+    setCurrentCustomer, 
+    loadCustomerCart,
+    removeProduct, 
+    addProduct, 
+    clearProducts 
+  } = useProductStore();
   const currency = useCurrencyStore((state) => state.currency) || '';
+  
+  // Set current customer and load their cart when component mounts
+  useEffect(() => {
+    if (details?.id || details?._id) {
+      const customerId = details.id || details._id;
+      setCurrentCustomer(customerId);
+      
+      // Try to load saved cart from AsyncStorage
+      loadCartFromStorage(customerId);
+    }
+  }, [details]);
+  
+  // Get current customer's products
+  const products = getCurrentCart();
+  
+  // Save cart to AsyncStorage whenever it changes
+  useEffect(() => {
+    if (details?.id || details?._id) {
+      const customerId = details.id || details._id;
+      saveCartToStorage(customerId, products);
+    }
+  }, [products, details]);
+
+  const loadCartFromStorage = async (customerId) => {
+    try {
+      const savedCart = await AsyncStorage.getItem(`cart_${customerId}`);
+      if (savedCart) {
+        const cartData = JSON.parse(savedCart);
+        loadCustomerCart(customerId, cartData);
+      } else {
+        loadCustomerCart(customerId, []);
+      }
+    } catch (error) {
+      console.error('Error loading cart from storage:', error);
+      loadCustomerCart(customerId, []);
+    }
+  };
+
+  const saveCartToStorage = async (customerId, cartData) => {
+    try {
+      await AsyncStorage.setItem(`cart_${customerId}`, JSON.stringify(cartData));
+    } catch (error) {
+      console.error('Error saving cart to storage:', error);
+    }
+  };
   
 
   const handleDelete = (productId) => {
@@ -141,7 +192,14 @@ const CustomerDetails = ({ navigation, route }) => {
         text2: 'Quotation created successfully',
         position: 'bottom',
       });
-      clearProducts()
+      
+      // Clear current customer's cart
+      clearProducts();
+      const customerId = details?.id || details?._id;
+      if (customerId) {
+        await clearCartFromStorage(customerId);
+      }
+      
       navigation.navigate('CustomerScreen');
     } else {
       Toast.show({

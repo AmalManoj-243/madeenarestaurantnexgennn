@@ -5,9 +5,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppNavigator from "./AppNavigator";
 import { ProductsScreen, SplashScreen } from "@screens";
 import { OptionsScreen } from "@screens/Home/Options";
+import { VehicleTrackingScreen, VehicleTrackingForm } from "@screens/Home/Options/VehicleTracking";
+import QRScannerScreen from "@screens/QRScanner/QRScannerScreen";
 import { TaskManagerScreen } from "@screens/Home/Options/TaskManager";
 import { AuditDetails, AuditForm, AuditScreen } from "@screens/Home/Options/Audit";
-import { LoginScreen, PrivacyPolicy } from "@screens/Auth";
+import { PrivacyPolicy } from "@screens/Auth";
+import LoginScreenOdoo from "@screens/Auth/LoginScreenOdoo";
 import { Barcode, Scanner } from "@components/Scanner";
 import { InventoryDetails, InventoryForm, InventoryScreen } from "@screens/Home/Options/Inventory";
 import { ProductDetail } from "@components/common/Detail";
@@ -49,7 +52,7 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Splash">
+    <Stack.Navigator initialRouteName="LoginScreenOdoo">
       {/* Splash Screen */}
       <Stack.Screen
         name="Splash"
@@ -73,8 +76,8 @@ const StackNavigator = () => {
       />
       {/* Login Screen */}
       <Stack.Screen
-        name="LoginScreen"
-        component={LoginScreen}
+        name="LoginScreenOdoo"
+        component={LoginScreenOdoo}
         options={{ headerShown: false }}
       />
 
@@ -93,6 +96,24 @@ const StackNavigator = () => {
       <Stack.Screen
         name="OptionsScreen"
         component={OptionsScreen}
+        options={{ headerShown: false }}
+      />
+      {/* Vehicle Tracking Screen */}
+      <Stack.Screen
+        name="VehicleTrackingScreen"
+        component={VehicleTrackingScreen}
+        options={{ headerShown: false }}
+      />
+      {/* Vehicle Tracking Form */}
+      <Stack.Screen
+        name="VehicleTrackingForm"
+        component={VehicleTrackingForm}
+        options={{ headerShown: false }}
+      />
+      {/* QR Scanner */}
+      <Stack.Screen
+        name="QRScanner"
+        component={QRScannerScreen}
         options={{ headerShown: false }}
       />
       {/* Audit Screen */}

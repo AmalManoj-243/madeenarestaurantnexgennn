@@ -142,7 +142,7 @@ const HomeScreen = ({ navigation }) => {
         <Header />
         {/* Navigation Header */}
         <NavigationBar
-          onSearchPress={() => navigation.navigate("")}
+          onSearchPress={() => navigation.navigate("Products")}
           onOptionsPress={() => navigation.navigate("OptionsScreen")}
           onScannerPress={() => navigation.navigate("Scanner", { onScan: handleScan })}
         />
@@ -173,7 +173,7 @@ const HomeScreen = ({ navigation }) => {
             source={require("@assets/images/Home/section/customer.png")}
             onPress={() => navigateToScreen("CustomerScreen")}
             backgroundColor="#f37021"
-            title="Customer"
+            title="Sales Order"
           />
         </View>
 

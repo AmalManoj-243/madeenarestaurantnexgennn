@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import * as ImagePicker from 'expo-image-picker';
 import { View, TouchableOpacity, StyleSheet, FlatList, Dimensions, Platform, Image } from 'react-native';
 import Modal from 'react-native-modal';
 import Text from '@components/Text';

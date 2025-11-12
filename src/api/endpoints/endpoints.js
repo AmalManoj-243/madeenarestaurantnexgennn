@@ -22,6 +22,9 @@ export const API_ENDPOINTS = {
     VIEW_SPARE_PARTS: '/viewSparePartsRequest',
     VIEW_KPI: '/viewKpiTasks',
     VIEW_PICKUP: '/viewJobBooking',
+    VIEW_VEHICLES: '/viewVehicles',
+    VIEW_DRIVERS: '/viewDrivers',
+    VIEW_LOCATIONS: '/viewLocations',
     VIEW_PURCHASE_REQUISITION: '/viewPurchaseRequest',
     VIEW_PRICE: '/viewPriceEnquiry',
     VIEW_PURCHASE_ORDER: '/viewPurchaseOrder',
@@ -103,8 +106,13 @@ export const DETAIL_API_ENDPOINTS = {
     GET_CHEQUE_LEDGER: '/viewChequeLedger',
     GET_STOCK_TRANSFER_DETAILS: '/viewStockTransfer',
     GET_FUND_TRANSFER_DETAILS: '/viewFundTransfer',
-    GET_INVENTORY_DETAILS: '/viewInventoryBox',
+    GET_INVENTORY_DETAILS: 'https://4d0c42359e62.ngrok-free.app/api/view_inventory_box',
     GET_PRODUCT_DETAILS: '/viewProducts',
+    // Vehicle Tracking endpoints
+    GET_VEHICLES_DETAILS: '/viewVehicles',
+    GET_DRIVERS_DETAILS: '/viewDrivers',
+    GET_LOCATIONS_DETAILS: '/viewLocations',
+    
     // latest updates keys
     GET_JOB_REGISTER_PAYMENT_DETAILS: '/viewJobRegisterPayment',
     GET_SERVICE_RETURN_DETAILS: '/viewServiceReturn/service_return/service_return_dropdown',
