@@ -17,7 +17,7 @@ import axios from 'axios';
 import { VEHICLE_TRACKING_URL } from '@api/endpoints/endpoints';
 import { OverlayLoader } from '@components/Loader';
 import { validateFields } from '@utils/validation';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+
 
 const VehicleTrackingForm = ({ navigation, route }) => {
   console.log('VehicleTrackingForm loaded');
@@ -273,16 +273,6 @@ const VehicleTrackingForm = ({ navigation, route }) => {
         const imageUri = response.assets[0].uri;
         handleInputChange('imageUri', imageUri);
         showToastMessage('Image selected successfully!', 'success');
-      }
-    });
-  };
-
-  const handleQRCodeScan = () => {
-    // Navigate to QR scanner screen
-    navigation.navigate('QRScanner', {
-      onScanSuccess: (qrData) => {
-        handleInputChange('invoiceNumbers', qrData);
-        showToastMessage('QR Code scanned successfully!', 'success');
       }
     });
   };
@@ -807,9 +797,7 @@ const VehicleTrackingForm = ({ navigation, route }) => {
               placeholder="Invoice numbers"
             />
           </View>
-          <Pressable style={styles.qrIconButton} onPress={handleQRCodeScan}>
-            <Text style={styles.qrIcon}>📱</Text>
-          </Pressable>
+            {/* QR Scanner button removed */}
         </View>
 
         {/* Amount */}

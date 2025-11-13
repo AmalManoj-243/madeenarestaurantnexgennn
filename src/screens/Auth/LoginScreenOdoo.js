@@ -69,7 +69,7 @@ LogBox.ignoreAllLogs();
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://192.168.1.121:8069/web/session/authenticate",
+        "http://192.168.1.120:8069/web/session/authenticate",
         {
           jsonrpc: "2.0",
           method: "call",

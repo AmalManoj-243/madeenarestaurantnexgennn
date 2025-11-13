@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RoundedScrollContainer } from '@components/containers';
 import { TextInput as FormInput } from '@components/common/TextInput';
 import { DropdownSheet } from '@components/common/BottomSheets';
-import { OCRButton } from '@components/common/OCR';
+
 import { fetchSalesPersonDropdown, fetchCollectionAgentDropdown } from '@api/dropdowns/dropdownApi';
 import { customerTypes } from '@constants/dropdownConst';
 import { customerTitles } from '@constants/dropdownConst';
@@ -101,43 +101,12 @@ const Details = ({ formData, onFieldChange, errors }) => {
     );
   };
 
-  const handleOCRTextExtracted = (extractedInfo) => {
-    console.log('📋 Received OCR data in Details form:', extractedInfo);
-    
-    // Prevent multiple rapid updates that might cause navigation issues
-    setTimeout(() => {
-      try {
-        // Fill form fields with extracted information
-        if (extractedInfo.name) {
-          onFieldChange('customerName', extractedInfo.name);
-        }
-        if (extractedInfo.email) {
-          onFieldChange('customerEmail', extractedInfo.email);
-        }
-        if (extractedInfo.phone) {
-          onFieldChange('customerPhone', extractedInfo.phone);
-        }
-        if (extractedInfo.customer_mobile) {
-          onFieldChange('customerMobile', extractedInfo.customer_mobile);
-        }
-        if (extractedInfo.address) {
-          onFieldChange('customerAddress', extractedInfo.address);
-        }
-        
-        console.log('✅ Successfully updated form fields from OCR');
-      } catch (error) {
-        console.error('❌ Error updating form fields from OCR:', error);
-      }
-    }, 150); // Small delay to prevent state conflicts
-  };
+ 
 
   return (
     <RoundedScrollContainer>
       {/* OCR Button for scanning business cards */}
-      <OCRButton 
-        onTextExtracted={handleOCRTextExtracted}
-        style={{ marginBottom: 15 }}
-      />
+     
       
       <FormInput
         label={"Customer Type "}

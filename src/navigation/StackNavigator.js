@@ -6,7 +6,7 @@ import AppNavigator from "./AppNavigator";
 import { ProductsScreen, SplashScreen } from "@screens";
 import { OptionsScreen } from "@screens/Home/Options";
 import { VehicleTrackingScreen, VehicleTrackingForm } from "@screens/Home/Options/VehicleTracking";
-import QRScannerScreen from "@screens/QRScanner/QRScannerScreen";
+
 import { TaskManagerScreen } from "@screens/Home/Options/TaskManager";
 import { AuditDetails, AuditForm, AuditScreen } from "@screens/Home/Options/Audit";
 import { PrivacyPolicy } from "@screens/Auth";
@@ -110,12 +110,7 @@ const StackNavigator = () => {
         component={VehicleTrackingForm}
         options={{ headerShown: false }}
       />
-      {/* QR Scanner */}
-      <Stack.Screen
-        name="QRScanner"
-        component={QRScannerScreen}
-        options={{ headerShown: false }}
-      />
+      
       {/* Audit Screen */}
       <Stack.Screen
         name="AuditScreen"
