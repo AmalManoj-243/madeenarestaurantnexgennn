@@ -35,9 +35,17 @@ export async function printKot(kotData) {
     table_name: kotData.table_name || '',
     order_name: kotData.order_name || '',
     cashier: kotData.cashier || '',
-    order_type: kotData.order_type || '',
     items: kotData.items || [],
   };
+    // Include order_type if provided (raw and a human-friendly label)
+    if (kotData.order_type) {
+      const ot = String(kotData.order_type || '');
+      data.order_type = ot;
+      // map common tokens to a friendly label for printers
+      if (ot === 'TAKEAWAY' || ot === 'TAKEOUT') data.order_type_label = 'Takeout';
+      else if (ot === 'DINEIN' || ot === 'DINE_IN') data.order_type_label = 'Dine In';
+      else data.order_type_label = ot.charAt(0).toUpperCase() + ot.slice(1).toLowerCase();
+    }
 
   try {
     const response = await fetch(`${CONFIG.odooUrl}/jsonrpc`, {

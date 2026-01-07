@@ -16,6 +16,7 @@ const KitchenBillPreview = ({ navigation, route }) => {
   const { items = [], orderId, orderName = '', tableName = '', serverName = '', order_type = null, cartOwner = null } = route?.params || {};
   const [printing, setPrinting] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [resolvedUserName, setResolvedUserName] = useState(serverName);
   const [previewHtml, setPreviewHtml] = useState('');
   const [previewMode, setPreviewMode] = useState('full');
   const getDelta = useKitchenTickets((s) => s.getDelta);
@@ -26,6 +27,18 @@ const KitchenBillPreview = ({ navigation, route }) => {
   // For TAKEAWAY flows where there is no prior printed snapshot, initialize snapshot
   // to current items so "Add-ons since last print" is empty by default (like dine-in)
   React.useEffect(() => {
+    // resolve logged-in user's display name for server/cashier if available
+    (async () => {
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        const ud = userDataStr ? JSON.parse(userDataStr) : null;
+        const name = ud?.related_profile?.name || ud?.user_name || ud?.name || serverName || '';
+        if (name) setResolvedUserName(name);
+      } catch (e) {
+        console.warn('Could not resolve user name for kitchen bill', e);
+      }
+    })();
+
     const snapshotKey = orderId || cartOwner || null;
     if (String(order_type).toUpperCase() === 'TAKEAWAY' && snapshotKey && Object.keys(snapshot || {}).length === 0 && Array.isArray(items) && items.length > 0) {
       try {
@@ -129,7 +142,7 @@ const KitchenBillPreview = ({ navigation, route }) => {
       orderName: orderName,
       orderId: orderId || null,
       tableName,
-      serverName,
+      serverName: resolvedUserName,
       items: list,
       order_type,
       mode: deltaOnly ? 'addons' : 'full',
@@ -167,12 +180,31 @@ const KitchenBillPreview = ({ navigation, route }) => {
     setPrinting(true);
     try {
       console.log('KitchenBillPreview: Print clicked', { previewMode, orderId, itemsCount: (previewMode === 'addons' ? deltaItems.length : mapped.length) });
+      // Resolve waiter/cashier name from logged-in user if available
+      let resolvedUserName = serverName;
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        const ud = userDataStr ? JSON.parse(userDataStr) : null;
+        resolvedUserName = ud?.related_profile?.name || ud?.user_name || ud?.name || serverName || resolvedUserName;
+      } catch (e) {
+        console.warn('Could not read userData for KOT cashier resolution', e);
+      }
+
       // Prepare KOT data
+      const isTakeaway = String(order_type || '').toUpperCase() === 'TAKEAWAY' || String(order_type || '').toUpperCase() === 'TAKEOUT';
       const kotData = {
         table_name: tableName,
         order_name: orderName,
-        cashier: serverName,
-        order_type: order_type ? String(order_type).toUpperCase() : undefined,
+        order_id: orderId || null,
+        cashier: resolvedUserName,
+        // Ensure order_type is the friendly label 'Takeout' for takeaway flows
+        order_type: isTakeaway ? 'Takeout' : (order_type ? String(order_type) : undefined),
+        order_type_label: isTakeaway ? 'Takeout' : (order_type ? (String(order_type).charAt(0).toUpperCase() + String(order_type).slice(1).toLowerCase()) : undefined),
+        // additional fields: order_number (friendly), guest_count, waiter, print_type
+        order_number: orderName || (orderId ? String(orderId) : undefined),
+        guest_count: route?.params?.guest_count ?? 0,
+        waiter: resolvedUserName,
+        print_type: previewMode === 'addons' ? 'ADDON' : 'NEW',
         items: (previewMode === 'addons' ? deltaItems : mapped).map((it) => ({
           name: it.name,
           qty: it.qty,
@@ -216,9 +248,10 @@ const KitchenBillPreview = ({ navigation, route }) => {
       </View>
       <View style={{ padding: 16 }}>
         <View style={{ backgroundColor: '#fff', borderRadius: 8, padding: 16, marginBottom: 12 }}>
-          <Text style={{ fontSize: 16, fontWeight: '800' }}>Order: {orderName || `#${orderId || ''}`}</Text>
+          <Text style={{ fontSize: 16, fontWeight: '800' }}>Order: {orderName || ''}</Text>
+          {orderId ? <Text style={{ color: '#6b7280', marginTop: 4 }}>Order ID: #{orderId}</Text> : null}
           {tableName ? <Text style={{ color: '#6b7280', marginTop: 4 }}>Table: {tableName}</Text> : null}
-          {serverName ? <Text style={{ color: '#6b7280', marginTop: 4 }}>Server: {serverName}</Text> : null}
+          {resolvedUserName ? <Text style={{ color: '#6b7280', marginTop: 4 }}>Server: {resolvedUserName}</Text> : null}
         </View>
         <View style={{ backgroundColor: '#fff', borderRadius: 8, padding: 16 }}>
           <Text style={{ fontWeight: '800', marginBottom: 8 }}>Add-ons since last print</Text>

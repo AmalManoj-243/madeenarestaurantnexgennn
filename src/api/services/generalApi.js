@@ -1822,10 +1822,11 @@ export const fetchOpenOrders = async ({ sessionId = null, limit = 100 } = {}) =>
 };
 
 // Fetch orders without filtering out done orders (flexible fetch)
-export const fetchOrders = async ({ sessionId = null, limit = 100, order = 'create_date desc' } = {}) => {
+export const fetchOrders = async ({ sessionId = null, limit = 100, order = 'create_date desc', fields = null } = {}) => {
   try {
     const domain = [];
     if (sessionId) domain.push(['session_id', '=', sessionId]);
+    const useFields = Array.isArray(fields) && fields.length > 0 ? fields : ['id', 'name', 'state', 'amount_total', 'table_id', 'create_date'];
 
     const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
       jsonrpc: '2.0',
@@ -1834,7 +1835,7 @@ export const fetchOrders = async ({ sessionId = null, limit = 100, order = 'crea
         model: 'pos.order',
         method: 'search_read',
         args: [domain],
-        kwargs: { fields: ['id', 'name', 'state', 'amount_total', 'table_id', 'create_date'], limit, order },
+        kwargs: { fields: useFields, limit, order },
       },
       id: new Date().getTime(),
     }, { headers: { 'Content-Type': 'application/json' } });

@@ -18,12 +18,18 @@ export const buildKitchenBillText = ({
   lines.push('*** KITCHEN ORDER ***');
   if (restaurant) lines.push(restaurant);
   lines.push(stamp);
-  if (orderName || orderId) {
-    const idPart = orderId ? ` (#${orderId})` : '';
-    lines.push(`Order: ${orderName || ''}${idPart}`);
+  if (orderName) {
+    lines.push(`Order: ${orderName}`);
+  }
+  if (orderId) {
+    lines.push(`Order ID: #${orderId}`);
   }
   if (tableName) lines.push(`Table: ${tableName}`);
-  if (order_type) lines.push(`Order Type: ${String(order_type).toUpperCase()}`);
+  if (order_type) {
+    const u = String(order_type || '').toUpperCase();
+    const label = (u === 'TAKEAWAY' || u === 'TAKEOUT') ? 'Takeout' : (u === 'DINEIN' || u === 'DINE_IN') ? 'Dine In' : (String(order_type).charAt(0).toUpperCase() + String(order_type).slice(1).toLowerCase());
+    lines.push(`Order Type: ${label}`);
+  }
   if (serverName) lines.push(`Server: ${serverName}`);
   lines.push('------------------------------');
 

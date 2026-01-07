@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { createDraftPosOrderOdoo, fetchPosPresets } from '@api/services/generalApi';
@@ -16,6 +17,7 @@ const ChooseOrderType = ({ navigation, route }) => {
   const goTakeaway = async () => {
     setLoading(true);
     try {
+      // Always create a fresh takeaway draft (do not reuse previous draft)
       const sessionId = params?.sessionId || null;
       const userId = params?.userId || null;
       // choose a preset (prefer takeaway)
@@ -48,6 +50,10 @@ const ChooseOrderType = ({ navigation, route }) => {
     }
   };
 
+  const openTakeawayOrders = () => {
+    navigation.navigate('TakeawayOrders', { ...params });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <NavigationHeader title="Choose Order Type" onBackPress={() => navigation.goBack()} />
@@ -57,7 +63,10 @@ const ChooseOrderType = ({ navigation, route }) => {
           <Text style={styles.btnText}>DINE IN</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.btn, styles.take]} onPress={goTakeaway}>
-          <Text style={styles.btnText}>TAKEAWAY</Text>
+          <Text style={styles.btnText}>NEW TAKEOUT ORDER</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.btn, styles.take]} onPress={openTakeawayOrders}>
+          <Text style={styles.btnText}>TAKEOUT ORDERS</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -17,6 +17,7 @@ import Scanner from "@components/Scanner";
 import SalesOrderChoice from "@screens/Home/Sections/Customer/SalesOrderChoice";
 import POSRegister from "@screens/Home/Sections/Customer/POSRegister";
 import ChooseOrderType from '@screens/Home/Sections/Customer/ChooseOrderType';
+import TakeawayOrdersScreen from '@screens/Home/Sections/Customer/TakeawayOrdersScreen';
 import POSOpenAmount from "@screens/Home/Sections/Customer/POSOpenAmount";
 import POSProducts from "@screens/Home/Sections/Customer/POSProducts";
 import POSCartSummary from "@screens/Home/Sections/Customer/POSCartSummary";
@@ -91,6 +92,11 @@ const StackNavigator = () => {
       <Stack.Screen
         name="ChooseOrderType"
         component={ChooseOrderType}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TakeawayOrders"
+        component={TakeawayOrdersScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

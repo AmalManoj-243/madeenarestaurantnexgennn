@@ -11,6 +11,14 @@ export function buildKitchenBillHtml({
   mode = 'full', // 'full' or 'addons'
   order_type = null,
 }) {
+  const resolveOrderTypeLabel = (ot) => {
+    if (!ot) return null;
+    const u = String(ot || '').toUpperCase();
+    if (u === 'TAKEAWAY' || u === 'TAKEOUT') return 'Takeout';
+    if (u === 'DINEIN' || u === 'DINE_IN') return 'Dine In';
+    return String(ot).charAt(0).toUpperCase() + String(ot).slice(1).toLowerCase();
+  };
+  const orderTypeLabel = resolveOrderTypeLabel(order_type);
   const now = new Date();
   const dateStr = now.toLocaleString();
   // 80mm paper ≈ 600px at 203dpi, use monospace for best alignment
@@ -30,9 +38,10 @@ export function buildKitchenBillHtml({
       </head>
       <body>
         <h2>${restaurant}</h2>
-        <div class="section">Order: <b>${orderName || orderId}</b></div>
+        ${orderName ? `<div class="section">Order: <b>${orderName}</b></div>` : ''}
+        ${orderId ? `<div class="section">Order ID: <b>#${orderId}</b></div>` : ''}
         ${tableName ? `<div class="section">Table: <b>${tableName}</b></div>` : ''}
-        ${order_type ? `<div class="section">Order Type: <b>${String(order_type).toUpperCase()}</b></div>` : ''}
+        ${orderTypeLabel ? `<div class="section">Order Type: <b>${orderTypeLabel}</b></div>` : ''}
         ${serverName ? `<div class="section">Server: <b>${serverName}</b></div>` : ''}
         <div class="divider"></div>
         <div class="section"><b>${mode === 'addons' ? 'Add-ons' : 'Items'}:</b></div>

@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { ButtonContainer, SafeAreaView } from '@components/containers';
 import { Button } from '@components/common/Button';
+import { version as appVersion } from '../../../package.json';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
 import { useAuthStore } from '@stores/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -86,6 +87,9 @@ const ProfileScreen = ({ navigation }) => {
           <ButtonContainer>
             <Button title="LOGOUT" onPress={handleLogout} paddingHorizontal={40} />
           </ButtonContainer>
+        </View>
+        <View style={{ alignItems: 'center', marginTop: 20, paddingBottom: 40 }}>
+          <Text style={{ color: '#666' }}>App Version {appVersion}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

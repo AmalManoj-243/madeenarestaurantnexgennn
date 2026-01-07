@@ -6,6 +6,7 @@ import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
 import { fetchPaymentJournalsOdoo, createAccountPaymentOdoo, fetchPOSSessions } from '@api/services/generalApi';
 import { createPosOrderOdoo, createPosPaymentOdoo } from '@api/services/generalApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ODOO_BASE_URL from '@api/config/odooConfig';
 
@@ -306,6 +307,12 @@ const POSPayment = ({ navigation, route }) => {
       }
 
       // Proceed to receipt screen
+      // If this was a TAKEAWAY order, clear the active takeaway marker
+      try {
+        if (String(route?.params?.order_type || '').toUpperCase() === 'TAKEAWAY') {
+          await AsyncStorage.removeItem('active_takeaway_order');
+        }
+      } catch (e) { console.warn('Failed to clear active_takeaway_order', e); }
       navigation.navigate('POSReceiptScreen', {
         orderId: createdOrderId,
         products,
