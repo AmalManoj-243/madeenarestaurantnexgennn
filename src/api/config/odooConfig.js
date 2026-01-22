@@ -2,7 +2,8 @@
 
 // 🔹 Put your Odoo server URL here ONE time
 // Local Odoo development server (updated to your machine)
-const ODOO_BASE_URL = "http://192.168.100.175:8079/";
+const ODOO_BASE_URL = "http://115.246.240.218:8869/";
+
 
 
 // Default DB to use for Odoo JSON-RPC login (change to your test DB)

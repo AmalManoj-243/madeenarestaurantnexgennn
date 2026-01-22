@@ -243,7 +243,7 @@ const POSProducts = ({ navigation, route }) => {
         const prodList = Array.isArray(prodResp) ? prodResp : (prodResp && prodResp.result ? prodResp.result : []);
         setPosCategories(posList);
         setProductCategories(prodList);
-        if (posList && posList.length > 0) setSelectedPosCategoryId(posList[0].id || (Array.isArray(posList[0]) ? posList[0][0] : null));
+        // Keep selectedPosCategoryId as null to show "Show All" by default
       } catch (e) {
         console.warn('Failed to load categories for POS modal', e);
       }
@@ -725,6 +725,12 @@ const POSProducts = ({ navigation, route }) => {
             {/* Category bar for POS modal */}
             <View style={{ paddingHorizontal: 12, paddingVertical: 8 }}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 6 }}>
+                {/* Show All option */}
+                <TouchableOpacity onPress={() => setSelectedPosCategoryId(null)} style={{ marginRight: 8 }}>
+                  <View style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: selectedPosCategoryId === null ? (COLORS.primaryThemeColor || '#7c3aed') : '#f3f4f6' }}>
+                    <Text style={{ color: selectedPosCategoryId === null ? '#fff' : '#111', fontWeight: '700' }}>Show All</Text>
+                  </View>
+                </TouchableOpacity>
                 {posCategories && posCategories.length > 0 ? (
                   posCategories.map(cat => {
                     const id = cat.id || (Array.isArray(cat) ? cat[0] : null);
