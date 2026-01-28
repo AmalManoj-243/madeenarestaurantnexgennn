@@ -1,8 +1,8 @@
-// Fetch products from product.template where pos_categ_id equals the given category id
+// Fetch products from product.template where pos_categ_id/pos_categ_ids equals the given category id
 export const fetchProductsByPosCategoryId = async (posCategoryId) => {
   try {
     if (!posCategoryId) throw new Error('posCategoryId is required');
-    // Fetch all products with pos_categ_id in the fields
+    // Fetch all products with both pos_categ_id (older Odoo) and pos_categ_ids (Odoo 18/19)
     const response = await axios.post(
       `${ODOO_BASE_URL}/web/dataset/call_kw`,
       {
@@ -12,7 +12,7 @@ export const fetchProductsByPosCategoryId = async (posCategoryId) => {
           model: 'product.template',
           method: 'search_read',
           args: [[]],
-          kwargs: { fields: ['id', 'name', 'pos_categ_id', 'list_price', 'default_code', 'uom_id', 'image_128'] },
+          kwargs: { fields: ['id', 'name', 'pos_categ_id', 'pos_categ_ids', 'list_price', 'default_code', 'image_128'] },
         },
       },
       { headers: { 'Content-Type': 'application/json' } }
@@ -22,12 +22,18 @@ export const fetchProductsByPosCategoryId = async (posCategoryId) => {
       throw new Error(response.data.error.message || 'Odoo error');
     }
     const allProducts = response.data.result || [];
-    // Robust filter: handle pos_categ_id as number, array/non-array
+    const catId = Number(posCategoryId);
+    // Robust filter: handle pos_categ_id (Many2one) and pos_categ_ids (Many2many, Odoo 18/19)
     const filtered = allProducts.filter(p => {
-      if (Array.isArray(p.pos_categ_id)) {
-        return p.pos_categ_id[0] === Number(posCategoryId);
+      // Check pos_categ_ids (Many2many - array of IDs) for Odoo 18/19
+      if (Array.isArray(p.pos_categ_ids) && p.pos_categ_ids.length > 0) {
+        return p.pos_categ_ids.includes(catId);
       }
-      return p.pos_categ_id === Number(posCategoryId);
+      // Fallback: check pos_categ_id (Many2one) for older Odoo
+      if (Array.isArray(p.pos_categ_id)) {
+        return p.pos_categ_id[0] === catId;
+      }
+      return p.pos_categ_id === catId;
     });
     // Map to always include product_name and image_url for UI compatibility
     const baseUrl = (ODOO_BASE_URL || '').replace(/\/$/, '');

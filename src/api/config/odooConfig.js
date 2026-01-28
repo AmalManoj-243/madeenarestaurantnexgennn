@@ -6,8 +6,10 @@ const ODOO_BASE_URL = "http://115.246.240.218:8869/";
 
 
 
+
 // Default DB to use for Odoo JSON-RPC login (change to your test DB)
-const DEFAULT_ODOO_DB = "nexgenn-restaurant";
+const DEFAULT_ODOO_DB = "nexgenn-aahaa";
+
 
 // Optional dev credentials (for local autofill - DO NOT COMMIT real credentials to repos)
 const DEV_ODOO_USERNAME = 'admin';

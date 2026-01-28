@@ -105,13 +105,37 @@ const ProductsScreen = ({ navigation, route }) => {
   const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchProductsOdoo);
 
   const { searchText, handleSearchTextChange } = useDebouncedSearch(
-    (text) => fetchData({ searchText: text, categoryId: mappedProductCategoryId }),
+    (text) => {
+      // If we have passed products, filter them client-side
+      if (passedFilteredProducts) {
+        if (text && String(text).trim()) {
+          const filtered = passedFilteredProducts.filter(p => {
+            const name = String(p.product_name || p.name || '').toLowerCase();
+            return name.includes(String(text).toLowerCase());
+          });
+          setFilteredProducts(filtered);
+        } else {
+          setFilteredProducts(passedFilteredProducts);
+        }
+      } else {
+        fetchData({ searchText: text, categoryId: mappedProductCategoryId });
+      }
+    },
     500
   );
   // If filteredProducts are passed, use them; otherwise, fetch as before
   useEffect(() => {
     if (passedFilteredProducts) {
-      setFilteredProducts(passedFilteredProducts);
+      // Apply current search text filter if any
+      if (searchText && String(searchText).trim()) {
+        const filtered = passedFilteredProducts.filter(p => {
+          const name = String(p.product_name || p.name || '').toLowerCase();
+          return name.includes(String(searchText).toLowerCase());
+        });
+        setFilteredProducts(filtered);
+      } else {
+        setFilteredProducts(passedFilteredProducts);
+      }
     } else {
       if (isFocused) {
         if (mappedProductCategoryId) {
