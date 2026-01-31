@@ -79,13 +79,6 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [isFocused]);
 
-  // Log fetched categories for debugging when data changes
-  useEffect(() => {
-    if (data && Array.isArray(data)) {
-      console.log('[HomeScreen] fetched categories:', data);
-    }
-  }, [data]);
-
   // Filter out categories named 'Food' or 'Drinks' and dedupe by name keeping last occurrence
   const filteredCategories = (() => {
     const raw = Array.isArray(data) ? data : [];
@@ -123,17 +116,14 @@ const HomeScreen = ({ navigation }) => {
       <CategoryList
         item={item}
         onPress={async () => {
-          console.log('Category pressed, categoryId:', item._id, 'categoryName:', item.category_name || item.name);
           try {
             const products = await fetchProductsByPosCategoryId(item._id);
-            console.log('Fetched products for pos_categ_id', item._id, ':', products);
             navigation.navigate("Products", {
               categoryId: item._id,
               categoryName: item.category_name || item.name,
               filteredProducts: products
             });
           } catch (err) {
-            console.error('Error fetching products for pos_categ_id', item._id, ':', err);
             navigation.navigate("Products", {
               categoryId: item._id,
               categoryName: item.category_name || item.name,

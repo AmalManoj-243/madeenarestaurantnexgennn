@@ -1,8 +1,11 @@
-// Fetch products from product.template where pos_categ_id/pos_categ_ids equals the given category id
-export const fetchProductsByPosCategoryId = async (posCategoryId) => {
+// In-memory product cache: fetch all products once, filter instantly for each category
+let _allProductsCache = null;
+let _allProductsCacheTime = 0;
+const PRODUCT_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Preload all products into cache (call this early, e.g. on app start or table click)
+export const preloadAllProducts = async () => {
   try {
-    if (!posCategoryId) throw new Error('posCategoryId is required');
-    // Fetch all products with both pos_categ_id (older Odoo) and pos_categ_ids (Odoo 18/19)
     const response = await axios.post(
       `${ODOO_BASE_URL}/web/dataset/call_kw`,
       {
@@ -18,13 +21,41 @@ export const fetchProductsByPosCategoryId = async (posCategoryId) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
     if (response.data && response.data.error) {
-      console.error('Odoo error (product.template):', response.data.error);
       throw new Error(response.data.error.message || 'Odoo error');
     }
     const allProducts = response.data.result || [];
+    const baseUrl = (ODOO_BASE_URL || '').replace(/\/$/, '');
+    _allProductsCache = allProducts.map(p => {
+      const hasBase64 = p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 0;
+      const imageUrl = hasBase64
+        ? `data:image/png;base64,${p.image_128}`
+        : `${baseUrl}/web/image?model=product.template&id=${p.id}&field=image_128`;
+      return { ...p, product_name: p.name || '', image_url: imageUrl };
+    });
+    _allProductsCacheTime = Date.now();
+    return _allProductsCache;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Clear product cache (call when products change in Odoo)
+export const clearProductCache = () => {
+  _allProductsCache = null;
+  _allProductsCacheTime = 0;
+};
+
+// Fetch products from product.template where pos_categ_id/pos_categ_ids equals the given category id
+export const fetchProductsByPosCategoryId = async (posCategoryId) => {
+  try {
+    if (!posCategoryId) throw new Error('posCategoryId is required');
+    // Use cache if available and fresh, otherwise fetch and cache
+    if (!_allProductsCache || (Date.now() - _allProductsCacheTime > PRODUCT_CACHE_TTL)) {
+      await preloadAllProducts();
+    }
     const catId = Number(posCategoryId);
-    // Robust filter: handle pos_categ_id (Many2one) and pos_categ_ids (Many2many, Odoo 18/19)
-    const filtered = allProducts.filter(p => {
+    // Filter from cache — instant, no network call
+    const filtered = _allProductsCache.filter(p => {
       // Check pos_categ_ids (Many2many - array of IDs) for Odoo 18/19
       if (Array.isArray(p.pos_categ_ids) && p.pos_categ_ids.length > 0) {
         return p.pos_categ_ids.includes(catId);
@@ -35,23 +66,8 @@ export const fetchProductsByPosCategoryId = async (posCategoryId) => {
       }
       return p.pos_categ_id === catId;
     });
-    // Map to always include product_name and image_url for UI compatibility
-    const baseUrl = (ODOO_BASE_URL || '').replace(/\/$/, '');
-    const products = filtered.map(p => {
-      const hasBase64 = p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 0;
-      const imageUrl = hasBase64
-        ? `data:image/png;base64,${p.image_128}`
-        : `${baseUrl}/web/image?model=product.template&id=${p.id}&field=image_128`;
-      return {
-        ...p,
-        product_name: p.name || '',
-        image_url: imageUrl,
-      };
-    });
-    console.log('Fetched products for pos_categ_id', posCategoryId, ':', products);
-    return products;
+    return filtered;
   } catch (error) {
-    console.error('fetchProductsByPosCategoryId error:', error);
     throw error;
   }
 };
@@ -78,12 +94,10 @@ export const fetchProductCategoriesOdoo = async () => {
       { headers: { 'Content-Type': 'application/json', 'X-Odoo-Database': DEFAULT_ODOO_DB } }
     );
     if (response.data && response.data.error) {
-      console.error('fetchProductCategoriesOdoo odoo error payload:', response.data.error);
       throw new Error(response.data.error.message || JSON.stringify(response.data.error) || 'Odoo error');
     }
     return response.data.result || [];
   } catch (error) {
-    console.error('fetchProductCategoriesOdoo error:', error);
     throw error;
   }
 };
@@ -111,20 +125,16 @@ export const fetchPosCategoriesOdoo = async () => {
       { headers: { 'Content-Type': 'application/json', 'X-Odoo-Database': DEFAULT_ODOO_DB } }
     );
     if (response.data && response.data.error) {
-      console.error('fetchPosCategoriesOdoo odoo error payload:', response.data.error);
       throw new Error(response.data.error.message || JSON.stringify(response.data.error) || 'Odoo error');
     }
     return response.data.result || [];
   } catch (error) {
-    console.error('fetchPosCategoriesOdoo error:', error);
     throw error;
   }
 };
 // Full workflow: create invoice, post, pay, and log status
 export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], journalId, invoiceDate = null, reference = '', paymentAmount = null } = {}) => {
   try {
-    console.log('[PROCESS] Starting processInvoiceWithPaymentOdoo with params:', { partnerId, products, journalId, invoiceDate, reference, paymentAmount });
-
     // Step 0: If journalId is not provided, fetch and select sales journal
     let finalJournalId = journalId;
     if (!finalJournalId) {
@@ -132,17 +142,14 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
       const salesJournal = journals.find(j => j.type === 'sale');
       if (!salesJournal) throw new Error('No sales journal found in Odoo.');
       finalJournalId = salesJournal.id;
-      console.log('[PROCESS] Auto-selected sales journal:', salesJournal);
     }
 
     // Step 1: Create and post invoice
     const invoiceResult = await createInvoiceOdoo({ partnerId, products, journalId: finalJournalId, invoiceDate, reference });
-    console.log('[PROCESS] Invoice creation result:', invoiceResult);
     if (!invoiceResult.id) {
       throw new Error('Invoice creation failed');
     }
     if (invoiceResult.posted) {
-      console.log('[PROCESS] Invoice is posted (ready for payment).');
     } else {
       throw new Error('Invoice was created but not posted. Cannot proceed with payment.');
     }
@@ -154,8 +161,6 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
     }
 
     const paymentResult = await createAccountPaymentOdoo({ partnerId, journalId: finalJournalId, amount, invoiceId: invoiceResult.id });
-    console.log('[PROCESS] Payment creation result:', paymentResult);
-
     if (!paymentResult.result) {
       throw new Error('Payment creation failed');
     }
@@ -178,8 +183,6 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
       }),
     });
     const postPaymentResult = await postPaymentResponse.json();
-    console.log('[PROCESS] Payment post result:', postPaymentResult);
-
     // Step 4: Verify payment reconciliation
     const paymentStatusResponse = await fetch(`${ODOO_BASE_URL}web/dataset/call_kw`, {
       method: 'POST',
@@ -198,10 +201,7 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
     });
     const paymentStatus = await paymentStatusResponse.json();
     const paymentDetails = paymentStatus.result?.[0];
-    console.log('[PROCESS] Payment details after posting:', paymentDetails);
-
     if (!paymentDetails.reconciled) {
-      console.warn('[PROCESS] Payment is not reconciled. Attempting manual reconciliation.');
       const reconcileResponse = await fetch(`${ODOO_BASE_URL}web/dataset/call_kw`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +218,6 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
         }),
       });
       const reconcileResult = await reconcileResponse.json();
-      console.log('[PROCESS] Manual reconciliation result:', reconcileResult);
     }
 
     // Step 5: Verify invoice status
@@ -241,14 +240,12 @@ export const processInvoiceWithPaymentOdoo = async ({ partnerId, products = [], 
     const updatedInvoice = invoiceStatus.result?.[0];
 
     if (updatedInvoice.payment_state === 'paid' && updatedInvoice.amount_residual === 0) {
-      console.log('[PROCESS] Invoice payment successfully linked and marked as paid.');
     } else {
       throw new Error('[PROCESS] Invoice payment not fully processed. Check payment state or residual amount.');
     }
 
     return { invoiceResult, paymentResult, invoiceStatus: updatedInvoice };
   } catch (error) {
-    console.error('[PROCESS] processInvoiceWithPaymentOdoo error:', error);
     return { error };
   }
 };
@@ -266,12 +263,10 @@ export const validatePosOrderOdoo = async (orderId) => {
       },
     }, { headers: { 'Content-Type': 'application/json' } });
     if (response.data && response.data.error) {
-      console.error('Odoo validate pos.order error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('validatePosOrderOdoo error:', error);
     return { error };
   }
 };
@@ -298,12 +293,10 @@ export const fetchPOSRegisters = async ({ limit = 20, offset = 0 } = {}) => {
       { headers: { "Content-Type": "application/json" } }
     );
     if (response.data.error) {
-      console.log("Odoo JSON-RPC error (pos.config):", response.data.error);
       throw new Error("Odoo JSON-RPC error");
     }
     return response.data.result || [];
   } catch (error) {
-    console.error("fetchPOSRegisters error:", error);
     throw error;
   }
 };
@@ -344,12 +337,10 @@ export const fetchPOSSessions = async ({ limit = 20, offset = 0, state = '' } = 
       { headers: { "Content-Type": "application/json" } }
     );
     if (response.data.error) {
-      console.log("Odoo JSON-RPC error (pos.session):", response.data.error);
       throw new Error("Odoo JSON-RPC error");
     }
     return response.data.result || [];
   } catch (error) {
-    console.error("fetchPOSSessions error:", error);
     throw error;
   }
 };
@@ -447,9 +438,6 @@ export const fetchProductsOdoo = async ({ offset, limit, searchText, categoryId 
       throw response.data.error;
     }
     const products = response.data.result || [];
-    if (products.length > 0) {
-      console.log('[fetchProductsOdoo] First product fields:', Object.keys(products[0]), products[0]);
-    }
     return products.map((p) => {
       const hasBase64 = p.image_128 && typeof p.image_128 === 'string' && p.image_128.length > 0;
       const baseUrl = (ODOO_BASE_URL || '').replace(/\/$/, '');
@@ -485,7 +473,6 @@ export const fetchProductsOdoo = async ({ offset, limit, searchText, categoryId 
           if (username && password) {
             const loginResult = await odooLogin(username, password);
             if (loginResult.success) {
-              console.log('Odoo session renewed, retrying fetchProductsOdoo...');
               continue; // Retry original request
             } else {
               throw new Error('Odoo re-login failed: ' + (loginResult.error?.message || loginResult.error));
@@ -498,7 +485,6 @@ export const fetchProductsOdoo = async ({ offset, limit, searchText, categoryId 
         }
       } else {
         // Not a session error or already retried
-        console.error("fetchProductsOdoo error:", error);
         throw error;
       }
     }
@@ -545,7 +531,6 @@ export const fetchCategoriesOdoo = async ({ offset = 0, limit = 50, searchText =
       category_name: category.name || '',
     }));
   } catch (error) {
-    console.error("Error fetching categories from Odoo:", error);
     throw error;
   }
 };
@@ -631,7 +616,6 @@ export const fetchProductDetailsOdoo = async (productId) => {
       product_description: p.description_sale || null,
     };
   } catch (error) {
-    console.error('fetchProductDetailsOdoo error:', error);
     throw error;
   }
 };
@@ -724,7 +708,6 @@ const response = await axios.post(
     );
 
     if (response.data.error) {
-      console.log("Odoo JSON-RPC error:", response.data.error);
       throw new Error("Odoo JSON-RPC error");
     }
 
@@ -745,7 +728,6 @@ const response = await axios.post(
       ].filter(Boolean).join(", "),
     }));
   } catch (error) {
-    console.error("fetchCustomersOdoo error:", error);
     throw error;
   }
 };
@@ -1071,7 +1053,6 @@ export const fetchCustomerDetailsOdoo = async (partnerId) => {
     );
 
     if (response.data.error) {
-      console.log('Odoo JSON-RPC error (customer details):', response.data.error);
       throw new Error('Odoo JSON-RPC error');
     }
 
@@ -1089,7 +1070,6 @@ export const fetchCustomerDetailsOdoo = async (partnerId) => {
       address: address || null,
     };
   } catch (error) {
-    console.error('fetchCustomerDetailsOdoo error:', error);
     throw error;
   }
 };
@@ -1122,8 +1102,6 @@ export const createAccountPaymentOdoo = async ({ partnerId, journalId, amount, i
       id: new Date().getTime(),
     };
 
-    console.log('[PAYMENT] Creating payment with payload:', payload);
-
     const response = await fetch(`${ODOO_BASE_URL}web/dataset/call_kw`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1131,8 +1109,6 @@ export const createAccountPaymentOdoo = async ({ partnerId, journalId, amount, i
     });
 
     const result = await response.json();
-    console.log('[PAYMENT] Payment creation response:', result);
-
     // Post the payment to finalize it
     if (result.result) {
       const paymentId = result.result;
@@ -1151,12 +1127,10 @@ export const createAccountPaymentOdoo = async ({ partnerId, journalId, amount, i
           id: new Date().getTime(),
         }),
       });
-      console.log('[PAYMENT] Payment posted successfully.');
     }
 
     return result;
   } catch (error) {
-    console.error('[PAYMENT] Error creating payment:', error);
     return { error };
   }
 };
@@ -1184,7 +1158,6 @@ export const fetchPaymentJournalsOdoo = async () => {
     if (response.data && response.data.result) return response.data.result;
     return [];
   } catch (error) {
-    console.error("fetchPaymentJournalsOdoo error:", error);
     return [];
   }
 };
@@ -1199,16 +1172,12 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
     if (!finalJournalId) {
       try {
         const journals = await fetchPaymentJournalsOdoo();
-        console.log('[INVOICE] Fetched journals from Odoo:', JSON.stringify(journals));
         const salesJournal = journals.find(j => j.type === 'sale');
         if (salesJournal) {
           finalJournalId = salesJournal.id;
-          console.log('[INVOICE] Auto-selected sales journal:', salesJournal);
         } else {
-          console.warn('[INVOICE] No sales journal found; invoice creation will fail if journal_id is required.');
         }
       } catch (err) {
-        console.warn('[INVOICE] Failed to fetch journals to auto-select sales journal:', err);
       }
     }
 
@@ -1228,10 +1197,8 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
       if (p.tax_ids && Array.isArray(p.tax_ids) && p.tax_ids.length) {
         vals.tax_ids = [[6, 0, p.tax_ids]];
         // For diagnosis, log tax_ids
-        console.log(`[INVOICE LINE] Product ${p.id} tax_ids:`, p.tax_ids);
       }
       // For diagnosis, log price and quantity
-      console.log(`[INVOICE LINE] Product ${p.id} price_unit:`, price_unit, 'quantity:', quantity);
       totalUntaxed += price_unit * quantity;
       // Note: Odoo will compute tax, but log if tax_ids present
       if (p.tax_ids && Array.isArray(p.tax_ids) && p.tax_ids.length) {
@@ -1252,10 +1219,6 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
     if (reference) moveVals.ref = reference;
 
     // Log computed totals before sending
-    console.log('[INVOICE] Computed untaxed total:', totalUntaxed);
-    console.log('[INVOICE] Computed tax (placeholder, Odoo computes):', totalTax);
-    console.log('[STEP 2] Invoice Payload:', moveVals);
-
     // Create the account.move record
     const createResp = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
       jsonrpc: '2.0',
@@ -1267,10 +1230,6 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
         kwargs: {},
       },
     }, { headers: { 'Content-Type': 'application/json' } });
-    console.log('[STEP 2] Invoice Creation Response:', createResp.data);
-    if (createResp.data && createResp.data.error) {
-      console.error('[INVOICE] Odoo error response:', createResp.data.error);
-    }
     const createdId = createResp.data && createResp.data.result;
     // Fetch and log the created move record and its lines for diagnosis
     if (createdId) {
@@ -1286,9 +1245,7 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
           },
           id: new Date().getTime(),
         }, { headers: { 'Content-Type': 'application/json' } });
-        console.log('[INVOICE DIAG] Created move (search_read):', moveResp.data);
       } catch (moveFetchErr) {
-        console.warn('[INVOICE DIAG] Failed to fetch created move:', moveFetchErr);
       }
       try {
         const linesResp = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
@@ -1302,9 +1259,7 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
           },
           id: new Date().getTime(),
         }, { headers: { 'Content-Type': 'application/json' } });
-        console.log('[INVOICE DIAG] Created move lines (search_read):', linesResp.data);
       } catch (linesFetchErr) {
-        console.warn('[INVOICE DIAG] Failed to fetch created move lines:', linesFetchErr);
       }
     }
     // Do not post the invoice here; leave it in draft state until explicitly posted later
@@ -1324,15 +1279,12 @@ export const createInvoiceOdoo = async ({ partnerId, products = [], journalId = 
           },
         }, { headers: { 'Content-Type': 'application/json' } });
         invoiceStatus = statusResp.data && statusResp.data.result && statusResp.data.result[0];
-        console.log(`[INVOICE STATUS] fetched for invoice id (${createdId}) :`, invoiceStatus);
       } catch (statusErr) {
-        console.warn('[INVOICE STATUS] Failed to fetch invoice status:', statusErr);
       }
     }
 
     return { id: createdId, posted, invoiceStatus };
   } catch (error) {
-    console.error('createInvoiceOdoo error:', error);
     throw error;
   }
 };
@@ -1346,8 +1298,6 @@ export const linkInvoiceToPosOrderOdoo = async ({ orderId, invoiceId, setState =
     // Only link the invoice, do not change the order state
     const vals = { account_move: invoiceId };
 
-    console.log('[POS LINK] Linking invoice to POS order:', { orderId, invoiceId, vals });
-
     const resp = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
       jsonrpc: '2.0',
       method: 'call',
@@ -1358,8 +1308,6 @@ export const linkInvoiceToPosOrderOdoo = async ({ orderId, invoiceId, setState =
         kwargs: {},
       },
     }, { headers: { 'Content-Type': 'application/json' } });
-
-    console.log('[POS LINK] write response:', resp.data);
 
     // Verify update by reading the order
     try {
@@ -1373,14 +1321,11 @@ export const linkInvoiceToPosOrderOdoo = async ({ orderId, invoiceId, setState =
           kwargs: { fields: ['id', 'state', 'account_move'] },
         },
       }, { headers: { 'Content-Type': 'application/json' } });
-      console.log('[POS LINK] verify response:', verify.data);
     } catch (verifyErr) {
-      console.warn('[POS LINK] verify read failed:', verifyErr);
     }
 
     return resp.data;
   } catch (error) {
-    console.error('linkInvoiceToPosOrderOdoo error:', error);
     return { error };
   }
 };
@@ -1464,7 +1409,6 @@ export const createPosOrderOdoo = async ({ partnerId = null, lines = [], session
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo create pos.order error:', response.data.error);
       return { error: response.data.error };
     }
 
@@ -1472,13 +1416,11 @@ export const createPosOrderOdoo = async ({ partnerId = null, lines = [], session
     // Immediately validate the order to trigger name generation
     const validateResp = await validatePosOrderOdoo(createdId);
     if (validateResp && validateResp.error) {
-      console.error('Odoo validate pos.order error:', validateResp.error);
       // Still return createdId so payment can proceed
       return { result: createdId, error: validateResp.error };
     }
     return { result: createdId };
   } catch (error) {
-    console.error('createPosOrderOdoo error:', error);
     return { error };
   }
 };
@@ -1523,7 +1465,6 @@ export const createPosPaymentOdoo = async ({ orderId, payments, amount, journalI
         }, { headers: { 'Content-Type': 'application/json' } });
         finalPaymentMethodId = pmResp.data?.result?.[0]?.id;
         if (!finalPaymentMethodId) {
-          console.error('No payment_method_id found for journalId', finalJournalId);
           return { error: { message: 'No payment_method_id found for journalId ' + finalJournalId } };
         }
       }
@@ -1549,7 +1490,6 @@ export const createPosPaymentOdoo = async ({ orderId, payments, amount, journalI
       }, { headers: { 'Content-Type': 'application/json' } });
 
       if (response.data && response.data.error) {
-        console.error('Odoo create pos.payment error:', response.data.error);
         results.push({ error: response.data.error });
       } else {
         results.push({ result: response.data.result });
@@ -1557,7 +1497,6 @@ export const createPosPaymentOdoo = async ({ orderId, payments, amount, journalI
     }
     return { results };
   } catch (error) {
-    console.error('createPosPaymentOdoo error:', error);
     return { error };
   }
 };
@@ -1581,12 +1520,10 @@ export const createPOSSesionOdoo = async ({ configId, userId }) => {
       },
     }, { headers: { 'Content-Type': 'application/json' } });
     if (response.data && response.data.error) {
-      console.error('Odoo create pos.session error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('createPOSSesionOdoo error:', error);
     return { error };
   }
 };
@@ -1619,23 +1556,17 @@ export const fetchRestaurantTablesOdoo = async () => {
       }),
     });
     const rawText = await response.text();
-    console.log('[fetchRestaurantTablesOdoo] Response status:', response.status);
-    console.log('[fetchRestaurantTablesOdoo] Response headers:', JSON.stringify([...response.headers]));
-    console.log('[fetchRestaurantTablesOdoo] Raw response text:', rawText);
     let data;
     try {
       data = JSON.parse(rawText);
     } catch (parseErr) {
-      console.error('fetchRestaurantTablesOdoo JSON parse error:', parseErr, 'Raw text:', rawText);
       return { error: parseErr, raw: rawText };
     }
     if (data.error) {
-      console.error('Odoo fetchRestaurantTablesOdoo error:', data.error);
       return { error: data.error };
     }
     return { result: data.result };
   } catch (error) {
-    console.error('fetchRestaurantTablesOdoo error:', error);
     return { error };
   }
 };
@@ -1659,12 +1590,10 @@ export const fetchOpenOrdersByTable = async (tableId) => {
       id: new Date().getTime(),
     }, { headers: { 'Content-Type': 'application/json' } });
     if (response.data && response.data.error) {
-      console.error('Odoo fetchOpenOrdersByTable error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('fetchOpenOrdersByTable error:', error);
     return { error };
   }
 };
@@ -1725,26 +1654,20 @@ export const createDraftPosOrderOdoo = async ({ sessionId, userId, tableId, part
       id: new Date().getTime(),
     }, { headers: { 'Content-Type': 'application/json' } });
     if (response.data && response.data.error) {
-      console.error('Odoo createPosOrderOdoo error:', response.data.error);
       return { error: response.data.error };
     }
     // response.data.result is the new record id
     const createdId = response.data.result;
-    console.log('[createDraftPosOrderOdoo] Created draft pos.order id:', createdId);
     // Try to fetch the full created order record for logging (non-blocking for callers)
     try {
       const full = await fetchPosOrderById(createdId);
       if (full && full.result) {
-        console.log('[createDraftPosOrderOdoo] Created order details:', full.result);
       } else {
-        console.log('[createDraftPosOrderOdoo] Could not fetch created order details for id', createdId);
       }
     } catch (fetchErr) {
-      console.warn('[createDraftPosOrderOdoo] Failed to fetch created order details:', fetchErr);
     }
     return { result: createdId };
   } catch (error) {
-    console.error('createDraftPosOrderOdoo error:', error);
     return { error };
   }
 };
@@ -1782,11 +1705,9 @@ export const addLineToOrderOdoo = async ({ orderId, productId, qty = 1, price_un
       },
       id: new Date().getTime(),
     };
-    console.log('[addLineToOrderOdoo] RPC payload:', { orderId, lineVals });
     const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, rpcPayload, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo addLineToOrderOdoo error:', response.data.error);
       return { error: response.data.error };
     }
 
@@ -1795,7 +1716,6 @@ export const addLineToOrderOdoo = async ({ orderId, productId, qty = 1, price_un
 
     return { result: response.data.result };
   } catch (error) {
-    console.error('addLineToOrderOdoo error:', error);
     return { error };
   }
 };
@@ -1817,12 +1737,10 @@ export const fetchOpenOrders = async ({ sessionId = null, limit = 100 } = {}) =>
       id: new Date().getTime(),
     }, { headers: { 'Content-Type': 'application/json' } });
     if (response.data && response.data.error) {
-      console.error('Odoo fetchOpenOrders error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('fetchOpenOrders error:', error);
     return { error };
   }
 };
@@ -1847,12 +1765,10 @@ export const fetchOrders = async ({ sessionId = null, limit = 100, order = 'crea
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo fetchOrders error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('fetchOrders error:', error);
     return { error };
   }
 };
@@ -1875,13 +1791,11 @@ export const fetchPosOrderById = async (orderId) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo fetchPosOrderById error:', response.data.error);
       return { error: response.data.error };
     }
     const result = (response.data.result && response.data.result[0]) || null;
     return { result };
   } catch (error) {
-    console.error('fetchPosOrderById error:', error);
     return { error };
   }
 };
@@ -1903,12 +1817,10 @@ export const fetchOrderLinesByIds = async (lineIds = []) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo fetchOrderLinesByIds error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result || [] };
   } catch (error) {
-    console.error('fetchOrderLinesByIds error:', error);
     return { error };
   }
 };
@@ -1929,12 +1841,10 @@ export const fetchPosPresets = async ({ limit = 200 } = {}) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo fetchPosPresets error:', response.data.error);
       return { error: response.data.error };
     }
     return { result: response.data.result };
   } catch (error) {
-    console.error('fetchPosPresets error:', error);
     return { error };
   }
 };
@@ -1958,13 +1868,11 @@ export const recomputePosOrderTotals = async (orderId) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (orderResponse.data && orderResponse.data.error) {
-      console.error('Odoo recomputePosOrderTotals (fetch order) error:', orderResponse.data.error);
       return { error: orderResponse.data.error };
     }
 
     const order = orderResponse.data.result?.[0];
     if (!order || !order.lines || order.lines.length === 0) {
-      console.log('[recomputePosOrderTotals] Order has no lines, setting amount_total to 0');
       // Update order with 0 total
       await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
         jsonrpc: '2.0',
@@ -1994,7 +1902,6 @@ export const recomputePosOrderTotals = async (orderId) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (linesResponse.data && linesResponse.data.error) {
-      console.error('Odoo recomputePosOrderTotals (fetch lines) error:', linesResponse.data.error);
       return { error: linesResponse.data.error };
     }
 
@@ -2019,8 +1926,6 @@ export const recomputePosOrderTotals = async (orderId) => {
       totalTax += 0;
     });
 
-    console.log('[recomputePosOrderTotals] Calculated totals:', { orderId, totalAmount, totalTax });
-
     // Update the order with calculated totals
     const updateResponse = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
       jsonrpc: '2.0',
@@ -2039,14 +1944,11 @@ export const recomputePosOrderTotals = async (orderId) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (updateResponse.data && updateResponse.data.error) {
-      console.error('Odoo recomputePosOrderTotals (update) error:', updateResponse.data.error);
       return { error: updateResponse.data.error };
     }
 
-    console.log('[recomputePosOrderTotals] Successfully updated order totals');
     return { result: true };
   } catch (error) {
-    console.error('recomputePosOrderTotals error:', error);
     return { error };
   }
 };
@@ -2078,11 +1980,9 @@ export const updateOrderLineOdoo = async ({ lineId, qty, price_unit, name, order
       },
       id: new Date().getTime(),
     };
-    console.log('[updateOrderLineOdoo] RPC payload:', { lineId, vals });
     const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, rpcPayload, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo updateOrderLineOdoo error:', response.data.error);
       return { error: response.data.error };
     }
     
@@ -2093,7 +1993,6 @@ export const updateOrderLineOdoo = async ({ lineId, qty, price_unit, name, order
     
     return { result: response.data.result };
   } catch (error) {
-    console.error('updateOrderLineOdoo error:', error);
     return { error };
   }
 };
@@ -2113,11 +2012,9 @@ export const removeOrderLineOdoo = async ({ lineId, orderId = null } = {}) => {
       },
       id: new Date().getTime(),
     };
-    console.log('[removeOrderLineOdoo] RPC payload:', { lineId });
     const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, rpcPayload, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error('Odoo removeOrderLineOdoo error:', response.data.error);
       return { error: response.data.error };
     }
     
@@ -2128,7 +2025,6 @@ export const removeOrderLineOdoo = async ({ lineId, orderId = null } = {}) => {
     
     return { result: response.data.result };
   } catch (error) {
-    console.error('removeOrderLineOdoo error:', error);
     return { error };
   }
 };
@@ -2149,7 +2045,6 @@ export const fetchFieldSelectionOdoo = async ({ model = '', field = '' } = {}) =
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (response.data && response.data.error) {
-      console.error(`[FIELDS_GET] Odoo error for ${model}.${field}:`, response.data.error);
       return [];
     }
 
@@ -2157,7 +2052,6 @@ export const fetchFieldSelectionOdoo = async ({ model = '', field = '' } = {}) =
     if (!fieldDef) return [];
     return fieldDef.selection || [];
   } catch (error) {
-    console.error('fetchFieldSelectionOdoo error:', error);
     return [];
   }
 };
@@ -2178,7 +2072,6 @@ export const postInvoiceOdoo = async (invoiceId) => {
     }, { headers: { 'Content-Type': 'application/json' } });
 
     if (resp.data && resp.data.error) {
-      console.error('[INVOICE POST] error:', resp.data.error);
       return { error: resp.data.error };
     }
     // fetch posted invoice to get number/name
@@ -2195,7 +2088,6 @@ export const postInvoiceOdoo = async (invoiceId) => {
     const meta = (info.data && info.data.result && info.data.result[0]) || null;
     return { result: meta };
   } catch (error) {
-    console.error('postInvoiceOdoo error:', error);
     return { error };
   }
 };

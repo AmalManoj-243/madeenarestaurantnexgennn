@@ -28,7 +28,6 @@ const POS = ({ navigation, route }) => {
         const list = await fetchPaymentJournalsOdoo();
         if (mounted) setJournals(list);
       } catch (e) {
-        console.warn('Failed to fetch payment journals:', e?.message || e);
       }
     };
     loadJournals();
@@ -38,7 +37,6 @@ const POS = ({ navigation, route }) => {
         await loadJournals();
         await handleCreatePos();
       } catch (err) {
-        console.warn('Auto-create pos order failed:', err);
       }
     })();
     return () => { mounted = false; };
@@ -72,7 +70,6 @@ const POS = ({ navigation, route }) => {
       setPaymentMode('cash');
       setSelectedJournal(null);
     } catch (e) {
-      console.error('POS create error:', e);
       Toast.show({ type: 'error', text1: 'POS Error', text2: e?.message || 'Failed to create POS order', position: 'bottom' });
     } finally {
       setLoading(false);
@@ -93,7 +90,6 @@ const POS = ({ navigation, route }) => {
       const amount = products.reduce((s, p) => s + ((p.price || 0) * (p.quantity || p.qty || 0)), 0);
       const partnerId = customer?.id || customer?._id || null;
       const payResp = await createPosPaymentOdoo({ orderId, amount, journalId: selectedJournal.id, partnerId });
-      console.log('createPosPaymentOdoo response:', payResp);
       if (payResp && payResp.error) {
         const msg = payResp.error.message || JSON.stringify(payResp.error) || 'Payment error';
         Toast.show({ type: 'error', text1: 'Payment Error', text2: msg, position: 'bottom' });
@@ -103,7 +99,6 @@ const POS = ({ navigation, route }) => {
         navigation.goBack();
       }
     } catch (e) {
-      console.error('POS payment error:', e);
       Toast.show({ type: 'error', text1: 'Payment Error', text2: e?.message || 'Failed to create payment', position: 'bottom' });
     } finally {
       setPaying(false);
@@ -135,7 +130,6 @@ const POS = ({ navigation, route }) => {
         Toast.show({ type: 'error', text1: 'Payment Error', text2: 'Unexpected response', position: 'bottom' });
       }
     } catch (e) {
-      console.error('Account payment error:', e);
       Toast.show({ type: 'error', text1: 'Payment Error', text2: e?.message || 'Failed to create payment', position: 'bottom' });
     } finally {
       setPaying(false);

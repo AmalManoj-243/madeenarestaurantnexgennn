@@ -35,9 +35,8 @@ const ProductsScreen = ({ navigation, route }) => {
       try {
         const cats = await fetchProductCategoriesOdoo();
         setProductCategories(cats);
-        console.log('ProductsScreen: Available product.category names:', cats.map(c => c.name));
       } catch (e) {
-        console.warn('Failed to fetch product categories', e);
+        // silently ignore
       }
     };
     fetchCats();
@@ -56,7 +55,6 @@ const ProductsScreen = ({ navigation, route }) => {
     let effectiveCategoryName = posCategoryName;
     if (posCategoryName && manualCategoryMap[posCategoryName.toUpperCase()]) {
       effectiveCategoryName = manualCategoryMap[posCategoryName.toUpperCase()];
-      console.log(`ProductsScreen: Manually mapped POS category '${posCategoryName}' to product.category '${effectiveCategoryName}'`);
     }
     if (effectiveCategoryName && productCategories.length > 0) {
       // Try exact (case-insensitive) match
@@ -68,22 +66,19 @@ const ProductsScreen = ({ navigation, route }) => {
           effectiveCategoryName.toLowerCase().includes((cat.name || '').toLowerCase())
         );
         if (match) {
-          console.log(`ProductsScreen: Fuzzy-mapped POS category '${effectiveCategoryName}' to product.category '${match.name}' (id ${match.id})`);
         }
       }
       if (match) {
         mappedId = match.id;
         if (!match.name.toLowerCase() === effectiveCategoryName.toLowerCase()) {
-          console.log(`ProductsScreen: Mapped POS category '${effectiveCategoryName}' to product.category id ${mappedId}`);
         }
       } else {
-        console.warn(`ProductsScreen: No product.category found for POS category '${effectiveCategoryName}'. No products will be loaded.`);
+        // no matching product category found
       }
     } else if (!effectiveCategoryName) {
-      console.warn('ProductsScreen: No categoryName provided in route.params. No products will be loaded.');
+      // no categoryName provided
     }
     setMappedProductCategoryId(mappedId);
-    console.log('ProductsScreen: posCategoryId:', posCategoryId, 'mappedProductCategoryId:', mappedId);
   }, [route?.params?.categoryName, productCategories, posCategoryId]);
   const { fromCustomerDetails } = route.params || {};
 
@@ -200,7 +195,6 @@ const ProductsScreen = ({ navigation, route }) => {
 
   const renderProducts = () => {
     const productsToShow = passedFilteredProducts ? filteredProducts : data;
-    console.log('ProductsScreen: products returned:', productsToShow.length);
     if (productsToShow.length === 0 && !loading) {
       return renderEmptyState();
     }
@@ -262,7 +256,7 @@ const ProductsScreen = ({ navigation, route }) => {
                     setQuickQty(1);
                   }, 900); // auto-dismiss after 900ms
                 } catch (e) {
-                  console.warn('Quick add failed', e);
+                  // quick add failed
                   setQuickAddVisible(false);
                 }
               }} style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#111827' }}>

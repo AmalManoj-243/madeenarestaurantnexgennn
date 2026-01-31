@@ -20,7 +20,6 @@ const ProductDetail = ({ navigation, route }) => {
   const { detail = {}, fromCustomerDetails = {} } = route?.params || {};
   useEffect(() => {
     // Debug log to show product details data for troubleshooting
-    console.log('ProductDetail details:', details);
   }, [details]);
   const [details, setDetails] = useState({});
   const [loading, setLoading] = useState(false);
@@ -60,7 +59,6 @@ const ProductDetail = ({ navigation, route }) => {
         }));
         setEmployee(extract);
       } catch (error) {
-        console.error("Error fetching dropdown data:", error);
       }
     };
 
@@ -83,16 +81,11 @@ const ProductDetail = ({ navigation, route }) => {
   const productDetails = async () => {
     try {
       const productId = detail?._id;
-      console.log('DEBUG: ProductDetail - productId to fetch:', productId);
       if (!productId) {
-        console.warn('ProductDetail: No productId provided to fetchProductDetails.');
       }
       const response = await fetchProductDetails(productId);
       setDetails(response[0] || {});
-        console.log('ProductDetail details (after set):', response[0] || {});
-        console.log('API response from fetchProductDetails:', response);
     } catch (e) {
-      console.error("Error fetching product details:", e);
     }
   };
 
@@ -120,7 +113,6 @@ const ProductDetail = ({ navigation, route }) => {
             categ_id: od?.categ_id || detail.categ_id || null,
           });
         } catch (e) {
-          console.error('Error loading Odoo product details:', e);
           // fallback minimal mapping
           setDetails({
             ...detail,
@@ -169,7 +161,6 @@ const ProductDetail = ({ navigation, route }) => {
         showToastMessage("No inventory box found for this box no");
       }
     } catch (error) {
-      console.error("Error fetching inventory details by name:", error);
       showToastMessage("Error fetching inventory details");
     } finally {
       setLoading(false);

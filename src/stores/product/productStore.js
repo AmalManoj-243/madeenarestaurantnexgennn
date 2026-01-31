@@ -58,7 +58,7 @@ const useProductStore = create((set, get) => ({
         ...state,
         cartItems: {
           ...state.cartItems,
-          [currentCustomerId]: updatedCart
+          [currentCustomerId]: updatedCart.filter((p) => (p.quantity ?? p.qty ?? 1) > 0)
         }
       };
     }

@@ -16,17 +16,14 @@ const POSReceiptScreen = ({ navigation, route }) => {
         const partnerId = (customer && (customer.id || customer.partner_id || customer.partner_id?.id)) || null;
         if (!partnerId) {
           Alert.alert('Missing Customer', 'Cannot create invoice: customer is not specified or has no partner id.');
-          console.error('Invoice creation error: Missing customer or partnerId', customer);
           return;
         }
         const invoiceProducts = (products || []).map(p => ({ id: p.id, name: p.name, quantity: p.quantity || p.qty || 1, price: p.price }));
         (async () => {
           try {
             const resp = await createInvoiceOdoo({ partnerId, products: invoiceProducts });
-            console.log('Invoice creation result:', resp);
             Alert.alert('Invoice Created', `Invoice created with ID: ${resp.id}`);
           } catch (err) {
-            console.error('Invoice creation error:', err);
             Alert.alert('Invoice Error', err.message || 'Failed to create invoice');
           }
         })();

@@ -107,9 +107,7 @@ const LoginScreenOdoo = () => {
         // ODOO CUSTOMER LOGIN
         const normalized = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
         const finalOdooUrl = (normalized.replace(/\/+$/, "") || DEFAULT_ODOO_BASE_URL);
-        console.log('Using Odoo URL:', finalOdooUrl);
         const dbNameUsed = inputs.db && inputs.db.trim() ? inputs.db.trim() : DEFAULT_ODOO_DB;
-        console.log('Logging in to Odoo DB:', dbNameUsed);
         const response = await axios.post(
           `${finalOdooUrl}/web/session/authenticate`,
           {
@@ -126,7 +124,6 @@ const LoginScreenOdoo = () => {
             withCredentials: true,
           }
         );
-        console.log("🚀 Odoo login response:", JSON.stringify(response.data, null, 2));
         if (response.data.result && response.data.result.uid) {
           const userData = response.data.result;
           // persist selected/used DB for future calls
@@ -139,7 +136,6 @@ const LoginScreenOdoo = () => {
           }
           // Log the DB name stored in AsyncStorage
           const dbNameStored = await AsyncStorage.getItem('odoo_db');
-          console.log('Current Odoo DB in storage:', dbNameStored);
           setUser(userData);
           navigation.navigate("AppNavigator");
         } else {
@@ -151,7 +147,6 @@ const LoginScreenOdoo = () => {
           user_name: username,
           password: password,
         });
-        console.log("🚀 UAE admin login response:", JSON.stringify(response, null, 2));
         if (response && response.success === true && response.data?.length) {
           const userData = response.data[0];
           await AsyncStorage.setItem("userData", JSON.stringify(userData));
@@ -162,7 +157,6 @@ const LoginScreenOdoo = () => {
         }
       }
     } catch (error) {
-      console.log("Login Error:", error.response ? error.response.data : error.message);
       showToastMessage(`Error! ${error.message}`);
     } finally {
       setLoading(false);

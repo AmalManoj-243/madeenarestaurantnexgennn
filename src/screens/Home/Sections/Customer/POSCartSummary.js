@@ -1,33 +1,120 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, memo, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { Button } from '@components/common/Button';
 import { useProductStore } from '@stores/product';
 import { fetchCustomersOdoo } from '@api/services/generalApi';
+import { shallow } from 'zustand/shallow';
+
+const errorImage = require('@assets/images/error/error.png');
+
+// Compare only the fields we display — prevents re-render when other items change
+const itemEqual = (a, b) => {
+  if (a === b) return true;
+  if (!a || !b) return a === b;
+  return a.id === b.id
+    && (a.quantity ?? a.qty) === (b.quantity ?? b.qty)
+    && a.price === b.price
+    && a.name === b.name;
+};
+
+// Each row subscribes to its OWN item from the store with custom equality.
+const CartRow = memo(({ itemId }) => {
+  const addProduct = useProductStore((s) => s.addProduct);
+  const removeProduct = useProductStore((s) => s.removeProduct);
+
+  // Subscribe to just this one item with deep equality on displayed fields
+  const item = useProductStore(
+    (s) => (s.cartItems[s.currentCustomerId] || []).find((p) => p.id === itemId) || null,
+    itemEqual
+  );
+
+  if (!item) return null;
+
+  const qty = Number(item.quantity || item.qty || 0);
+  const price = Number(item.price || 0);
+  const lineTotal = (qty * price).toFixed(2);
+
+  const increase = () => addProduct({ ...item, quantity: qty + 1 });
+  const decrease = () => {
+    if (qty <= 1) removeProduct(item.id);
+    else addProduct({ ...item, quantity: qty - 1 });
+  };
+
+  const rawImg = item.imageUrl || item.image_url || null;
+  let imageSource = errorImage;
+  if (rawImg) {
+    if (typeof rawImg === 'string') {
+      if (rawImg.startsWith('data:') || rawImg.startsWith('http')) {
+        imageSource = { uri: rawImg };
+      } else if (rawImg.length > 100) {
+        imageSource = { uri: `data:image/png;base64,${rawImg}` };
+      }
+    } else if (rawImg.uri) {
+      imageSource = rawImg;
+    }
+  }
+
+  return (
+    <View style={styles.line}>
+      <Image source={imageSource} style={styles.thumb} resizeMode="cover" />
+      <View style={styles.info}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.qty}>{qty} × {price.toFixed(2)}</Text>
+      </View>
+      <View style={styles.controls}>
+        <TouchableOpacity style={styles.qtyBtn} onPress={decrease} activeOpacity={0.6}>
+          <Text style={styles.qtyBtnText}>-</Text>
+        </TouchableOpacity>
+        <Text style={styles.qtyDisplay}>{qty}</Text>
+        <TouchableOpacity style={styles.qtyBtn} onPress={increase} activeOpacity={0.6}>
+          <Text style={styles.qtyBtnText}>+</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.lineTotal}>{lineTotal}</Text>
+    </View>
+  );
+});
+
+const ITEM_HEIGHT = 69;
 
 const POSCartSummary = ({ navigation, route }) => {
   const {
-    openingAmount,
-    sessionId,
-    registerId,
-    registerName,
-    userId,
-    userName
+    openingAmount, sessionId, registerId, registerName, userId, userName
   } = route?.params || {};
-  const { getCurrentCart, clearProducts, setCurrentCustomer, addProduct, removeProduct, loadCustomerCart } = useProductStore();
-  const errorImage = require('@assets/images/error/error.png');
-  const products = getCurrentCart();
+
+  const { clearProducts, setCurrentCustomer, loadCustomerCart } = useProductStore();
+
+  // Only subscribe to the list of IDs — changes only when items are added/removed
+  const itemIds = useProductStore(
+    (s) => (s.cartItems[s.currentCustomerId] || []).map((p) => p.id),
+    shallow
+  );
+
+  // Subscribe to total separately
+  const total = useProductStore(
+    (s) => (s.cartItems[s.currentCustomerId] || []).reduce(
+      (sum, p) => sum + ((p.price || 0) * (p.quantity || p.qty || 0)), 0
+    )
+  );
+
+  // For checkout, get full products
+  const getProducts = useCallback(
+    () => useProductStore.getState().cartItems[useProductStore.getState().currentCustomerId] || [],
+    []
+  );
+
   const [customerModal, setCustomerModal] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  useEffect(() => {
-    console.log('POSCartSummary params:', route?.params);
-  }, []);
-
-  const computeTotal = () => products.reduce((s, p) => s + ((p.price || 0) * (p.quantity || p.qty || 0)), 0);
+  const renderItem = useCallback(({ item: id }) => <CartRow itemId={id} />, []);
+  const keyExtractor = useCallback((id) => String(id), []);
+  const getItemLayout = useCallback((_, index) => ({
+    length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index,
+  }), []);
 
   const handleCustomer = async () => {
     setCustomerModal(true);
@@ -43,115 +130,53 @@ const POSCartSummary = ({ navigation, route }) => {
   };
 
   const handleSelectCustomer = (customer) => {
-    // Preserve current cart by moving it to the selected customer's cart
     try {
-      const currentCart = getCurrentCart() || [];
-      // loadCustomerCart will set the currentCustomerId and assign the cart data
-      loadCustomerCart(customer.id, currentCart);
+      loadCustomerCart(customer.id, getProducts());
     } catch (e) {
-      console.warn('Failed to migrate cart to selected customer', e);
-      // fallback: just set current customer id
       setCurrentCustomer(customer.id);
     }
     setSelectedCustomer(customer);
     setCustomerModal(false);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = useCallback(() => {
     navigation.navigate('POSPayment', {
-      openingAmount,
-      sessionId,
-      registerId,
-      registerName,
-      userId,
-      userName,
-      products
+      openingAmount, sessionId, registerId, registerName, userId, userName,
+      products: getProducts(),
     });
-  };
+  }, [navigation, openingAmount, sessionId, registerId, registerName, userId, userName, getProducts]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={styles.safe}>
       <NavigationHeader title="Cart" onBackPress={() => navigation.goBack()} />
-      <View style={{ padding: 12, flex: 1, backgroundColor: '#fff' }}>
-        {products && products.length > 0 ? (
+      <View style={styles.container}>
+        {itemIds.length > 0 ? (
           <FlatList
-            data={products}
-            keyExtractor={(i) => String(i.id)}
-            renderItem={({ item }) => {
-              const qty = Number(item.quantity || item.qty || 0);
-              const price = Number(item.price || 0);
-              const lineTotal = (qty * price).toFixed(2);
-              const increase = () => {
-                addProduct({ ...item, quantity: qty + 1, price });
-              };
-              const decrease = () => {
-                if (qty <= 1) {
-                  removeProduct(item.id);
-                } else {
-                  addProduct({ ...item, quantity: qty - 1, price });
-                }
-              };
-              // normalize image source: support `data:` URIs, http URLs, or raw base64
-              const rawImg = item.imageUrl || item.image_url || null;
-              let imageSource = errorImage;
-              if (rawImg) {
-                if (typeof rawImg === 'string') {
-                  if (rawImg.startsWith('data:') || rawImg.startsWith('http')) {
-                    imageSource = { uri: rawImg };
-                  } else if (rawImg.length > 100) {
-                    // likely a base64 string without data: prefix
-                    imageSource = { uri: `data:image/png;base64,${rawImg}` };
-                  }
-                } else if (rawImg.uri) {
-                  imageSource = rawImg;
-                }
-              }
-
-              return (
-                  <View style={styles.line}>
-                    <Image
-                      source={imageSource}
-                      style={styles.thumb}
-                      resizeMode="cover"
-                      onError={() => { /* fallback to errorImage automatically */ }}
-                    />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.qty}>{qty} × {price.toFixed(2)}</Text>
-                  </View>
-                  <View style={styles.controls}>
-                    <TouchableOpacity style={styles.qtyBtn} onPress={decrease}>
-                      <Text style={styles.qtyBtnText}>-</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.qtyDisplay}>{qty}</Text>
-                    <TouchableOpacity style={styles.qtyBtn} onPress={increase}>
-                      <Text style={styles.qtyBtnText}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <Text style={styles.lineTotal}>{lineTotal}</Text>
-                </View>
-              );
-            }}
+            data={itemIds}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            getItemLayout={getItemLayout}
+            initialNumToRender={15}
+            maxToRenderPerBatch={5}
+            windowSize={7}
           />
         ) : (
-          <Text style={{ color: '#666' }}>Cart is empty</Text>
+          <Text style={styles.empty}>Cart is empty</Text>
         )}
 
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>{computeTotal().toFixed(2)}</Text>
+          <Text style={styles.totalValue}>{total.toFixed(2)}</Text>
         </View>
 
-        {/* Customer selection removed from cart page. Now only available in payment page. */}
-
-        <View style={{ marginTop: 12 }}>
+        <View style={styles.checkoutWrap}>
           <Button title="Checkout / Payment" onPress={handleCheckout} />
         </View>
 
-        <Modal visible={customerModal} animationType="slide" transparent={true}>
+        <Modal visible={customerModal} animationType="slide" transparent>
           <View style={styles.modalBg}>
             <View style={styles.modalContent}>
-              <Text style={{ fontWeight: '700', fontSize: 18, marginBottom: 12 }}>Select Customer</Text>
+              <Text style={styles.modalTitle}>Select Customer</Text>
               {loadingCustomers ? (
                 <ActivityIndicator size="large" color="#444" />
               ) : (
@@ -160,7 +185,7 @@ const POSCartSummary = ({ navigation, route }) => {
                   keyExtractor={(i) => String(i.id)}
                   renderItem={({ item }) => (
                     <TouchableOpacity style={styles.customerItem} onPress={() => handleSelectCustomer(item)}>
-                      <Text style={{ fontSize: 22, fontWeight: '700' }}>{item.name}</Text>
+                      <Text style={styles.customerName}>{item.name}</Text>
                     </TouchableOpacity>
                   )}
                 />
@@ -169,7 +194,6 @@ const POSCartSummary = ({ navigation, route }) => {
             </View>
           </View>
         </Modal>
-
       </View>
     </SafeAreaView>
   );
@@ -178,7 +202,10 @@ const POSCartSummary = ({ navigation, route }) => {
 export default POSCartSummary;
 
 const styles = StyleSheet.create({
-  line: { paddingVertical: 10, borderBottomWidth: 1, borderColor: '#f0f0f0', flexDirection: 'row', alignItems: 'center' },
+  safe: { flex: 1, backgroundColor: '#fff' },
+  container: { padding: 12, flex: 1, backgroundColor: '#fff' },
+  line: { height: ITEM_HEIGHT, paddingVertical: 10, borderBottomWidth: 1, borderColor: '#f0f0f0', flexDirection: 'row', alignItems: 'center' },
+  info: { flex: 1 },
   name: { fontWeight: '700', fontSize: 22, color: '#111' },
   qty: { color: '#666', marginTop: 6, fontSize: 16 },
   controls: { flexDirection: 'row', alignItems: 'center', marginRight: 12 },
@@ -189,9 +216,12 @@ const styles = StyleSheet.create({
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12, paddingTop: 8, borderTopWidth: 1, borderColor: '#f0f0f0' },
   totalLabel: { fontWeight: '800', fontSize: 20, color: '#111' },
   totalValue: { fontWeight: '800', fontSize: 24, color: '#111' },
-  customerLabel: { fontWeight: '600', fontSize: 16, marginBottom: 6, color: '#111' },
+  empty: { color: '#666' },
+  checkoutWrap: { marginTop: 12 },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { backgroundColor: '#fff', padding: 20, borderRadius: 12, width: '80%', maxHeight: '80%' },
+  modalTitle: { fontWeight: '700', fontSize: 18, marginBottom: 12 },
   customerItem: { paddingVertical: 10, borderBottomWidth: 1, borderColor: '#eee' },
+  customerName: { fontSize: 22, fontWeight: '700' },
   thumb: { width: 48, height: 48, borderRadius: 6, marginRight: 12, backgroundColor: '#fff' },
 });

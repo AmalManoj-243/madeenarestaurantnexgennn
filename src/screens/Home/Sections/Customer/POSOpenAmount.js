@@ -51,9 +51,7 @@ const POSOpenAmount = ({ navigation, route }) => {
       }
 
       await AsyncStorage.setItem(OPENED_REGISTER_KEY, JSON.stringify(arr));
-      console.log('Persisted opened_registers:', arr);
     } catch (err) {
-      console.warn('Failed to persist opened register', err);
     }
 
     // Navigate to POS products screen and pass openingAmount and register

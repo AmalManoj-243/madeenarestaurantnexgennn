@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { fetchRestaurantTablesOdoo, fetchOpenOrdersByTable, createDraftPosOrderOdoo, fetchPosPresets, fetchOrders, fetchPosOrderById, fetchOrderLinesByIds } from '@api/services/generalApi';
+import { fetchRestaurantTablesOdoo, fetchOpenOrdersByTable, createDraftPosOrderOdoo, fetchPosPresets, fetchOrders, fetchPosOrderById, fetchOrderLinesByIds, preloadAllProducts } from '@api/services/generalApi';
 import { useFocusEffect } from '@react-navigation/native';
 
 const { width: windowWidth } = Dimensions.get('window');
@@ -54,6 +54,8 @@ const TablesScreen = ({ navigation, route }) => {
   const handleTablePress = async (table) => {
     setGlobalLoading(true);
     const tableId = table.id;
+    // Preload all products in background while fetching order data — so products are cached when user taps "Add Products"
+    preloadAllProducts().catch(() => {});
     try {
       // Log all orders for this table (use fetchOrders and filter client-side)
       try {
@@ -78,7 +80,6 @@ const TablesScreen = ({ navigation, route }) => {
                   presetsById = presetsResp.result.reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
                 }
               } catch (pErr) {
-                console.warn('Could not fetch pos.presets for enrichment:', pErr);
               }
             }
 
@@ -98,8 +99,6 @@ const TablesScreen = ({ navigation, route }) => {
                 preset: presetDetail,
               };
             });
-            console.log(`LOG Orders for table ${tableId}: ${JSON.stringify(enriched)}`);
-
             // Use the original `details` array when fetching order lines to avoid duplicating the full record
             for (let idx = 0; idx < enriched.length; idx++) {
               const orderEntry = enriched[idx];
@@ -111,24 +110,17 @@ const TablesScreen = ({ navigation, route }) => {
                 if (Array.isArray(lineIds) && lineIds.length > 0) {
                   const linesResp = await fetchOrderLinesByIds(lineIds);
                   if (linesResp && linesResp.result) {
-                    console.log(`LOG Order lines for order id ${oid}: ${JSON.stringify(linesResp.result)}`);
                   } else {
-                    console.log(`LOG Order lines for order id ${oid}: []`);
                   }
                 } else {
-                  console.log(`LOG Order lines for order id ${oid}: []`);
                 }
               } catch (lineErr) {
-                console.warn('Failed to fetch order lines for order', orderEntry.id, lineErr);
               }
             }
           } catch (innerErr) {
-            console.warn('Failed to enrich table orders with preset_id:', innerErr);
-            console.log(`LOG Orders for table ${tableId}: ${JSON.stringify(tableOrders)}`);
           }
         }
       } catch (logErr) {
-        console.warn('Could not fetch all orders for logging:', logErr);
       }
       setTableLoadingState(tableId, true);
       // Refresh open tables after any order navigation
@@ -153,7 +145,6 @@ const TablesScreen = ({ navigation, route }) => {
           const presetDetail = Array.isArray(presetRef) && presetRef[0] ? { id: presetRef[0], name: presetRef[1] } : null;
           navigation.navigate('POSProducts', { ...route?.params, orderId: order.id, tableId, orderLines, preset: presetDetail, preset_id: presetRef });
         } catch (e) {
-          console.warn('Failed to preload order lines for order', order.id, e);
           // Even if preloading failed, still pass any preset info available on the brief order record
           const presetRef = Array.isArray(order.preset_id) ? order.preset_id : null;
           const presetDetail = Array.isArray(presetRef) && presetRef[0] ? { id: presetRef[0], name: presetRef[1] } : null;
@@ -174,10 +165,8 @@ const TablesScreen = ({ navigation, route }) => {
             preset_id = chosen.id;
             preset = { id: chosen.id, name: chosen.name };
           } else {
-            console.warn('No pos.presets returned; using fallback preset_id', preset_id);
           }
         } catch (pErr) {
-          console.warn('Failed to fetch pos.presets; using fallback preset_id', preset_id, pErr);
         }
         const created = await createDraftPosOrderOdoo({ sessionId, userId, tableId, preset_id, order_type: route?.params?.order_type || 'DINEIN' });
         if (created && created.result) {
@@ -187,7 +176,6 @@ const TablesScreen = ({ navigation, route }) => {
         }
       }
     } catch (err) {
-      console.error('handleTablePress error:', err);
       // show a simple alert
       try { alert('Could not open/create order for table.'); } catch (e) {}
     } finally {
@@ -204,7 +192,6 @@ const TablesScreen = ({ navigation, route }) => {
       setLoading(true);
       const res = await fetchRestaurantTablesOdoo();
       if (res.result) {
-        console.log('Fetched tables:', res.result);
         const t = res.result;
         setTables(t);
 
@@ -225,7 +212,6 @@ const TablesScreen = ({ navigation, route }) => {
         if (floorList.length === 0) floorList.push({ id: 0, name: 'Main Floor' });
         setFloors(floorList);
         setSelectedFloorId(floorList[0].id);
-        console.log('Detected floors:', floorList);
         await refreshTablesWithOpenOrders();
       }
       setLoading(false);

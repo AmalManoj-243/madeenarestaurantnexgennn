@@ -64,7 +64,6 @@ const CustomerDetails = ({ navigation, route }) => {
         loadCustomerCart(customerId, []);
       }
     } catch (error) {
-      console.error('Error loading cart from storage:', error);
       loadCustomerCart(customerId, []);
     }
   };
@@ -73,7 +72,6 @@ const CustomerDetails = ({ navigation, route }) => {
     try {
       await AsyncStorage.setItem(`cart_${customerId}`, JSON.stringify(cartData));
     } catch (error) {
-      console.error('Error saving cart to storage:', error);
     }
   };
   
@@ -158,7 +156,6 @@ const CustomerDetails = ({ navigation, route }) => {
 
   const placeOrder = async () => {
     try {
-      console.log('Place Order button clicked');
       const date = format(new Date(), 'yyyy-MM-dd');
       const orderItems = products.map((product) => ({
         // product identifiers: include both internal DB id and external/odoo id when available
@@ -180,7 +177,6 @@ const CustomerDetails = ({ navigation, route }) => {
         remarks: '',
         total: product.price * product.quantity,
       }));
-      console.log('Order Items:', orderItems);
       // Compute fallbacks for required fields
       const customerId = details?.id || details?._id || details?.customer_id || null;
       let addressVal = details?.address || details?.customer_address || details?.address_line || null;
@@ -189,13 +185,10 @@ const CustomerDetails = ({ navigation, route }) => {
         try {
           const partnerId = details.id || details._id;
           const fetched = await fetchCustomerDetailsOdoo(partnerId);
-          console.log('Fetched partner details from Odoo:', fetched);
           if (fetched && fetched.address) {
             addressVal = fetched.address;
-            console.log('Using fetched address for order:', addressVal);
           }
         } catch (err) {
-          console.warn('Could not fetch partner address:', err);
         }
       }
       // Fallback: use customer name as address if still missing
@@ -215,9 +208,7 @@ const CustomerDetails = ({ navigation, route }) => {
       if (!warehouseId) missing.push('warehouse_id');
       if (!addressVal) missing.push('address');
 
-      console.log('Computed customerId:', customerId, 'warehouseId:', warehouseId, 'address:', addressVal);
       if (missing.length > 0) {
-        console.warn('Place Order aborted — missing fields:', missing);
         Toast.show({
           type: 'error',
           text1: 'Missing required data',
@@ -243,9 +234,7 @@ const CustomerDetails = ({ navigation, route }) => {
         sales_person_id: currentUser?.related_profile?._id ?? null,
         sales_person_name: currentUser?.related_profile?.name ?? '',
       }
-      console.log('Place Order Data:', placeOrderData);
       try {
-        console.log('Posting to /createQuotation with payload:', JSON.stringify(placeOrderData));
       } catch (e) {
         // ignore
       }
@@ -260,10 +249,7 @@ const CustomerDetails = ({ navigation, route }) => {
         params: placeOrderData,
         id: new Date().getTime(),
       };
-      console.log('JSON-RPC Payload:', JSON.stringify(jsonRpcPayload));
-
       const response = await post('/createQuotation', jsonRpcPayload);
-      console.log('CreateQuotation response:', response);
       // Try to find the quotation ID from possible keys
       const quotationId = response.quotation_id || response.id || response.result || response.quotationId;
       if (response.success === 'true' && quotationId) {
@@ -290,7 +276,6 @@ const CustomerDetails = ({ navigation, route }) => {
         });
       }
     } catch (err) {
-      console.error('Place Order error:', err);
       Toast.show({
         type: 'error',
         text1: 'ERROR',

@@ -25,13 +25,10 @@ const fetchAllPaymentMethods = async () => {
     }, { headers: { 'Content-Type': 'application/json' } });
     const methods = response.data?.result || [];
     if (methods.length > 0) {
-      console.log('All pos.payment.method records:', methods);
     } else {
-      console.log('No pos.payment.method records found');
     }
     return methods;
   } catch (e) {
-    console.error('Error fetching all pos.payment.method records:', e);
     return [];
   }
 };
@@ -50,13 +47,10 @@ const fetchAllPaymentMethods = async () => {
       }, { headers: { 'Content-Type': 'application/json' } });
       const paymentMethodId = response.data?.result?.[0]?.id;
       if (paymentMethodId) {
-        console.log('Fetched payment_method_id for journal', journalId, ':', paymentMethodId);
       } else {
-        console.log('No payment_method_id found for journal', journalId);
       }
       return paymentMethodId;
     } catch (e) {
-      console.error('Error fetching payment_method_id:', e);
       return null;
     }
   };
@@ -84,7 +78,6 @@ const POSPayment = ({ navigation, route }) => {
   const [paymentMode, setPaymentMode] = useState('cash');
     useEffect(() => {
       if (paymentMode === 'account') {
-        console.log('Journals available for account payment:', journals);
       }
     }, [paymentMode, journals]);
   const [selectedJournal, setSelectedJournal] = useState(null);
@@ -113,7 +106,6 @@ const POSPayment = ({ navigation, route }) => {
   // When payment mode or journals change, automatically pick the corresponding journal
   useEffect(() => {
     const j = getJournalForMode(paymentMode);
-      console.log('Mapping result for mode', paymentMode, j);
     setSelectedJournal(j);
   }, [paymentMode, journals]);
 
@@ -122,10 +114,8 @@ const POSPayment = ({ navigation, route }) => {
     const load = async () => {
       try {
         const list = await fetchPaymentJournalsOdoo();
-          console.log('Fetched journals from Odoo:', list);
         if (mounted) setJournals(list);
       } catch (e) {
-        console.warn('Failed to load journals', e?.message || e);
       }
     };
     load();
@@ -133,7 +123,6 @@ const POSPayment = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    console.log('POSPayment params:', route?.params);
   }, []);
 
   const computeTotal = () => (products || []).reduce((s, p) => s + ((p.price || 0) * (p.quantity || p.qty || 0)), 0);
@@ -167,8 +156,6 @@ const POSPayment = ({ navigation, route }) => {
   ];
 
   const handlePay = async () => {
-    console.log('Customer before payment:', customer);
-    console.log('Journal before payment:', selectedJournal);
     try {
       // Build order lines
       const lines = products.map(p => ({
@@ -186,9 +173,7 @@ const POSPayment = ({ navigation, route }) => {
       if (!posConfigId && sessionId) {
         try {
           const sessionList = await fetchPOSSessions({ limit: 10, offset: 0, state: '', });
-          console.log('[POS CONFIG] Full session list:', sessionList);
           const session = sessionList.find(s => s.id === sessionId);
-          console.log('[POS CONFIG] Session found for sessionId', sessionId, ':', session);
           if (session && session.config_id) {
             // Odoo often returns many2one as [id, name]
             if (Array.isArray(session.config_id)) {
@@ -199,20 +184,15 @@ const POSPayment = ({ navigation, route }) => {
           } else {
             posConfigId = null;
           }
-          console.log('[POS CONFIG] Extracted posConfigId:', posConfigId);
         } catch (e) {
-          console.warn('Failed to auto-fetch posConfigId from session:', e?.message || e);
         }
       }
       // Step 1: Log POS order creation payload
       const posOrderPayload = { partnerId, lines, sessionId, posConfigId, companyId, orderName: '/' };
       // include order_type from route params if provided
       const posOrderPayloadWithPreset = { ...posOrderPayload, preset_id: 10, order_type: route?.params?.order_type };
-      console.log('[STEP 1] POS Order Payload:', posOrderPayloadWithPreset);
       const resp = await createPosOrderOdoo(posOrderPayloadWithPreset);
-      console.log('[STEP 1] POS Order Response:', resp);
       if (resp && resp.error) {
-        console.error('Odoo POS Order Error:', resp.error);
         Toast.show({ type: 'error', text1: 'POS Error', text2: resp.error.message || JSON.stringify(resp.error) || 'Failed to create POS order', position: 'bottom' });
         return;
       }
@@ -273,17 +253,14 @@ const POSPayment = ({ navigation, route }) => {
                     paymentMode: 'cash',
                   });
                 } else {
-                  console.warn('No payment method found for cash journal when processing card change');
                 }
               } else {
-                console.warn('No cash journal found when processing card change');
               }
             }
           }
           // Log each payment record for diagnostics
           payments.forEach((p, idx) => {
             const type = p.amount > 0 ? 'RECEIVED' : 'CHANGE';
-            console.log(`[PAYMENT LOG] #${idx + 1} Type: ${type}, Amount: ${p.amount}, JournalId: ${p.journalId}, PaymentMethodId: ${p.paymentMethodId}`);
           });
           const paymentPayload = {
             orderId: createdOrderId,
@@ -292,16 +269,12 @@ const POSPayment = ({ navigation, route }) => {
             sessionId,
             companyId
           };
-          console.log('JSON-RPC payment payload:', paymentPayload);
           const paymentResp = await createPosPaymentOdoo(paymentPayload);
-          console.log('Payment API response:', paymentResp);
           if (paymentResp && paymentResp.error) {
-            console.error('Payment API error:', paymentResp.error);
             Toast.show({ type: 'error', text1: 'Payment Error', text2: paymentResp.error.message || JSON.stringify(paymentResp.error) || 'Failed to create payment', position: 'bottom' });
             // Optionally, you can return here or continue to receipt
           }
         } catch (e) {
-          console.error('Payment API exception:', e);
           Toast.show({ type: 'error', text1: 'Payment Error', text2: e?.message || 'Failed to create payment', position: 'bottom' });
         }
       }
@@ -345,7 +318,6 @@ const POSPayment = ({ navigation, route }) => {
             const cashJournal = { id: 13, name: 'Cash Restaurant', type: 'cash' };
             setSelectedJournal(cashJournal);
             setTimeout(async () => {
-              console.log('Cash card selected, journal id:', cashJournal.id);
               // Fetch and log full payment method details for journal id 9
               try {
                 const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
@@ -360,14 +332,11 @@ const POSPayment = ({ navigation, route }) => {
                 }, { headers: { 'Content-Type': 'application/json' } });
                 const methods = response.data?.result || [];
                 if (methods.length > 0) {
-                  console.log('Payment method(s) for journal', cashJournal.id, ':', methods);
                 } else {
-                  console.log('No payment method found for journal', cashJournal.id);
                 }
                   // Also fetch and log all payment methods for diagnostics
                   await fetchAllPaymentMethods();
               } catch (e) {
-                console.error('Error fetching payment method details:', e);
               }
             }, 100);
           }} style={[styles.modeCard, paymentMode === 'cash' && styles.modeCardSelected]}>
@@ -381,11 +350,9 @@ const POSPayment = ({ navigation, route }) => {
             setSelectedJournal(cardJournal);
             setTimeout(async () => {
               if (cardJournal) {
-                console.log('Card payment selected, journal id:', cardJournal.id);
                 const paymentMethodId = await fetchPaymentMethodId(cardJournal.id);
                 // This will log: Fetched payment_method_id for journal ...
               } else {
-                console.log('Card payment selected, no journal mapped');
               }
             }, 100);
           }} style={[styles.modeCard, paymentMode === 'card' && styles.modeCardSelected]}>
@@ -397,7 +364,6 @@ const POSPayment = ({ navigation, route }) => {
                 setPaymentMode('card');
                 setTimeout(async () => {
                   if (selectedJournal) {
-                    console.log('Card payment selected, journal id:', selectedJournal.id);
                     try {
                       const response = await axios.post(`${ODOO_BASE_URL}/web/dataset/call_kw`, {
                         jsonrpc: '2.0',
@@ -411,16 +377,12 @@ const POSPayment = ({ navigation, route }) => {
                       }, { headers: { 'Content-Type': 'application/json' } });
                       const methods = response.data?.result || [];
                       if (methods.length > 0) {
-                        console.log('Payment method(s) for journal', selectedJournal.id, ':', methods);
                       } else {
-                        console.log('No payment method found for journal', selectedJournal.id);
                       }
                       await fetchAllPaymentMethods();
                     } catch (e) {
-                      console.error('Error fetching payment method details:', e);
                     }
                   } else {
-                    console.log('Card payment selected, no journal mapped');
                   }
                 }, 100);
               }}
@@ -430,10 +392,8 @@ const POSPayment = ({ navigation, route }) => {
             setPaymentMode('account');
             setTimeout(async () => {
               if (selectedJournal) {
-                console.log('Customer Account card selected, journal id:', selectedJournal.id);
                 await fetchPaymentMethodId(selectedJournal.id);
               } else {
-                console.log('Customer Account card selected, no journal mapped');
               }
             }, 100);
           }} style={[styles.modeCard, paymentMode === 'account' && styles.modeCardSelected]}>

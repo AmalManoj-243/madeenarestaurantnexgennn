@@ -1,20 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { memo } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY, COLORS } from '@constants/theme';
 import { useCurrencyStore } from '@stores/currency';
 
 const ProductsList = ({ item, onPress, showQuickAdd, onQuickAdd }) => {
     const errorImage = require('@assets/images/error/error.png');
-    const [imageLoading, setImageLoading] = useState(true);
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setImageLoading(false);
-        }, 10000); // Adjust the timeout as needed
-
-        return () => clearTimeout(timeout);
-    }, []);
 
     const truncatedName =
         item?.product_name?.length > 35 ? item?.product_name?.substring(0, 60) + '...' : item?.product_name;
@@ -26,16 +17,13 @@ const ProductsList = ({ item, onPress, showQuickAdd, onQuickAdd }) => {
     return (
         <TouchableOpacity onPress={onPress} style={styles.container}>
             {showQuickAdd && (
-                <TouchableOpacity style={styles.plusBtn} onPress={() => onQuickAdd?.(item)}>
+                <Pressable style={styles.plusBtn} onPress={() => onQuickAdd?.(item)}>
                     <Text style={styles.plusText}>+</Text>
-                </TouchableOpacity>
+                </Pressable>
             )}
-            {imageLoading && <ActivityIndicator size="small" color="black" style={styles.activityIndicator} />}
             <Image
                 source={item?.image_url ? { uri: item.image_url } : errorImage}
                 style={styles.image}
-                onLoad={() => setImageLoading(false)}
-                onError={() => setImageLoading(false)}
             />
                         <View style={styles.textContainer}>
                                 <Text style={styles.name}>{truncatedName?.trim()}</Text>
@@ -56,7 +44,7 @@ const ProductsList = ({ item, onPress, showQuickAdd, onQuickAdd }) => {
     );
 };
 
-export default ProductsList;
+export default memo(ProductsList);
 
 const styles = StyleSheet.create({
     container: {
@@ -71,11 +59,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         width: 150,  // Set a fixed width
         height: 180, // Adjusted height to make space for text
-    },
-    activityIndicator: {
-        position: 'absolute',
-        top: 30,
-        left: 50,
     },
     image: {
         width: 85,  // Adjusted width as necessary
@@ -107,20 +90,20 @@ const styles = StyleSheet.create({
     },
     plusBtn: {
         position: 'absolute',
-        top: 8,
-        right: 8,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: COLORS.orange, // changed from green to orange
+        top: 6,
+        right: 6,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: COLORS.orange,
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
     },
     plusText: {
         color: '#fff',
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 22,
+        fontWeight: '800',
     },
     category: {
         fontSize: 11,

@@ -20,7 +20,6 @@ const useDataFetching = (fetchDataCallback) => {
       setAllDataLoaded(list.length < limit);
       setOffset(0);
     } catch (error) {
-      console.error('Error fetching data:', error);
     } finally {
       stopLoading();
     }
@@ -43,7 +42,6 @@ const useDataFetching = (fetchDataCallback) => {
         if (list.length < limit) setAllDataLoaded(true);
       }
     } catch (error) {
-      console.error('Error fetching more data:', error);
     } finally {
       stopLoading();
     }

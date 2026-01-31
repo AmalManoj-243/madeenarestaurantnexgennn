@@ -98,7 +98,6 @@ const POSRegister = ({ navigation }) => {
   };
 
   const renderOpenSession = ({ item }) => {
-    console.log('Open session item:', item);
     return (
       <View style={[styles.card, styles.sessionItemCard]}>
         <View style={styles.cardHeader}>
