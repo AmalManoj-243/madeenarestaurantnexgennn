@@ -55,7 +55,7 @@ const SplashScreen = () => {
             } else {
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: 'LoginScreen' }],
+                    routes: [{ name: 'Login' }],
                 });
             }
         }

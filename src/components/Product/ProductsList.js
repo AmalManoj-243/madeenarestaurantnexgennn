@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Text from '@components/Text';
 import { FONT_FAMILY, COLORS } from '@constants/theme';
 import { useCurrencyStore } from '@stores/currency';
@@ -15,11 +15,11 @@ const ProductsList = ({ item, onPress, showQuickAdd, onQuickAdd }) => {
 
 
     return (
-        <TouchableOpacity onPress={onPress} style={styles.container}>
+        <TouchableOpacity onPress={showQuickAdd ? () => onQuickAdd?.(item) : onPress} style={styles.container} activeOpacity={0.7}>
             {showQuickAdd && (
-                <Pressable style={styles.plusBtn} onPress={() => onQuickAdd?.(item)}>
+                <View style={styles.plusBtn} pointerEvents="none">
                     <Text style={styles.plusText}>+</Text>
-                </Pressable>
+                </View>
             )}
             <Image
                 source={item?.image_url ? { uri: item.image_url } : errorImage}

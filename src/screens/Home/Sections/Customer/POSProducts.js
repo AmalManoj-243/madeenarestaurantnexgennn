@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ScrollView, Modal, Pressable, StyleSheet as RNStyleSheet, InteractionManager } from 'react-native';
 import { NavigationHeader } from '@components/Header';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProductsList } from '@components/Product';
 import { fetchPosPresets, addLineToOrderOdoo, updateOrderLineOdoo, removeOrderLineOdoo, fetchPosOrderById, fetchOrderLinesByIds, fetchPosCategoriesOdoo, fetchProductCategoriesOdoo, preloadAllProducts } from '@api/services/generalApi';
 import { useFocusEffect } from '@react-navigation/native';
@@ -58,6 +59,8 @@ const localStyles = RNStyleSheet.create({
   orderLineRow: { paddingVertical: 10, borderBottomWidth: 1, borderColor: '#eee', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   orderLineName: { fontWeight: '700' },
   orderLinePrice: { color: '#666' },
+  deleteBtn: { backgroundColor: '#fee2e2', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8, marginRight: 24, alignItems: 'center', justifyContent: 'center' },
+  deleteBtnText: { fontSize: 16, fontWeight: '800', color: '#dc2626' },
   orderLineControls: { flexDirection: 'row', alignItems: 'center' },
   orderLineBtn: { backgroundColor: '#f3f4f6', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, marginHorizontal: 6, minWidth: 44, alignItems: 'center', justifyContent: 'center' },
   orderLineBtnText: { fontSize: 24, fontWeight: '800' },
@@ -266,9 +269,17 @@ const POSProducts = ({ navigation, route }) => {
     if (!allCachedProducts) return;
     const catId = Number(selectedPosCategoryId);
     const filtered = allCachedProducts.filter(p => {
-      if (Array.isArray(p.pos_categ_ids) && p.pos_categ_ids.length > 0) return p.pos_categ_ids.includes(catId);
-      if (Array.isArray(p.pos_categ_id)) return p.pos_categ_id[0] === catId;
-      return p.pos_categ_id === catId;
+      // Many2many pos_categ_ids — could be [1,2,3] or [[1,"name"],[2,"name"]]
+      if (Array.isArray(p.pos_categ_ids) && p.pos_categ_ids.length > 0) {
+        return p.pos_categ_ids.some(v => (Array.isArray(v) ? Number(v[0]) : Number(v)) === catId);
+      }
+      // Many2one pos_categ_id — [id, "name"] or integer or false
+      if (Array.isArray(p.pos_categ_id) && p.pos_categ_id.length > 0) return Number(p.pos_categ_id[0]) === catId;
+      if (typeof p.pos_categ_id === 'number') return p.pos_categ_id === catId;
+      // Fallback: internal categ_id
+      if (Array.isArray(p.categ_id) && p.categ_id.length > 0) return Number(p.categ_id[0]) === catId;
+      if (typeof p.categ_id === 'number') return p.categ_id === catId;
+      return false;
     });
     setPosFilteredProducts(filtered);
   }, [selectedPosCategoryId, showProducts, allCachedProducts]);
@@ -305,6 +316,14 @@ const POSProducts = ({ navigation, route }) => {
   }, [route?.params?.orderId, addProduct]);
 
   const openQuickAdd = useCallback((p) => {
+    const cartItems = useProductStore.getState().getCurrentCart() || [];
+    const alreadyInCart = cartItems.some(
+      (it) => it.id === p.id || it.remoteId === p.id
+    );
+    if (alreadyInCart) {
+      Toast.show({ type: 'info', text1: 'Already in cart', text2: `${p.product_name || p.name || 'Item'} is already added`, visibilityTime: 1500 });
+      return;
+    }
     setConfirmVisible(false);
     setQuickProduct(p);
     setQuickQty(1);
@@ -383,7 +402,9 @@ const POSProducts = ({ navigation, route }) => {
     const handleDecrease = async () => {
       const orderId = route?.params?.orderId;
       if (qty <= 1) {
+        const removedName = item.name || item.product_id?.[1] || 'Item';
         removeProduct(item.id);
+        Toast.show({ type: 'info', text1: `${removedName} removed`, visibilityTime: 1500 });
         if (orderId && String(item.id).startsWith('odoo_line_')) {
           const lineId = Number(String(item.id).replace('odoo_line_', ''));
           try { await removeOrderLineOdoo({ lineId, orderId }); } catch (e) {}
@@ -406,6 +427,20 @@ const POSProducts = ({ navigation, route }) => {
       }
     };
 
+    const handleDelete = async () => {
+      const removedName = item.name || item.product_id?.[1] || 'Item';
+      removeProduct(item.id);
+      Toast.show({ type: 'info', text1: `${removedName} removed`, visibilityTime: 1500 });
+      const orderId = route?.params?.orderId;
+      if (orderId && String(item.id).startsWith('odoo_line_')) {
+        const lineId = Number(String(item.id).replace('odoo_line_', ''));
+        try { await removeOrderLineOdoo({ lineId, orderId }); } catch (e) {}
+        try { await refreshServerOrder(orderId); } catch (_) {}
+      } else if (orderId) {
+        try { await refreshServerOrder(orderId); } catch (_) {}
+      }
+    };
+
     return (
       <View style={localStyles.orderLineRow}>
         <View style={{ flex: 1 }}>
@@ -413,6 +448,9 @@ const POSProducts = ({ navigation, route }) => {
           <Text style={localStyles.orderLinePrice}>{formatCurrency(unit).replace(/^\w+\s/, '')} each</Text>
         </View>
         <View style={localStyles.orderLineControls}>
+          <TouchableOpacity onPress={handleDelete} style={localStyles.deleteBtn}>
+            <MaterialCommunityIcons name="delete-outline" size={20} color="#dc2626" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={handleDecrease} style={localStyles.orderLineBtn}>
             <Text style={localStyles.orderLineBtnText}>-</Text>
           </TouchableOpacity>
@@ -631,6 +669,7 @@ const POSProducts = ({ navigation, route }) => {
                 </View>
               </View>
             )}
+            <Toast />
           </SafeAreaView>
         </Modal>
       </View>

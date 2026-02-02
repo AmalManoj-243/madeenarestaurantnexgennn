@@ -265,8 +265,7 @@ const CustomerDetails = ({ navigation, route }) => {
         if (customerId) {
           await clearCartFromStorage(customerId);
         }
-        // Navigate to DirectInvoiceScreen with the found quotation ID
-        navigation.navigate('DirectInvoiceScreen', { quotation_id: quotationId });
+        navigation.goBack();
       } else {
         Toast.show({
           type: 'error',

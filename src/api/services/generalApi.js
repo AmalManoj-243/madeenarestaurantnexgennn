@@ -56,15 +56,17 @@ export const fetchProductsByPosCategoryId = async (posCategoryId) => {
     const catId = Number(posCategoryId);
     // Filter from cache — instant, no network call
     const filtered = _allProductsCache.filter(p => {
-      // Check pos_categ_ids (Many2many - array of IDs) for Odoo 18/19
+      // Many2many pos_categ_ids — could be [1,2,3] or [[1,"name"],[2,"name"]]
       if (Array.isArray(p.pos_categ_ids) && p.pos_categ_ids.length > 0) {
-        return p.pos_categ_ids.includes(catId);
+        return p.pos_categ_ids.some(v => (Array.isArray(v) ? Number(v[0]) : Number(v)) === catId);
       }
-      // Fallback: check pos_categ_id (Many2one) for older Odoo
-      if (Array.isArray(p.pos_categ_id)) {
-        return p.pos_categ_id[0] === catId;
-      }
-      return p.pos_categ_id === catId;
+      // Many2one pos_categ_id — [id, "name"] or integer or false
+      if (Array.isArray(p.pos_categ_id) && p.pos_categ_id.length > 0) return Number(p.pos_categ_id[0]) === catId;
+      if (typeof p.pos_categ_id === 'number') return p.pos_categ_id === catId;
+      // Fallback: internal categ_id
+      if (Array.isArray(p.categ_id) && p.categ_id.length > 0) return Number(p.categ_id[0]) === catId;
+      if (typeof p.categ_id === 'number') return p.categ_id === catId;
+      return false;
     });
     return filtered;
   } catch (error) {

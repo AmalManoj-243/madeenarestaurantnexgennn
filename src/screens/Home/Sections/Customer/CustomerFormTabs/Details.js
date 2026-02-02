@@ -106,17 +106,10 @@ const Details = ({ formData, onFieldChange, errors }) => {
     );
   };
 
-  // 🔹 Navigate to OCR screen
-  const handleOpenOcr = () => {
-    navigation.navigate('LiveOcr');
-  };
+  const handleOpenOcr = () => {};
 
   return (
     <RoundedScrollContainer>
-      {/* 🔹 OCR Button for scanning business cards */}
-      <TouchableOpacity style={styles.ocrButton} onPress={handleOpenOcr}>
-        <Text style={styles.ocrButtonText}>Scan with OCR</Text>
-      </TouchableOpacity>
 
       <FormInput
         label={"Customer Type "}

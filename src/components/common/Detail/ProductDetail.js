@@ -4,95 +4,38 @@ import Text from '@components/Text';
 import { RoundedScrollContainer, SafeAreaView } from '@components/containers';
 import { NavigationHeader } from '@components/Header';
 import { COLORS, FONT_FAMILY } from '@constants/theme';
-import { fetchInventoryDetailsByName, fetchProductDetails } from '@api/details/detailApi';
+import { fetchProductDetails } from '@api/details/detailApi';
 import { fetchProductDetailsOdoo } from '@api/services/generalApi';
 import { showToastMessage } from '@components/Toast';
 import { useAuthStore } from '@stores/auth';
 import { OverlayLoader } from '@components/Loader';
-import { CustomListModal, EmployeeListModal } from '@components/Modal';
-import { reasons } from '@constants/dropdownConst';
-import { fetchEmployeesDropdown } from '@api/dropdowns/dropdownApi';
-import { Button } from '../Button';
 import { useProductStore } from '@stores/product';
 import { useCurrencyStore } from '@stores/currency';
 
 const ProductDetail = ({ navigation, route }) => {
   const { detail = {}, fromCustomerDetails = {} } = route?.params || {};
-  useEffect(() => {
-    // Debug log to show product details data for troubleshooting
-  }, [details]);
   const [details, setDetails] = useState({});
   const [loading, setLoading] = useState(false);
-  const [getDetail, setGetDetail] = useState(null);
-  const [isVisibleCustomListModal, setIsVisibleCustomListModal] = useState(false);
-  const [isVisibleEmployeeListModal, setIsVisibleEmployeeListModal] = useState(false);
-  const [employee, setEmployee] = useState([]);
   const currentUser = useAuthStore(state => state.user);
   const currency = useCurrencyStore((state) => state.currency);
 
   const addProductStore = useProductStore((state) => state.addProduct);
 
-  const isResponsibleOrEmployee = (inventoryDetails) => {
-    const responsiblePersonId = inventoryDetails?.responsible_person?._id;
-    const employeeIds = inventoryDetails?.employees?.map((employee) => employee._id) || [];
-    const tempAssigneeIds = inventoryDetails?.temp_assignee?.map((tempAssignee) => tempAssignee._id) || [];
-
-    return (
-      currentUser &&
-      (currentUser.related_profile._id === responsiblePersonId ||
-        employeeIds.includes(currentUser.related_profile._id) ||
-        tempAssigneeIds.includes(currentUser.related_profile._id))
-    );
-  };
-
-  // 🔹 Detect if this is an Odoo product (id but no _id)
+  // Detect if this is an Odoo product (id but no _id)
   const isOdooProduct = !!detail.id && !detail._id;
-
-  // 🔹 Load employees (same as before)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const employeeDropdown = await fetchEmployeesDropdown();
-        const extract = employeeDropdown.map((employee) => ({
-          id: employee._id,
-          label: employee.name,
-        }));
-        setEmployee(extract);
-      } catch (error) {
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleBoxOpeningRequest = (value) => {
-    if (value) {
-      navigation.navigate("InventoryForm", {
-        reason: value,
-        inventoryDetails: getDetail,
-      });
-    }
-  };
-
-  const handleSelectTemporaryAssignee = (value) => {
-    // console.log("🚀 ~ handleSelectTemporaryAssignee ~ value:", value);
-  };
 
   const productDetails = async () => {
     try {
       const productId = detail?._id;
-      if (!productId) {
-      }
+      if (!productId) return;
       const response = await fetchProductDetails(productId);
       setDetails(response[0] || {});
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
-  // 🔹 Initialise `details` depending on source (Odoo vs existing backend)
+  // Initialise `details` depending on source (Odoo vs existing backend)
   useEffect(() => {
     if (isOdooProduct) {
-      // Coming from Odoo JSON-RPC list — fetch richer details and inventory
       const loadOdooDetails = async () => {
         setLoading(true);
         try {
@@ -107,13 +50,11 @@ const ProductDetail = ({ navigation, route }) => {
             minimal_sales_price: od?.minimal_sales_price ?? null,
             inventory_ledgers: od?.inventory_ledgers || [],
             total_product_quantity: od?.total_product_quantity ?? 0,
-            inventory_box_products_details: od?.inventory_box_products_details || [],
             product_code: od?.product_code || detail.code || detail.default_code || null,
             uom: od?.uom || detail.uom || null,
             categ_id: od?.categ_id || detail.categ_id || null,
           });
         } catch (e) {
-          // fallback minimal mapping
           setDetails({
             ...detail,
             id: detail.id,
@@ -130,46 +71,16 @@ const ProductDetail = ({ navigation, route }) => {
           setLoading(false);
         }
       };
-
       loadOdooDetails();
     } else if (detail?._id) {
-      // Old behaviour (your existing Node backend product)
       productDetails();
     } else {
       setDetails(detail || {});
     }
   }, [detail, isOdooProduct]);
 
-  const handleBoxNamePress = async (boxName, warehouseId) => {
-    setLoading(true);
-    try {
-      const inventoryDetails = await fetchInventoryDetailsByName(
-        boxName,
-        warehouseId
-      );
-      if (inventoryDetails.length > 0) {
-        const d = inventoryDetails[0];
-        setGetDetail(d);
-        if (isResponsibleOrEmployee(d)) {
-          setIsVisibleCustomListModal(true);
-        } else {
-          navigation.navigate("InventoryDetails", {
-            inventoryDetails: d,
-          });
-        }
-      } else {
-        showToastMessage("No inventory box found for this box no");
-      }
-    } catch (error) {
-      showToastMessage("Error fetching inventory details");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const renderStockDetails = () => {
     const { inventory_ledgers = [] } = details || {};
-    // Filter out inventory adjustment entries
     const filteredLedgers = inventory_ledgers.filter(
       l => l?.warehouse_name?.toLowerCase() !== 'inv adj' && l?.warehouse_name?.toLowerCase() !== 'inventory adjustment'
     );
@@ -213,73 +124,9 @@ const ProductDetail = ({ navigation, route }) => {
     );
   };
 
-  const renderInventoryBoxDetails = () => {
-    if (details?.inventory_box_products_details?.length > 0) {
-      return (
-        <View style={{ marginTop: 10, marginLeft: 10 }}>
-          <Text style={{ fontFamily: FONT_FAMILY.urbanistBold, fontSize: 16 }}>
-            Inventory Box Details:
-          </Text>
-          {details.inventory_box_products_details.map((boxDetail, index) => {
-            const boxNames = Array.isArray(boxDetail.box_name) ? boxDetail.box_name : [(boxDetail.box_name || '-')];
-            return boxNames.map((boxName, idx) => (
-              <View
-                key={`${index}-${idx}`}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: FONT_FAMILY.urbanistBold,
-                    color: COLORS.orange,
-                    fontSize: 16,
-                    flex: 1,
-                  }}
-                >
-                  {boxDetail?.warehouse_name || '-'}
-                </Text>
-
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={{
-                    marginTop: 0,
-                    paddingVertical: 10,
-                    paddingHorizontal: 12,
-                    width: '48%',
-                    alignItems: 'center',
-                    borderRadius: 8,
-                    backgroundColor: COLORS.lightGray,
-                  }}
-                  onPress={() => handleBoxNamePress(boxName, boxDetail?.warehouse_id ? boxDetail?.warehouse_id : '')}
-                >
-                  <Text
-                    style={{
-                      fontFamily: FONT_FAMILY.urbanistBold,
-                      color: COLORS.orange,
-                      fontSize: 15,
-                    }}
-                  >
-                    Box Name: {boxName}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ));
-          })}
-        </View>
-      );
-    } else {
-      return null;
-    }
-  };
-
   const handleAddProduct = () => {
     const { getCurrentCart, addProduct, setCurrentCustomer } = useProductStore.getState();
 
-    // Ensure we have a current customer set (when coming from CustomerDetails)
     if (Object.keys(fromCustomerDetails).length > 0) {
       const customerId = fromCustomerDetails.id || fromCustomerDetails._id;
       if (customerId) {
@@ -289,22 +136,17 @@ const ProductDetail = ({ navigation, route }) => {
 
     const currentProducts = getCurrentCart();
 
-    // 🔹 Normalize UOM structure for cart
     let uomData = null;
     if (details?.uom?.uom_id) {
-      // Already { uom_id, uom_name }
       uomData = details.uom;
     } else if (Array.isArray(details?.uom) && details.uom.length >= 2) {
-      // Odoo many2one [id, name]
       uomData = { uom_id: details.uom[0], uom_name: details.uom[1] };
     }
 
     const newProduct = {
       id: details.id ?? details._id,
       name: details.product_name || details.name,
-      // default 1, user will edit in cart screen
       quantity: 1,
-      // prefer cost; fall back to price
       price: details.cost ?? details.price ?? 0,
       imageUrl: details.image_url,
       uom: uomData,
@@ -331,7 +173,6 @@ const ProductDetail = ({ navigation, route }) => {
 
   const handleAddToPosCart = () => {
     const { getCurrentCart, addProduct, setCurrentCustomer } = useProductStore.getState();
-    // ensure pos_guest cart owner
     setCurrentCustomer('pos_guest');
 
     const currentProducts = getCurrentCart();
@@ -379,9 +220,7 @@ const ProductDetail = ({ navigation, route }) => {
                     <Image
                       source={
                         details.image_url
-                          ? (typeof details.image_url === 'string' && !details.image_url.startsWith('data:') && details.image_url.length > 100
-                              ? { uri: details.image_url }
-                              : { uri: details.image_url })
+                          ? { uri: details.image_url }
                           : require('@assets/images/error/error.png')
                       }
                       style={{ width: '100%', height: 260 }}
@@ -432,11 +271,9 @@ const ProductDetail = ({ navigation, route }) => {
                     </Text>
                     <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold, fontSize: 18 }}>
                       {
-                        details?.category?.category_name          // old backend
-                        || (Array.isArray(details?.categ_id)      // Odoo many2one
-                            ? details.categ_id[1]
-                            : null)
-                        || details?.category_name                 // if you mapped this in fetchProductsOdoo
+                        details?.category?.category_name
+                        || (Array.isArray(details?.categ_id) ? details.categ_id[1] : null)
+                        || details?.category_name
                         || 'N/A'
                       }
                     </Text>
@@ -469,7 +306,6 @@ const ProductDetail = ({ navigation, route }) => {
                     </Text>
                   </View>
 
-                  {/* Stocks on hand field */}
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 12 }}>
                     <Text style={{ width: '50%', fontFamily: FONT_FAMILY.urbanistSemiBold, fontSize: 18 }}>
                       Stocks on hand:
@@ -481,7 +317,6 @@ const ProductDetail = ({ navigation, route }) => {
                 </View>
               )}
 
-              {/* Always show category and price at top for POS */}
               {route?.params?.fromPOS && (
                 <View style={{ marginBottom: 12 }}>
                   <Text style={{ fontFamily: FONT_FAMILY.urbanistSemiBold, fontSize: 18 }}>
@@ -498,10 +333,8 @@ const ProductDetail = ({ navigation, route }) => {
             </View>
 
             {renderStockDetails()}
-            {renderInventoryBoxDetails()}
 
             <View style={{ flex: 1 }} />
-            {/* Add-to-cart button removed per request (hotel product details view) */}
           </>
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -534,26 +367,6 @@ const ProductDetail = ({ navigation, route }) => {
           />
         </View>
       </Modal>
-
-      <CustomListModal
-        isVisible={isVisibleCustomListModal}
-        items={reasons}
-        title="Select Reason"
-        onClose={() => setIsVisibleCustomListModal(false)}
-        onValueChange={handleBoxOpeningRequest}
-        onAdd={() => {
-          setIsVisibleEmployeeListModal(true);
-          setIsVisibleCustomListModal(false);
-        }}
-      />
-      <EmployeeListModal
-        isVisible={isVisibleEmployeeListModal}
-        items={employee}
-        boxId={getDetail?._id}
-        title="Select Assignee"
-        onClose={() => setIsVisibleEmployeeListModal(false)}
-        onValueChange={handleSelectTemporaryAssignee}
-      />
 
       {loading && <OverlayLoader visible={true} backgroundColor={true} />}
     </SafeAreaView>
