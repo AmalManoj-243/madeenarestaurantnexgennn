@@ -4,7 +4,7 @@ import { create } from 'zustand';
 const getItemKey = (it) => {
   if (Number.isInteger(it?.remoteId)) return `p_${it.remoteId}`;
   if (Array.isArray(it?.product_id) && Number.isInteger(it.product_id[0])) return `p_${it.product_id[0]}`;
-  if (Number.isInteger(it?.id)) return `id_${it.id}`;
+  if (Number.isInteger(it?.id)) return `p_${it.id}`;
   const name = it?.name || (Array.isArray(it?.product_id) ? it.product_id[1] : 'Item');
   return `n_${name}`;
 };
@@ -41,10 +41,12 @@ const useKitchenTickets = create((set, get) => ({
     const prev = get().snapshots[orderId] || {};
     const curr = normalizeLines(currentItems);
     const delta = [];
+    const seen = new Set();
     const nameFrom = (it) => it?.name || (Array.isArray(it?.product_id) ? it.product_id[1] : 'Item');
-    // Build by product keys from current items only (new adds)
     currentItems.forEach((it) => {
       const key = getItemKey(it);
+      if (seen.has(key)) return;
+      seen.add(key);
       const c = curr[key] || 0;
       const p = prev[key] || 0;
       const diff = c - p;
